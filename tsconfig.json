@@ -1,6 +1,17 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/modules/core/*"],
+      "@auth/*": ["src/modules/auth/*"],
+      "@habits/*": ["src/modules/habits/*"],
+      "@checkin/*": ["src/modules/check-in/*"],
+      "@commitment/*": ["src/modules/commitment/*"],
+      "@progression/*": ["src/modules/progression/*"],
+      "@shared/*": ["src/shared/*"]
+    }
   }
 }
