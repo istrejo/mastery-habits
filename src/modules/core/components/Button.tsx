@@ -1,0 +1,89 @@
+import React from 'react';
+import {
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  type ViewStyle,
+} from 'react-native';
+import { useTheme } from '@core/theming';
+
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg';
+
+interface ButtonProps {
+  label: string;
+  onPress: () => void;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  disabled?: boolean;
+  loading?: boolean;
+  style?: ViewStyle;
+}
+
+export const Button: React.FC<ButtonProps> = ({
+  label,
+  onPress,
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  loading = false,
+  style,
+}) => {
+  const t = useTheme();
+
+  const paddingMap: Record<ButtonSize, { v: number; h: number }> = {
+    sm: { v: 8, h: 14 },
+    md: { v: 12, h: 20 },
+    lg: { v: 16, h: 28 },
+  };
+  const fontSizeMap: Record<ButtonSize, number> = { sm: 13, md: 15, lg: 17 };
+
+  const pad = paddingMap[size];
+
+  const bgColor = {
+    primary: t.accent.primary,
+    secondary: t.bg.surfaceAlt,
+    ghost: 'transparent',
+    danger: t.status.danger,
+  }[variant];
+
+  const textColor = {
+    primary: t.accent.onPrimary,
+    secondary: t.text.primary,
+    ghost: t.text.primary,
+    danger: t.text.inverse,
+  }[variant];
+
+  const borderProps: ViewStyle =
+    variant === 'secondary'
+      ? { borderWidth: t.borderWidth.default, borderColor: t.border.default }
+      : {};
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled || loading}
+      style={[
+        {
+          backgroundColor: bgColor,
+          borderRadius: t.radius.md,
+          paddingVertical: pad.v,
+          paddingHorizontal: pad.h,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: disabled ? 0.4 : 1,
+        },
+        borderProps,
+        style,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={textColor} />
+      ) : (
+        <Text style={{ color: textColor, fontWeight: '600', fontSize: fontSizeMap[size] }}>
+          {label}
+        </Text>
+      )}
+    </TouchableOpacity>
+  );
+};

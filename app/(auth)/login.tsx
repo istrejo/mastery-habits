@@ -1,10 +1,10 @@
 import { Text } from "react-native";
 import { Screen } from "@core/components";
 
-export default function HomeScreen() {
+export default function LoginScreen() {
   return (
     <Screen>
-      <Text>Mastery Habits — Phase 4</Text>
+      <Text>Login — Phase 3</Text>
     </Screen>
   );
 }
