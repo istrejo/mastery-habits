@@ -8,15 +8,20 @@ import { Screen, Input, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 
 const schema = z.object({
+  displayName: z.string().min(2, "Mínimo 2 caracteres").max(40),
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Mínimo 6 caracteres"),
+  confirmPassword: z.string(),
+}).refine((d) => d.password === d.confirmPassword, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const t = useTheme();
-  const { signIn, loading, error } = useAuth();
+  const { signUp, loading, error } = useAuth();
 
   const {
     control,
@@ -25,7 +30,7 @@ export default function LoginScreen() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = (data: FormData) => {
-    signIn(data.email, data.password);
+    signUp(data.email, data.password, data.displayName);
   };
 
   return (
@@ -34,17 +39,32 @@ export default function LoginScreen() {
         <Text
           style={{
             color: t.text.primary,
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: "800",
             marginBottom: 6,
             fontFamily: t.typography.displayFontFamily,
           }}
         >
-          Mastery Habits
+          Crear cuenta
         </Text>
         <Text style={{ color: t.text.secondary, fontSize: 15, marginBottom: 40 }}>
-          Cultivá disciplina real.
+          Empezá tu camino hacia la maestría.
         </Text>
+
+        <Controller
+          control={control}
+          name="displayName"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="Nombre"
+              onChangeText={onChange}
+              value={value}
+              autoComplete="name"
+              error={errors.displayName?.message}
+              containerStyle={{ marginBottom: 16 }}
+            />
+          )}
+        />
 
         <Controller
           control={control}
@@ -72,8 +92,24 @@ export default function LoginScreen() {
               onChangeText={onChange}
               value={value}
               secureTextEntry
-              autoComplete="current-password"
+              autoComplete="new-password"
               error={errors.password?.message}
+              containerStyle={{ marginBottom: 16 }}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="confirmPassword"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="Confirmar contraseña"
+              onChangeText={onChange}
+              value={value}
+              secureTextEntry
+              autoComplete="new-password"
+              error={errors.confirmPassword?.message}
               containerStyle={{ marginBottom: 24 }}
             />
           )}
@@ -86,15 +122,15 @@ export default function LoginScreen() {
         ) : null}
 
         <Button
-          label="Iniciar sesión"
+          label="Crear cuenta"
           onPress={handleSubmit(onSubmit)}
           loading={loading}
           style={{ marginBottom: 16 }}
         />
 
-        <Link href="/(auth)/signup" asChild>
+        <Link href="/(auth)/login" asChild>
           <Text style={{ color: t.accent.primary, textAlign: "center", fontSize: 14 }}>
-            ¿No tenés cuenta? Registrate
+            ¿Ya tenés cuenta? Iniciá sesión
           </Text>
         </Link>
       </View>
