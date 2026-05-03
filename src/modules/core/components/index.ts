@@ -4,3 +4,4 @@ export { Input } from './Input';
 export { Modal } from './Modal';
 export { ProgressBar } from './ProgressBar';
 export { Screen } from './Screen';
+export { Skeleton } from './Skeleton';
