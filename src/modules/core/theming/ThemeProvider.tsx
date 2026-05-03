@@ -8,7 +8,7 @@ import { cyberpunkTheme } from './themes/cyberpunk.theme';
 import { terminalPhosphorTheme } from './themes/terminalPhosphor.theme';
 import type { ThemeId, ThemeTokens } from './types';
 
-const THEMES: Record<ThemeId, ThemeTokens> = {
+export const THEMES: Record<ThemeId, ThemeTokens> = {
   'tech-neon': techNeonTheme,
   'organic-growth': organicGrowthTheme,
   'minimal-light': minimalLightTheme,

@@ -4,5 +4,4 @@ export interface Level {
   emoji: string;
   min: number;
   max: number;
-  color: string;
 }

@@ -84,7 +84,7 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
             opacity: loading ? 0.6 : 1,
           })}
         >
-          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>
+          <Text style={{ color: t.text.inverse, fontSize: 16, fontWeight: '700' }}>
             ✓ Completar hoy
           </Text>
         </Pressable>
@@ -138,7 +138,7 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
                 }}
                 style={{ flex: 1, padding: 12, borderRadius: t.radius.md, backgroundColor: t.status.skip, alignItems: 'center' }}
               >
-                <Text style={{ color: '#fff', fontWeight: '700' }}>Confirmar</Text>
+                <Text style={{ color: t.text.inverse, fontWeight: '700' }}>Confirmar</Text>
               </Pressable>
             </View>
           </View>

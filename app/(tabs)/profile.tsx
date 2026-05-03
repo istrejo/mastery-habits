@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { View, Text, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { Screen, Card, Button, Skeleton } from "@core/components";
-import { useTheme } from "@core/theming";
+import { Screen, Card, Button, Skeleton, ThemePicker } from "@core/components";
+import { useTheme, type MasteryLevel } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
 import { authService } from "@auth/services/auth.service";
 import { useHabits } from "@habits/index";
@@ -112,7 +112,7 @@ export default function ProfileScreen() {
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={{ fontSize: 16 }}>{globalLevel.emoji}</Text>
-              <Text style={{ color: globalLevel.color, fontSize: 13, fontWeight: '600' }}>
+              <Text style={{ color: t.level[globalLevel.key as MasteryLevel].fg, fontSize: 13, fontWeight: '600' }}>
                 {globalLevel.label}
               </Text>
               <Text style={{ color: t.text.tertiary, fontSize: 13 }}>
@@ -135,7 +135,7 @@ export default function ProfileScreen() {
             const level = getLevel(key === 'ancient' ? 100 : key === 'forest' ? 80 : key === 'tree' ? 58 : key === 'sprout' ? 33 : 10);
             return (
               <View key={key} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <Text style={{ color: level.color, fontSize: 13 }}>
+                <Text style={{ color: t.level[level.key as MasteryLevel].fg, fontSize: 13 }}>
                   {level.emoji} {level.label}
                 </Text>
                 <Text style={{ color: t.text.secondary, fontSize: 13, fontWeight: '600' }}>
@@ -146,6 +146,14 @@ export default function ProfileScreen() {
           })}
         </Card>
       )}
+
+      {/* Theme picker */}
+      <Card style={{ marginBottom: 16 }}>
+        <Text style={{ color: t.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+          TEMA
+        </Text>
+        <ThemePicker />
+      </Card>
 
       <Button
         label={loggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}

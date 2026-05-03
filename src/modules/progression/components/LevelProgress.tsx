@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, type ViewStyle } from 'react-native';
-import { useTheme } from '@core/theming';
+import { useTheme, type MasteryLevel } from '@core/theming';
 import { getLevel, getLevelProgress } from '../utils/getLevel';
 import { LEVELS } from '../utils/LEVELS';
 
@@ -13,6 +13,7 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
   const t = useTheme();
   const level = getLevel(score);
   const progress = getLevelProgress(score);
+  const lv = t.level[level.key as MasteryLevel];
   const currentIndex = LEVELS.findIndex((l) => l.key === level.key);
   const nextLevel = currentIndex < LEVELS.length - 1 ? LEVELS[currentIndex + 1] : null;
 
@@ -25,7 +26,7 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
           marginBottom: 6,
         }}
       >
-        <Text style={{ fontSize: 12, color: level.color, fontWeight: '600' }}>
+        <Text style={{ fontSize: 12, color: lv.fg, fontWeight: '600' }}>
           {level.emoji} {level.label}
         </Text>
         {nextLevel && (
@@ -46,7 +47,7 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
           style={{
             width: `${progress * 100}%`,
             height: '100%',
-            backgroundColor: level.color,
+            backgroundColor: lv.fg,
             borderRadius: t.radius.pill,
           }}
         />
