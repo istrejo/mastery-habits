@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, ActivityIndicator, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { format, subDays } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { Screen, Button, Card } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useHabit, useHabits, HabitForm } from "@habits/index";
@@ -9,29 +10,25 @@ import type { HabitInsert } from "@habits/index";
 import { useCheckIn, CheckInButton } from "@checkin/index";
 import { LevelProgress, MasteryBadge } from "@progression/index";
 
-const DAY_NAMES: Record<number, string> = {
-  1: 'Lun', 2: 'Mar', 3: 'Mié', 4: 'Jue', 5: 'Vie', 6: 'Sáb', 7: 'Dom',
-};
-
 function CheckInGrid({ checkIns }: { checkIns: { check_date: string; status: string }[] }) {
-  const t = useTheme();
+  const theme = useTheme();
   const today = new Date();
   const days = Array.from({ length: 30 }, (_, i) => {
     const date = subDays(today, 29 - i);
-    const dateStr = format(date, 'yyyy-MM-dd');
+    const dateStr = format(date, "yyyy-MM-dd");
     const record = checkIns.find((c) => c.check_date === dateStr);
     return { dateStr, status: record?.status ?? null };
   });
 
   const colorForStatus = (status: string | null) => {
-    if (status === 'completed') return t.status.success;
-    if (status === 'skipped') return t.status.skip;
-    if (status === 'missed') return t.status.danger;
-    return t.bg.surfaceAlt;
+    if (status === "completed") return theme.status.success;
+    if (status === "skipped") return theme.status.skip;
+    if (status === "missed") return theme.status.danger;
+    return theme.bg.surfaceAlt;
   };
 
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
       {days.map((d) => (
         <View
           key={d.dateStr}
@@ -49,7 +46,8 @@ function CheckInGrid({ checkIns }: { checkIns: { check_date: string; status: str
 
 export default function HabitDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const t = useTheme();
+  const theme = useTheme();
+  const { t } = useTranslation();
   const router = useRouter();
   const { habit, loading, error, updateHabit } = useHabit(id);
   const { archiveHabit } = useHabits();
@@ -67,6 +65,16 @@ export default function HabitDetailScreen() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const DAY_NAMES: Record<number, string> = {
+    1: t("habit_detail.day_mon"),
+    2: t("habit_detail.day_tue"),
+    3: t("habit_detail.day_wed"),
+    4: t("habit_detail.day_thu"),
+    5: t("habit_detail.day_fri"),
+    6: t("habit_detail.day_sat"),
+    7: t("habit_detail.day_sun"),
+  };
+
   const handleUpdate = async (data: HabitInsert) => {
     setSaving(true);
     await updateHabit(data);
@@ -76,16 +84,16 @@ export default function HabitDetailScreen() {
 
   const handleArchive = () => {
     Alert.alert(
-      'Archivar hábito',
-      '¿Confirmás? El hábito dejará de aparecer en tu lista.',
+      t("habit_detail.archive_title"),
+      t("habit_detail.archive_body"),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: 'Archivar',
-          style: 'destructive',
+          text: t("habit_detail.archive_button"),
+          style: "destructive",
           onPress: async () => {
             await archiveHabit(id);
-            router.replace('/(tabs)');
+            router.replace("/(tabs)");
           },
         },
       ]
@@ -95,7 +103,7 @@ export default function HabitDetailScreen() {
   if (loading) {
     return (
       <Screen>
-        <ActivityIndicator color={t.accent.primary} style={{ marginTop: 40 }} />
+        <ActivityIndicator color={theme.accent.primary} style={{ marginTop: 40 }} />
       </Screen>
     );
   }
@@ -103,7 +111,7 @@ export default function HabitDetailScreen() {
   if (error || !habit) {
     return (
       <Screen>
-        <Text style={{ color: t.status.danger }}>{error ?? 'Hábito no encontrado'}</Text>
+        <Text style={{ color: theme.status.danger }}>{error ?? t("habit_detail.not_found")}</Text>
       </Screen>
     );
   }
@@ -113,30 +121,30 @@ export default function HabitDetailScreen() {
 
   return (
     <Screen scrollable>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, gap: 12 }}>
-        <Text onPress={() => router.back()} style={{ color: t.accent.primary, fontSize: 15 }}>
-          ← Volver
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24, gap: 12 }}>
+        <Text onPress={() => router.back()} style={{ color: theme.accent.primary, fontSize: 15 }}>
+          {t("common.back")}
         </Text>
       </View>
 
       {editing ? (
         <>
-          <Text style={{ color: t.text.primary, fontSize: 20, fontWeight: '700', marginBottom: 20 }}>
-            Editar hábito
+          <Text style={{ color: theme.text.primary, fontSize: 20, fontWeight: "700", marginBottom: 20 }}>
+            {t("habit_detail.edit_title")}
           </Text>
           <HabitForm
             defaultValues={{
               name: habit.name,
-              description: habit.description ?? '',
-              category: habit.category ?? '',
+              description: habit.description ?? "",
+              category: habit.category ?? "",
               frequency_days: days,
             }}
             onSubmit={handleUpdate}
-            submitLabel="Guardar cambios"
+            submitLabel={t("habit_detail.save_changes")}
             loading={saving}
           />
           <Button
-            label="Cancelar"
+            label={t("common.cancel")}
             variant="ghost"
             onPress={() => setEditing(false)}
             style={{ marginTop: 8 }}
@@ -146,26 +154,26 @@ export default function HabitDetailScreen() {
         <>
           {/* Header */}
           <Card style={{ marginBottom: 16 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-              <Text style={{ color: t.text.primary, fontSize: 22, fontWeight: '800', flex: 1 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+              <Text style={{ color: theme.text.primary, fontSize: 22, fontWeight: "800", flex: 1 }}>
                 {habit.name}
               </Text>
               <MasteryBadge score={score} style={{ marginLeft: 8 }} />
             </View>
             {habit.description ? (
-              <Text style={{ color: t.text.secondary, fontSize: 14, marginBottom: 8 }}>
+              <Text style={{ color: theme.text.secondary, fontSize: 14, marginBottom: 8 }}>
                 {habit.description}
               </Text>
             ) : null}
             {habit.category ? (
               <View style={{
-                alignSelf: 'flex-start',
-                backgroundColor: t.accent.muted,
-                borderRadius: t.radius.sm,
+                alignSelf: "flex-start",
+                backgroundColor: theme.accent.muted,
+                borderRadius: theme.radius.sm,
                 paddingHorizontal: 8,
                 paddingVertical: 2,
               }}>
-                <Text style={{ color: t.accent.primary, fontSize: 11, fontWeight: '600' }}>
+                <Text style={{ color: theme.accent.primary, fontSize: 11, fontWeight: "600" }}>
                   {habit.category}
                 </Text>
               </View>
@@ -174,15 +182,15 @@ export default function HabitDetailScreen() {
 
           {/* Score */}
           <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: t.text.tertiary, fontSize: 11, fontWeight: '600', letterSpacing: 1, marginBottom: 12 }}>
-              COMMITMENT SCORE
+            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+              {t("habit_detail.commitment_score")}
             </Text>
             <Text style={{
-              color: score >= 71 ? t.score.excellent : score >= 46 ? t.score.good : score >= 21 ? t.score.warning : t.score.critical,
+              color: score >= 71 ? theme.score.excellent : score >= 46 ? theme.score.good : score >= 21 ? theme.score.warning : theme.score.critical,
               fontSize: 48,
-              fontWeight: '800',
-              fontVariant: ['tabular-nums'],
-              fontFamily: t.typography.displayFontFamily,
+              fontWeight: "800",
+              fontVariant: ["tabular-nums"],
+              fontFamily: theme.typography.displayFontFamily,
               marginBottom: 16,
             }}>
               {score.toFixed(1)}
@@ -192,8 +200,8 @@ export default function HabitDetailScreen() {
 
           {/* Check-in */}
           <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: t.text.tertiary, fontSize: 11, fontWeight: '600', letterSpacing: 1, marginBottom: 12 }}>
-              HOY
+            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+              {t("habit_detail.today_section")}
             </Text>
             <CheckInButton
               canCheckIn={canCheckInToday}
@@ -208,18 +216,18 @@ export default function HabitDetailScreen() {
 
           {/* History */}
           <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: t.text.tertiary, fontSize: 11, fontWeight: '600', letterSpacing: 1, marginBottom: 12 }}>
-              ÚLTIMOS 30 DÍAS
+            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+              {t("habit_detail.history_section")}
             </Text>
-            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 10 }}>
+            <View style={{ flexDirection: "row", gap: 12, marginBottom: 10 }}>
               {[
-                { color: t.status.success, label: 'Completado' },
-                { color: t.status.skip, label: 'Skip' },
-                { color: t.status.danger, label: 'Fallado' },
+                { color: theme.status.success, label: t("habit_detail.legend_completed") },
+                { color: theme.status.skip, label: t("habit_detail.legend_skip") },
+                { color: theme.status.danger, label: t("habit_detail.legend_missed") },
               ].map((item) => (
-                <View key={item.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View key={item.label} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                   <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: item.color }} />
-                  <Text style={{ color: t.text.tertiary, fontSize: 11 }}>{item.label}</Text>
+                  <Text style={{ color: theme.text.tertiary, fontSize: 11 }}>{item.label}</Text>
                 </View>
               ))}
             </View>
@@ -228,16 +236,16 @@ export default function HabitDetailScreen() {
 
           {/* Frequency */}
           <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: t.text.tertiary, fontSize: 11, fontWeight: '600', letterSpacing: 1, marginBottom: 6 }}>
-              FRECUENCIA
+            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 6 }}>
+              {t("habit_detail.frequency_section")}
             </Text>
-            <Text style={{ color: t.text.secondary, fontSize: 14 }}>
-              {days.map((d) => DAY_NAMES[d]).join(' · ')}
+            <Text style={{ color: theme.text.secondary, fontSize: 14 }}>
+              {days.map((d) => DAY_NAMES[d]).join(" · ")}
             </Text>
           </Card>
 
-          <Button label="Editar" variant="secondary" onPress={() => setEditing(true)} style={{ marginBottom: 8 }} />
-          <Button label="Archivar" variant="danger" onPress={handleArchive} />
+          <Button label={t("habit_detail.edit_button")} variant="secondary" onPress={() => setEditing(true)} style={{ marginBottom: 8 }} />
+          <Button label={t("habit_detail.archive_button")} variant="danger" onPress={handleArchive} />
         </>
       )}
     </Screen>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Modal, type ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@core/theming';
 import type { CheckInRecord } from '../services/checkin.service';
 
@@ -24,7 +25,8 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
   onSkip,
   style,
 }) => {
-  const t = useTheme();
+  const theme = useTheme();
+  const { t } = useTranslation();
   const [skipModalVisible, setSkipModalVisible] = useState(false);
 
   if (!canCheckIn) {
@@ -33,15 +35,15 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
         style={[
           {
             padding: 16,
-            borderRadius: t.radius.md,
-            backgroundColor: t.bg.surfaceAlt,
+            borderRadius: theme.radius.md,
+            backgroundColor: theme.bg.surfaceAlt,
             alignItems: 'center',
           },
           style,
         ]}
       >
-        <Text style={{ color: t.text.tertiary, fontSize: 13 }}>
-          No es día planificado
+        <Text style={{ color: theme.text.tertiary, fontSize: 13 }}>
+          {t('checkin.not_planned')}
         </Text>
       </View>
     );
@@ -54,17 +56,17 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
         style={[
           {
             padding: 16,
-            borderRadius: t.radius.md,
-            backgroundColor: isSkipped ? `${t.status.skip}22` : `${t.status.success}22`,
-            borderWidth: t.borderWidth.default,
-            borderColor: isSkipped ? t.status.skip : t.status.success,
+            borderRadius: theme.radius.md,
+            backgroundColor: isSkipped ? `${theme.status.skip}22` : `${theme.status.success}22`,
+            borderWidth: theme.borderWidth.default,
+            borderColor: isSkipped ? theme.status.skip : theme.status.success,
             alignItems: 'center',
           },
           style,
         ]}
       >
-        <Text style={{ color: isSkipped ? t.status.skip : t.status.success, fontSize: 15, fontWeight: '700' }}>
-          {isSkipped ? '⏭ Skip usado hoy' : '✓ Completado hoy'}
+        <Text style={{ color: isSkipped ? theme.status.skip : theme.status.success, fontSize: 15, fontWeight: '700' }}>
+          {isSkipped ? t('checkin.skip_used') : t('checkin.completed')}
         </Text>
       </View>
     );
@@ -77,15 +79,15 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
           onPress={onComplete}
           disabled={loading}
           style={({ pressed }) => ({
-            backgroundColor: pressed ? `${t.status.success}cc` : t.status.success,
+            backgroundColor: pressed ? `${theme.status.success}cc` : theme.status.success,
             padding: 16,
-            borderRadius: t.radius.md,
+            borderRadius: theme.radius.md,
             alignItems: 'center',
             opacity: loading ? 0.6 : 1,
           })}
         >
-          <Text style={{ color: t.text.inverse, fontSize: 16, fontWeight: '700' }}>
-            ✓ Completar hoy
+          <Text style={{ color: theme.text.inverse, fontSize: 16, fontWeight: '700' }}>
+            {t('checkin.complete_action')}
           </Text>
         </Pressable>
 
@@ -94,17 +96,17 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
             onPress={() => setSkipModalVisible(true)}
             disabled={loading}
             style={({ pressed }) => ({
-              backgroundColor: pressed ? `${t.status.skip}22` : 'transparent',
+              backgroundColor: pressed ? `${theme.status.skip}22` : 'transparent',
               padding: 12,
-              borderRadius: t.radius.md,
-              borderWidth: t.borderWidth.default,
-              borderColor: t.status.skip,
+              borderRadius: theme.radius.md,
+              borderWidth: theme.borderWidth.default,
+              borderColor: theme.status.skip,
               alignItems: 'center',
               opacity: loading ? 0.6 : 1,
             })}
           >
-            <Text style={{ color: t.status.skip, fontSize: 14, fontWeight: '600' }}>
-              ⏭ Usar skip semanal
+            <Text style={{ color: theme.status.skip, fontSize: 14, fontWeight: '600' }}>
+              {t('checkin.use_skip')}
             </Text>
           </Pressable>
         )}
@@ -117,28 +119,28 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
         onRequestClose={() => setSkipModalVisible(false)}
       >
         <View style={{ flex: 1, backgroundColor: '#00000080', justifyContent: 'center', padding: 24 }}>
-          <View style={{ backgroundColor: t.bg.surface, borderRadius: t.radius.lg, padding: 24 }}>
-            <Text style={{ color: t.text.primary, fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
-              Usar skip semanal
+          <View style={{ backgroundColor: theme.bg.surface, borderRadius: theme.radius.lg, padding: 24 }}>
+            <Text style={{ color: theme.text.primary, fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
+              {t('checkin.skip_modal_title')}
             </Text>
-            <Text style={{ color: t.text.secondary, fontSize: 14, marginBottom: 24 }}>
-              Tenés 1 skip por semana ISO. Conta como cumplimiento — no rompe la racha. ¿Confirmás?
+            <Text style={{ color: theme.text.secondary, fontSize: 14, marginBottom: 24 }}>
+              {t('checkin.skip_modal_body')}
             </Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <Pressable
                 onPress={() => setSkipModalVisible(false)}
-                style={{ flex: 1, padding: 12, borderRadius: t.radius.md, borderWidth: t.borderWidth.default, borderColor: t.border.default, alignItems: 'center' }}
+                style={{ flex: 1, padding: 12, borderRadius: theme.radius.md, borderWidth: theme.borderWidth.default, borderColor: theme.border.default, alignItems: 'center' }}
               >
-                <Text style={{ color: t.text.secondary, fontWeight: '600' }}>Cancelar</Text>
+                <Text style={{ color: theme.text.secondary, fontWeight: '600' }}>{t('common.cancel')}</Text>
               </Pressable>
               <Pressable
                 onPress={async () => {
                   setSkipModalVisible(false);
                   await onSkip();
                 }}
-                style={{ flex: 1, padding: 12, borderRadius: t.radius.md, backgroundColor: t.status.skip, alignItems: 'center' }}
+                style={{ flex: 1, padding: 12, borderRadius: theme.radius.md, backgroundColor: theme.status.skip, alignItems: 'center' }}
               >
-                <Text style={{ color: t.text.inverse, fontWeight: '700' }}>Confirmar</Text>
+                <Text style={{ color: theme.text.inverse, fontWeight: '700' }}>{t('common.confirm')}</Text>
               </Pressable>
             </View>
           </View>

@@ -1,22 +1,29 @@
+import { useMemo } from "react";
 import { Text, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@auth/index";
 import { Screen, Input, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 
-const schema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
-});
-
-type FormData = z.infer<typeof schema>;
-
 export default function LoginScreen() {
-  const t = useTheme();
+  const theme = useTheme();
+  const { t } = useTranslation();
   const { signIn, loading, error } = useAuth();
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email(t("login.error_email")),
+        password: z.string().min(6, t("login.error_password_min")),
+      }),
+    [t]
+  );
+
+  type FormData = z.infer<typeof schema>;
 
   const {
     control,
@@ -33,17 +40,17 @@ export default function LoginScreen() {
       <View style={{ flex: 1, justifyContent: "center", paddingVertical: 40 }}>
         <Text
           style={{
-            color: t.text.primary,
+            color: theme.text.primary,
             fontSize: 32,
             fontWeight: "800",
             marginBottom: 6,
-            fontFamily: t.typography.displayFontFamily,
+            fontFamily: theme.typography.displayFontFamily,
           }}
         >
-          Mastery Habits
+          {t("login.app_title")}
         </Text>
-        <Text style={{ color: t.text.secondary, fontSize: 15, marginBottom: 40 }}>
-          Cultivá disciplina real.
+        <Text style={{ color: theme.text.secondary, fontSize: 15, marginBottom: 40 }}>
+          {t("login.tagline")}
         </Text>
 
         <Controller
@@ -51,7 +58,7 @@ export default function LoginScreen() {
           name="email"
           render={({ field: { onChange, value } }) => (
             <Input
-              label="Email"
+              label={t("login.email_label")}
               onChangeText={onChange}
               value={value}
               keyboardType="email-address"
@@ -68,7 +75,7 @@ export default function LoginScreen() {
           name="password"
           render={({ field: { onChange, value } }) => (
             <Input
-              label="Contraseña"
+              label={t("login.password_label")}
               onChangeText={onChange}
               value={value}
               secureTextEntry
@@ -80,21 +87,21 @@ export default function LoginScreen() {
         />
 
         {error ? (
-          <Text style={{ color: t.status.danger, marginBottom: 16, fontSize: 14 }}>
+          <Text style={{ color: theme.status.danger, marginBottom: 16, fontSize: 14 }}>
             {error}
           </Text>
         ) : null}
 
         <Button
-          label="Iniciar sesión"
+          label={t("login.submit")}
           onPress={handleSubmit(onSubmit)}
           loading={loading}
           style={{ marginBottom: 16 }}
         />
 
         <Link href="/(auth)/signup" asChild>
-          <Text style={{ color: t.accent.primary, textAlign: "center", fontSize: 14 }}>
-            ¿No tenés cuenta? Registrate
+          <Text style={{ color: theme.accent.primary, textAlign: "center", fontSize: 14 }}>
+            {t("login.go_signup")}
           </Text>
         </Link>
       </View>

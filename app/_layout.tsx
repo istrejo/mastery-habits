@@ -2,8 +2,11 @@ import "../global.css";
 import { useEffect, useState } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { ThemeProvider } from "@core/theming";
+import { LocaleProvider, initI18n, resolveLocale, useLocaleStore } from "@core/i18n";
 import { useSessionStore } from "@core/states/session.store";
 import { supabase } from "@core/lib/supabase";
+
+initI18n(resolveLocale(useLocaleStore.getState().locale));
 
 function AuthGate() {
   const router = useRouter();
@@ -43,8 +46,10 @@ function AuthGate() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <AuthGate />
-      <Stack screenOptions={{ headerShown: false }} />
+      <LocaleProvider>
+        <AuthGate />
+        <Stack screenOptions={{ headerShown: false }} />
+      </LocaleProvider>
     </ThemeProvider>
   );
 }

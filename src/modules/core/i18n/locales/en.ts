@@ -1,0 +1,149 @@
+import type { TranslationKeys } from './es';
+
+export const en: TranslationKeys = {
+  common: {
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    save: 'Save',
+    back: '← Back',
+    score_suffix: '/ 100',
+  },
+
+  dashboard: {
+    app_name: 'MASTERY HABITS',
+    empty_title: 'Start your first habit',
+    empty_body: 'Build a Commitment Score.\nConsistency creates mastery.',
+    create_habit: '+ Create habit',
+    score_avg: 'AVERAGE SCORE',
+    habits_today_one: '{{count}} habit planned for today',
+    habits_today_other: '{{count}} habits planned for today',
+    my_habits: 'MY HABITS',
+  },
+
+  profile: {
+    title: 'PROFILE',
+    score_global: 'GLOBAL SCORE',
+    habits_count_one: '{{count}} habit',
+    habits_count_other: '{{count}} habits',
+    distribution: 'DISTRIBUTION',
+    theme_section: 'THEME',
+    language_section: 'LANGUAGE',
+    logout: 'Log out',
+    logout_confirm_title: 'Log out',
+    logout_confirm_body: 'Are you sure?',
+    logout_exit: 'Log out',
+    logging_out: 'Logging out…',
+  },
+
+  habit_detail: {
+    not_found: 'Habit not found',
+    edit_title: 'Edit habit',
+    commitment_score: 'COMMITMENT SCORE',
+    today_section: 'TODAY',
+    history_section: 'LAST 30 DAYS',
+    legend_completed: 'Completed',
+    legend_skip: 'Skip',
+    legend_missed: 'Missed',
+    frequency_section: 'FREQUENCY',
+    edit_button: 'Edit',
+    archive_button: 'Archive',
+    save_changes: 'Save changes',
+    archive_title: 'Archive habit',
+    archive_body: 'Are you sure? The habit will no longer appear in your list.',
+    day_mon: 'Mon',
+    day_tue: 'Tue',
+    day_wed: 'Wed',
+    day_thu: 'Thu',
+    day_fri: 'Fri',
+    day_sat: 'Sat',
+    day_sun: 'Sun',
+  },
+
+  new_habit: {
+    title: 'New habit',
+    create_button: 'Create habit',
+  },
+
+  login: {
+    app_title: 'Mastery Habits',
+    tagline: 'Build real discipline.',
+    email_label: 'Email',
+    password_label: 'Password',
+    submit: 'Sign in',
+    go_signup: "Don't have an account? Sign up",
+    error_email: 'Invalid email',
+    error_password_min: 'Minimum 6 characters',
+  },
+
+  signup: {
+    title: 'Create account',
+    tagline: 'Start your journey to mastery.',
+    name_label: 'Name',
+    email_label: 'Email',
+    password_label: 'Password',
+    confirm_password_label: 'Confirm password',
+    submit: 'Create account',
+    go_login: 'Already have an account? Sign in',
+    error_name_min: 'Minimum 2 characters',
+    error_email: 'Invalid email',
+    error_password_min: 'Minimum 6 characters',
+    error_passwords_match: 'Passwords do not match',
+  },
+
+  habit_form: {
+    name_label: 'Name',
+    name_placeholder: 'E.g.: Meditation',
+    description_label: 'Description (optional)',
+    description_placeholder: 'What is this habit for?',
+    category_label: 'Category (optional)',
+    category_placeholder: 'E.g.: Health, Mind, Work',
+    error_required: 'Required',
+    error_name_max: 'Maximum 80 characters',
+    error_days_min: 'Select at least one day',
+    save_default: 'Save',
+  },
+
+  frequency: {
+    label: 'Days',
+    day_mon: 'M',
+    day_tue: 'T',
+    day_wed: 'W',
+    day_thu: 'T',
+    day_fri: 'F',
+    day_sat: 'S',
+    day_sun: 'S',
+  },
+
+  checkin: {
+    not_planned: 'Not a planned day',
+    skip_used: '⏭ Skip used today',
+    completed: '✓ Completed today',
+    complete_action: '✓ Complete today',
+    use_skip: '⏭ Use weekly skip',
+    skip_modal_title: 'Use weekly skip',
+    skip_modal_body: 'You have 1 skip per ISO week. Counts as completion — does not break your streak. Confirm?',
+  },
+
+  theme_picker: {
+    free_tier: 'FREE',
+    premium_tier: 'PREMIUM',
+    badge_free: 'FREE',
+    badge_premium: 'PREMIUM',
+    coming_soon_title: 'Coming soon',
+    coming_soon_body: 'Premium themes will be available in the full version of Mastery Habits.',
+    understood: 'Got it',
+  },
+
+  language_picker: {
+    lang_es: 'Español',
+    lang_en: 'English',
+  },
+
+  levels: {
+    seed: 'Seed',
+    sprout: 'Sprout',
+    tree: 'Tree',
+    forest: 'Forest',
+    ancient: 'Ancient',
+  },
+};

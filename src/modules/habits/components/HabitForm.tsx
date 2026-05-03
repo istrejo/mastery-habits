@@ -1,23 +1,19 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useMemo } from 'react';
+import { View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { Input, Button } from '@core/components';
-import { useTheme } from '@core/theming';
 import { FrequencySelector } from './FrequencySelector';
 import type { HabitInsert } from '../types';
 
-const schema = z.object({
-  name: z.string().min(1, 'Requerido').max(80, 'Máximo 80 caracteres'),
-  description: z.string().max(300).optional(),
-  category: z.string().max(40).optional(),
-  frequency_days: z
-    .array(z.number().int().min(1).max(7))
-    .min(1, 'Seleccioná al menos un día'),
-});
-
-export type HabitFormData = z.infer<typeof schema>;
+export type HabitFormData = {
+  name: string;
+  description?: string;
+  category?: string;
+  frequency_days: number[];
+};
 
 interface HabitFormProps {
   defaultValues?: Partial<HabitFormData>;
@@ -29,10 +25,23 @@ interface HabitFormProps {
 export const HabitForm: React.FC<HabitFormProps> = ({
   defaultValues,
   onSubmit,
-  submitLabel = 'Guardar',
+  submitLabel,
   loading = false,
 }) => {
-  const t = useTheme();
+  const { t } = useTranslation();
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, t('habit_form.error_required')).max(80, t('habit_form.error_name_max')),
+        description: z.string().max(300).optional(),
+        category: z.string().max(40).optional(),
+        frequency_days: z
+          .array(z.number().int().min(1).max(7))
+          .min(1, t('habit_form.error_days_min')),
+      }),
+    [t]
+  );
 
   const {
     control,
@@ -66,10 +75,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         name="name"
         render={({ field: { onChange, value } }) => (
           <Input
-            label="Nombre"
+            label={t('habit_form.name_label')}
             onChangeText={onChange}
             value={value}
-            placeholder="Ej: Meditación"
+            placeholder={t('habit_form.name_placeholder')}
             error={errors.name?.message}
           />
         )}
@@ -80,10 +89,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         name="description"
         render={({ field: { onChange, value } }) => (
           <Input
-            label="Descripción (opcional)"
+            label={t('habit_form.description_label')}
             onChangeText={onChange}
             value={value ?? ''}
-            placeholder="¿Para qué querés este hábito?"
+            placeholder={t('habit_form.description_placeholder')}
             multiline
             numberOfLines={3}
           />
@@ -95,10 +104,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         name="category"
         render={({ field: { onChange, value } }) => (
           <Input
-            label="Categoría (opcional)"
+            label={t('habit_form.category_label')}
             onChangeText={onChange}
             value={value ?? ''}
-            placeholder="Ej: Salud, Mente, Trabajo"
+            placeholder={t('habit_form.category_placeholder')}
           />
         )}
       />
@@ -116,7 +125,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
       />
 
       <Button
-        label={submitLabel}
+        label={submitLabel ?? t('habit_form.save_default')}
         onPress={handleSubmit(handleFormSubmit)}
         loading={loading}
         style={{ marginTop: 8 }}

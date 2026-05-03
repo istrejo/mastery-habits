@@ -6,3 +6,4 @@ export { ProgressBar } from './ProgressBar';
 export { Screen } from './Screen';
 export { Skeleton } from './Skeleton';
 export { ThemePicker } from './ThemePicker';
+export { LanguagePicker } from './LanguagePicker';

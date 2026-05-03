@@ -1,27 +1,36 @@
+import { useMemo } from "react";
 import { Text, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@auth/index";
 import { Screen, Input, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 
-const schema = z.object({
-  displayName: z.string().min(2, "Mínimo 2 caracteres").max(40),
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
-  confirmPassword: z.string(),
-}).refine((d) => d.password === d.confirmPassword, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirmPassword"],
-});
-
-type FormData = z.infer<typeof schema>;
-
 export default function SignupScreen() {
-  const t = useTheme();
+  const theme = useTheme();
+  const { t } = useTranslation();
   const { signUp, loading, error } = useAuth();
+
+  const schema = useMemo(
+    () =>
+      z
+        .object({
+          displayName: z.string().min(2, t("signup.error_name_min")).max(40),
+          email: z.string().email(t("signup.error_email")),
+          password: z.string().min(6, t("signup.error_password_min")),
+          confirmPassword: z.string(),
+        })
+        .refine((d) => d.password === d.confirmPassword, {
+          message: t("signup.error_passwords_match"),
+          path: ["confirmPassword"],
+        }),
+    [t]
+  );
+
+  type FormData = z.infer<typeof schema>;
 
   const {
     control,
@@ -38,17 +47,17 @@ export default function SignupScreen() {
       <View style={{ flex: 1, justifyContent: "center", paddingVertical: 40 }}>
         <Text
           style={{
-            color: t.text.primary,
+            color: theme.text.primary,
             fontSize: 28,
             fontWeight: "800",
             marginBottom: 6,
-            fontFamily: t.typography.displayFontFamily,
+            fontFamily: theme.typography.displayFontFamily,
           }}
         >
-          Crear cuenta
+          {t("signup.title")}
         </Text>
-        <Text style={{ color: t.text.secondary, fontSize: 15, marginBottom: 40 }}>
-          Empezá tu camino hacia la maestría.
+        <Text style={{ color: theme.text.secondary, fontSize: 15, marginBottom: 40 }}>
+          {t("signup.tagline")}
         </Text>
 
         <Controller
@@ -56,7 +65,7 @@ export default function SignupScreen() {
           name="displayName"
           render={({ field: { onChange, value } }) => (
             <Input
-              label="Nombre"
+              label={t("signup.name_label")}
               onChangeText={onChange}
               value={value}
               autoComplete="name"
@@ -71,7 +80,7 @@ export default function SignupScreen() {
           name="email"
           render={({ field: { onChange, value } }) => (
             <Input
-              label="Email"
+              label={t("signup.email_label")}
               onChangeText={onChange}
               value={value}
               keyboardType="email-address"
@@ -88,7 +97,7 @@ export default function SignupScreen() {
           name="password"
           render={({ field: { onChange, value } }) => (
             <Input
-              label="Contraseña"
+              label={t("signup.password_label")}
               onChangeText={onChange}
               value={value}
               secureTextEntry
@@ -104,7 +113,7 @@ export default function SignupScreen() {
           name="confirmPassword"
           render={({ field: { onChange, value } }) => (
             <Input
-              label="Confirmar contraseña"
+              label={t("signup.confirm_password_label")}
               onChangeText={onChange}
               value={value}
               secureTextEntry
@@ -116,21 +125,21 @@ export default function SignupScreen() {
         />
 
         {error ? (
-          <Text style={{ color: t.status.danger, marginBottom: 16, fontSize: 14 }}>
+          <Text style={{ color: theme.status.danger, marginBottom: 16, fontSize: 14 }}>
             {error}
           </Text>
         ) : null}
 
         <Button
-          label="Crear cuenta"
+          label={t("signup.submit")}
           onPress={handleSubmit(onSubmit)}
           loading={loading}
           style={{ marginBottom: 16 }}
         />
 
         <Link href="/(auth)/login" asChild>
-          <Text style={{ color: t.accent.primary, textAlign: "center", fontSize: 14 }}>
-            ¿Ya tenés cuenta? Iniciá sesión
+          <Text style={{ color: theme.accent.primary, textAlign: "center", fontSize: 14 }}>
+            {t("signup.go_login")}
           </Text>
         </Link>
       </View>
