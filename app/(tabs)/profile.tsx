@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Screen, Card, Button, Skeleton, ThemePicker, LanguagePicker } from "@core/components";
+import { Ionicons } from "@expo/vector-icons";
+import { Screen, Card, Skeleton } from "@core/components";
 import { useTheme, type MasteryLevel } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
-import { authService } from "@auth/services/auth.service";
 import { useHabits } from "@habits/index";
 import { getLevel } from "@progression/index";
 
@@ -13,9 +12,8 @@ export default function ProfileScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
-  const { user, clear } = useSessionStore();
+  const { user } = useSessionStore();
   const { habits, loading } = useHabits();
-  const [loggingOut, setLoggingOut] = useState(false);
 
   const avgScore =
     habits.length > 0
@@ -30,26 +28,6 @@ export default function ProfileScreen() {
     : avgScore >= 21 ? theme.score.warning
     : theme.score.critical;
 
-  const handleLogout = () => {
-    Alert.alert(
-      t("profile.logout_confirm_title"),
-      t("profile.logout_confirm_body"),
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("profile.logout_exit"),
-          style: "destructive",
-          onPress: async () => {
-            setLoggingOut(true);
-            await authService.signOut();
-            clear();
-            router.replace("/(auth)/login");
-          },
-        },
-      ]
-    );
-  };
-
   const displayName = user?.user_metadata?.["display_name"] as string | undefined;
   const email = user?.email ?? "";
   const initials = displayName
@@ -58,9 +36,19 @@ export default function ProfileScreen() {
 
   return (
     <Screen scrollable>
-      <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 20 }}>
-        {t("profile.title")}
-      </Text>
+      {/* Header row */}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1 }}>
+          {t("profile.title")}
+        </Text>
+        <Pressable
+          onPress={() => router.push("/settings")}
+          hitSlop={12}
+          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+        >
+          <Ionicons name="settings-outline" size={22} color={theme.text.tertiary} />
+        </Pressable>
+      </View>
 
       {/* Avatar + identity */}
       <Card style={{ marginBottom: 16, alignItems: "center" }}>
@@ -127,7 +115,7 @@ export default function ProfileScreen() {
         )}
       </Card>
 
-      {/* Stats */}
+      {/* Stats distribution */}
       {!loading && habits.length > 0 && (
         <Card style={{ marginBottom: 16 }}>
           <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
@@ -150,29 +138,6 @@ export default function ProfileScreen() {
           })}
         </Card>
       )}
-
-      {/* Theme picker */}
-      <Card style={{ marginBottom: 16 }}>
-        <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
-          {t("profile.theme_section")}
-        </Text>
-        <ThemePicker />
-      </Card>
-
-      {/* Language picker */}
-      <Card style={{ marginBottom: 16 }}>
-        <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
-          {t("profile.language_section")}
-        </Text>
-        <LanguagePicker />
-      </Card>
-
-      <Button
-        label={loggingOut ? t("profile.logging_out") : t("profile.logout")}
-        variant="danger"
-        onPress={handleLogout}
-        disabled={loggingOut}
-      />
     </Screen>
   );
 }

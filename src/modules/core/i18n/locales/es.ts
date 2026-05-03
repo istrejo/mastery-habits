@@ -135,6 +135,21 @@ export const es = {
   language_picker: {
     lang_es: 'Español',
     lang_en: 'English',
+    lang_system: 'Sistema',
+  },
+
+  settings: {
+    title: 'AJUSTES',
+    language_section: 'IDIOMA',
+    theme_section: 'TEMA',
+    lang_es_subtitle: 'Español',
+    lang_en_subtitle: 'English',
+    lang_system_subtitle: 'Idioma del dispositivo',
+    logout: 'Cerrar sesión',
+    logout_confirm_title: 'Cerrar sesión',
+    logout_confirm_body: '¿Confirmás?',
+    logout_exit: 'Salir',
+    logging_out: 'Cerrando sesión…',
   },
 
   levels: {
@@ -143,6 +158,11 @@ export const es = {
     tree: 'Tree',
     forest: 'Forest',
     ancient: 'Ancient',
+  },
+
+  tabs: {
+    habits: 'Hábitos',
+    profile: 'Perfil',
   },
 };
 

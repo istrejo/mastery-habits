@@ -6,6 +6,7 @@ import type { LocaleId } from './types';
 interface LocaleState {
   locale: LocaleId | null;
   setLocale: (id: LocaleId) => void;
+  clearLocale: () => void;
 }
 
 export const useLocaleStore = create<LocaleState>()(
@@ -13,6 +14,7 @@ export const useLocaleStore = create<LocaleState>()(
     (set) => ({
       locale: null,
       setLocale: (id) => set({ locale: id }),
+      clearLocale: () => set({ locale: null }),
     }),
     {
       name: 'mastery-habits-locale',

@@ -137,6 +137,21 @@ export const en: TranslationKeys = {
   language_picker: {
     lang_es: 'Español',
     lang_en: 'English',
+    lang_system: 'System',
+  },
+
+  settings: {
+    title: 'SETTINGS',
+    language_section: 'LANGUAGE',
+    theme_section: 'THEME',
+    lang_es_subtitle: 'Español',
+    lang_en_subtitle: 'English',
+    lang_system_subtitle: 'Device language',
+    logout: 'Log out',
+    logout_confirm_title: 'Log out',
+    logout_confirm_body: 'Are you sure?',
+    logout_exit: 'Log out',
+    logging_out: 'Logging out…',
   },
 
   levels: {
@@ -145,5 +160,10 @@ export const en: TranslationKeys = {
     tree: 'Tree',
     forest: 'Forest',
     ancient: 'Ancient',
+  },
+
+  tabs: {
+    habits: 'Habits',
+    profile: 'Profile',
   },
 };

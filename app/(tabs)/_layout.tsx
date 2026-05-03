@@ -1,9 +1,11 @@
 import { Tabs } from "expo-router";
 import { useTheme } from "@core/theming";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function TabsLayout() {
   const t = useTheme();
+  const { t: tr } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -20,7 +22,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Hábitos",
+          title: tr("tabs.habits"),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "checkmark-circle" : "checkmark-circle-outline"}
@@ -33,7 +35,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Perfil",
+          title: tr("tabs.profile"),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "person" : "person-outline"}
