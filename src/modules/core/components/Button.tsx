@@ -1,3 +1,4 @@
+/* stitch: button */
 import React from 'react';
 import {
   TouchableOpacity,
@@ -32,7 +33,7 @@ export const Button: React.FC<ButtonProps> = ({
   const t = useTheme();
 
   const paddingMap: Record<ButtonSize, { v: number; h: number }> = {
-    sm: { v: 8, h: 14 },
+    sm: { v: 8,  h: 14 },
     md: { v: 12, h: 20 },
     lg: { v: 16, h: 28 },
   };
@@ -42,7 +43,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   const bgColor = {
     primary: t.accent.primary,
-    secondary: t.bg.surfaceAlt,
+    secondary: 'transparent',
     ghost: 'transparent',
     danger: t.status.danger,
   }[variant];
@@ -80,7 +81,13 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <Text style={{ color: textColor, fontWeight: '600', fontSize: fontSizeMap[size] }}>
+        <Text style={{
+          color: textColor,
+          fontWeight: '600',
+          fontSize: fontSizeMap[size],
+          fontFamily: 'Inter_600SemiBold',
+          letterSpacing: 0.2,
+        }}>
           {label}
         </Text>
       )}
