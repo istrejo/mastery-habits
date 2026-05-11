@@ -1,52 +1,65 @@
 import type { ThemeTokens } from '../types';
 import { SPACING, TYPE_SCALE } from '../tokens';
 
+const SURFACE = '#FFFFFF';
+const BACKGROUND = '#FAFAFA';
+const SURFACE_ALT = '#F4F4F4';
+const BORDER = '#E5E5E5';
+const PRIMARY = '#111111';
+const SECONDARY = '#666666';
+const TERTIARY = '#A3A3A3';
+const ERROR = '#BA1A1A';
+
+const neutralCategory = { fg: PRIMARY, bg: 'rgba(17, 17, 17, 0.06)', border: BORDER };
+
 export const minimalLightTheme: ThemeTokens = {
   bg: {
-    base: '#fdf8f8',
-    surface: '#fdf8f8',
-    surfaceAlt: '#f7f3f2',
-    elevated: '#ebe7e6',
+    base: BACKGROUND,
+    surface: SURFACE,
+    surfaceAlt: SURFACE_ALT,
+    elevated: SURFACE,
   },
   border: {
-    subtle: '#c4c7c7',
-    default: '#c4c7c7',
-    strong: '#747878',
+    subtle: BORDER,
+    default: BORDER,
+    strong: PRIMARY,
   },
   text: {
-    primary: '#1c1b1b',
-    secondary: '#444748',
-    tertiary: '#747878',
-    inverse: '#ffffff',
+    primary: PRIMARY,
+    secondary: SECONDARY,
+    tertiary: TERTIARY,
+    inverse: SURFACE,
   },
   accent: {
-    primary: '#000000',
-    onPrimary: '#ffffff',
-    muted: '#e1dfdf',
+    primary: PRIMARY,
+    onPrimary: SURFACE,
+    muted: 'rgba(17, 17, 17, 0.10)',
   },
   score: {
-    excellent: '#000000',
-    good: '#444748',
-    warning: '#a8a29e',
-    critical: '#ba1a1a',
+    excellent: PRIMARY,
+    good: PRIMARY,
+    warning: SECONDARY,
+    critical: ERROR,
   },
   level: {
-    seed:    { fg: '#747878', bg: '#f7f3f2', border: '#c4c7c7' },
-    sprout:  { fg: '#57534e', bg: '#f7f3f2', border: '#d6d3d1' },
-    tree:    { fg: '#44403c', bg: '#f7f3f2', border: '#a8a29e' },
-    forest:  { fg: '#292524', bg: '#f7f3f2', border: '#747878' },
-    ancient: { fg: '#ffffff', bg: '#1c1b1b', border: '#1c1b1b' },
+    seed:    { fg: SECONDARY, bg: SURFACE_ALT, border: BORDER },
+    sprout:  { fg: PRIMARY, bg: SURFACE_ALT, border: BORDER },
+    tree:    { fg: PRIMARY, bg: SURFACE_ALT, border: BORDER },
+    forest:  { fg: PRIMARY, bg: SURFACE_ALT, border: PRIMARY },
+    ancient: { fg: SURFACE, bg: PRIMARY, border: PRIMARY },
   },
   status: {
-    success: '#000000',
-    skip: '#a8a29e',
-    danger: '#ba1a1a',
-    info: '#444748',
+    success: PRIMARY,
+    skip: SECONDARY,
+    danger: ERROR,
+    info: SECONDARY,
   },
-  radius: { sm: 6, md: 8, lg: 12, pill: 999 },
-  borderWidth: { hairline: 0.5, default: 1, bold: 1 },
+  radius: { sm: 4, md: 8, lg: 12, pill: 9999 },
+  borderWidth: { hairline: 1, default: 1, bold: 2 },
   spacing: SPACING,
   typography: {
+    displayFontFamily: 'Anton_400Regular',
+    bodyFontFamily: 'Lexend_400Regular',
     numericFeatures: 'tnum',
     scale: {
       displayXl: TYPE_SCALE.displayXl,
@@ -59,15 +72,15 @@ export const minimalLightTheme: ThemeTokens = {
     },
   },
   categoryColors: {
-    green:   { fg: '#15803d', bg: '#f0fdf4', border: '#bbf7d0' },
-    violet:  { fg: '#6b21a8', bg: '#faf5ff', border: '#e9d5ff' },
-    blue:    { fg: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' },
-    yellow:  { fg: '#a16207', bg: '#fefce8', border: '#fef08a' },
-    orange:  { fg: '#c2410c', bg: '#fff7ed', border: '#fed7aa' },
-    pink:    { fg: '#be185d', bg: '#fdf2f8', border: '#fbcfe8' },
-    cyan:    { fg: '#0e7490', bg: '#ecfeff', border: '#a5f3fc' },
-    emerald: { fg: '#047857', bg: '#ecfdf5', border: '#a7f3d0' },
-    neutral: { fg: '#444748', bg: '#f7f3f2', border: '#c4c7c7' },
+    green: neutralCategory,
+    violet: neutralCategory,
+    blue: neutralCategory,
+    yellow: neutralCategory,
+    orange: neutralCategory,
+    pink: neutralCategory,
+    cyan: neutralCategory,
+    emerald: neutralCategory,
+    neutral: neutralCategory,
   },
-  meta: { id: 'minimal-light', name: 'Minimal Light', mode: 'light', tier: 'free' },
+  meta: { id: 'minimal-light', name: 'Mastery Habits Light', mode: 'light', tier: 'free' },
 };

@@ -26,13 +26,16 @@ export const THEMES_BY_MODE: Record<'light' | 'dark', ThemeId[]> = {
     .map(([id]) => id),
 };
 
-export const ThemeContext = createContext<ThemeTokens>(techNeonTheme);
+export const ThemeContext = createContext<ThemeTokens>(minimalLightTheme);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const themeId = useThemeStore((s) => s.themeId);
-  const theme = useMemo(() => THEMES[themeId], [themeId]);
+  // The theme registry stays in place for future theming, but v1 is intentionally
+  // pinned to Stitch's Mastery Habits Light system. Persisted legacy dark themes
+  // must not leak into the UI.
+  useThemeStore((s) => s.themeId);
+  const theme = useMemo(() => minimalLightTheme, []);
   return (
     <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
   );
