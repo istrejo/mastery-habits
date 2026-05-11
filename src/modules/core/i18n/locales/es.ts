@@ -184,6 +184,16 @@ export const es = {
     stats: 'Stats',
     profile: 'Perfil',
   },
+
+  stats: {
+    current_streak: 'Racha Actual',
+    days: 'Días',
+    best_streak_one: 'Mejor: {{count}} día',
+    best_streak_other: 'Mejor: {{count}} días',
+    best_streak: 'Mejor: {{count}} días',
+    top_habits: 'Top Hábitos',
+    activity: 'Actividad',
+  },
 };
 
 export type TranslationKeys = typeof es;

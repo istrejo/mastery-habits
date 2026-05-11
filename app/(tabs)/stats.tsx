@@ -1,12 +1,13 @@
 /* stitch: stats-dashboard */
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { subDays, format } from "date-fns";
+import { subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Screen, ProgressBar } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useHabits } from "@habits/index";
 import { isPlannedDay } from "@checkin/index";
+import { useGlobalStreak } from "@commitment/index";
 
 function ActivityGrid() {
   const theme = useTheme();
@@ -52,23 +53,13 @@ export default function StatsScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
-  const { habits, loading } = useHabits();
+  const { habits } = useHabits();
+  const { current: currentStreak, best: bestStreak, loading: streakLoading } = useGlobalStreak();
 
   const sorted = [...habits].sort(
     (a, b) => (b.mastery_scores?.score ?? 0) - (a.mastery_scores?.score ?? 0)
   );
   const top3 = sorted.slice(0, 3);
-
-  const avgScore =
-    habits.length > 0
-      ? habits.reduce((s, h) => s + (h.mastery_scores?.score ?? 0), 0) / habits.length
-      : 0;
-
-  const scoreColor =
-    avgScore >= 71 ? theme.score.excellent
-    : avgScore >= 46 ? theme.score.good
-    : avgScore >= 21 ? theme.score.warning
-    : theme.score.critical;
 
   const RANK_COLORS = [theme.accent.primary, theme.text.secondary, theme.text.secondary];
 
@@ -107,7 +98,7 @@ export default function StatsScreen() {
       </View>
 
       <View style={{ gap: theme.spacing.stackLg }}>
-        {/* Global Score */}
+        {/* Current Streak Hero */}
         <View style={{
           backgroundColor: theme.bg.surfaceAlt,
           borderColor: theme.border.subtle,
@@ -123,11 +114,11 @@ export default function StatsScreen() {
             letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
             textTransform: "uppercase",
           }}>
-            {t("dashboard.score_avg")}
+            {t("stats.current_streak")}
           </Text>
-          <View style={{ flexDirection: "row", alignItems: "baseline", gap: theme.spacing.unit }}>
+          <View style={{ flexDirection: "row", alignItems: "baseline", gap: theme.spacing.stackSm }}>
             <Text style={{
-              color: scoreColor,
+              color: theme.accent.primary,
               fontSize: theme.typography.scale.displayXl.fontSize,
               fontWeight: "900",
               fontFamily: "Inter_900Black",
@@ -135,15 +126,17 @@ export default function StatsScreen() {
               lineHeight: theme.typography.scale.displayXl.lineHeight,
               fontVariant: ["tabular-nums"],
             }}>
-              {loading ? "--" : avgScore.toFixed(1)}
+              {streakLoading ? "--" : currentStreak}
             </Text>
             <Text style={{
-              color: scoreColor,
+              color: theme.accent.primary,
               fontSize: theme.typography.scale.titleSm.fontSize,
               fontWeight: "700",
               fontFamily: "Inter_700Bold",
+              letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+              textTransform: "uppercase",
             }}>
-              {t("common.score_suffix")}
+              {t("stats.days")}
             </Text>
           </View>
           <Text style={{
@@ -151,7 +144,7 @@ export default function StatsScreen() {
             fontSize: theme.typography.scale.bodyMain.fontSize,
             fontFamily: "Inter_400Regular",
           }}>
-            {t("dashboard.habits_today", { count: habits.length })}
+            {t("stats.best_streak", { count: bestStreak })}
           </Text>
         </View>
 
@@ -166,11 +159,10 @@ export default function StatsScreen() {
               textTransform: "uppercase",
               paddingHorizontal: theme.spacing.unit,
             }}>
-              TOP HABITS
+              {t("stats.top_habits")}
             </Text>
             {top3.map((habit, i) => {
               const score = habit.mastery_scores?.score ?? 0;
-              const pct = score / 100;
               return (
                 <TouchableOpacity
                   key={habit.id}
@@ -231,7 +223,7 @@ export default function StatsScreen() {
             textTransform: "uppercase",
             paddingHorizontal: theme.spacing.unit,
           }}>
-            ACTIVITY
+            {t("stats.activity")}
           </Text>
           <View style={{
             backgroundColor: theme.bg.surfaceAlt,
@@ -243,30 +235,6 @@ export default function StatsScreen() {
             <ActivityGrid />
           </View>
         </View>
-
-        {/* Power Grid link */}
-        <TouchableOpacity
-          onPress={() => router.push("/habit/grid")}
-          style={{
-            borderColor: theme.border.default,
-            borderWidth: theme.borderWidth.default,
-            borderRadius: theme.radius.lg,
-            padding: theme.spacing.marginMobile,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{
-            color: theme.text.primary,
-            fontSize: theme.typography.scale.bodyMain.fontSize,
-            fontFamily: "Inter_600SemiBold",
-            fontWeight: "600",
-          }}>
-            POWER GRID
-          </Text>
-          <Text style={{ color: theme.accent.primary, fontSize: 18 }}>→</Text>
-        </TouchableOpacity>
       </View>
     </Screen>
   );

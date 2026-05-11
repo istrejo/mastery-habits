@@ -186,4 +186,14 @@ export const en: TranslationKeys = {
     stats: 'Stats',
     profile: 'Profile',
   },
+
+  stats: {
+    current_streak: 'Current Streak',
+    days: 'Days',
+    best_streak_one: 'Best: {{count}} day',
+    best_streak_other: 'Best: {{count}} days',
+    best_streak: 'Best: {{count}} days',
+    top_habits: 'Top Habits',
+    activity: 'Activity',
+  },
 };
