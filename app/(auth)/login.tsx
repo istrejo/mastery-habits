@@ -1,3 +1,4 @@
+/* stitch: login */
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
@@ -37,22 +38,31 @@ export default function LoginScreen() {
 
   return (
     <Screen scrollable>
-      <View style={{ flex: 1, justifyContent: "center", paddingVertical: 40 }}>
-        <Text
-          style={{
-            color: theme.text.primary,
-            fontSize: 32,
-            fontWeight: "800",
-            marginBottom: 6,
-            fontFamily: theme.typography.displayFontFamily,
-          }}
-        >
+      <View style={{ flex: 1, justifyContent: "center", paddingVertical: theme.spacing.stackLg }}>
+
+        {/* Header */}
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.titleLg.fontSize,
+          fontWeight: "700",
+          fontFamily: "Inter_700Bold",
+          letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+          textTransform: "uppercase",
+          marginBottom: theme.spacing.unit,
+        }}>
           {t("login.app_title")}
         </Text>
-        <Text style={{ color: theme.text.secondary, fontSize: 15, marginBottom: 40 }}>
+        <Text style={{
+          color: theme.text.secondary,
+          fontSize: theme.typography.scale.bodyMain.fontSize,
+          fontFamily: "Inter_400Regular",
+          lineHeight: theme.typography.scale.bodyMain.lineHeight,
+          marginBottom: theme.spacing.stackLg,
+        }}>
           {t("login.tagline")}
         </Text>
 
+        {/* Fields */}
         <Controller
           control={control}
           name="email"
@@ -65,7 +75,7 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoComplete="email"
               error={errors.email?.message}
-              containerStyle={{ marginBottom: 16 }}
+              containerStyle={{ marginBottom: theme.spacing.stackMd }}
             />
           )}
         />
@@ -81,13 +91,18 @@ export default function LoginScreen() {
               secureTextEntry
               autoComplete="current-password"
               error={errors.password?.message}
-              containerStyle={{ marginBottom: 24 }}
+              containerStyle={{ marginBottom: theme.spacing.stackMd }}
             />
           )}
         />
 
         {error ? (
-          <Text style={{ color: theme.status.danger, marginBottom: 16, fontSize: 14 }}>
+          <Text style={{
+            color: theme.status.danger,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: "Inter_500Medium",
+            marginBottom: theme.spacing.stackSm,
+          }}>
             {error}
           </Text>
         ) : null}
@@ -96,11 +111,19 @@ export default function LoginScreen() {
           label={t("login.submit")}
           onPress={handleSubmit(onSubmit)}
           loading={loading}
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: theme.spacing.stackMd }}
         />
 
         <Link href="/(auth)/signup" asChild>
-          <Text style={{ color: theme.accent.primary, textAlign: "center", fontSize: 14 }}>
+          <Text style={{
+            color: theme.accent.primary,
+            textAlign: "center",
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: "Inter_500Medium",
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+            textTransform: "uppercase",
+            textDecorationLine: "underline",
+          }}>
             {t("login.go_signup")}
           </Text>
         </Link>

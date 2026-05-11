@@ -1,3 +1,4 @@
+/* stitch: register */
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
@@ -44,22 +45,31 @@ export default function SignupScreen() {
 
   return (
     <Screen scrollable>
-      <View style={{ flex: 1, justifyContent: "center", paddingVertical: 40 }}>
-        <Text
-          style={{
-            color: theme.text.primary,
-            fontSize: 28,
-            fontWeight: "800",
-            marginBottom: 6,
-            fontFamily: theme.typography.displayFontFamily,
-          }}
-        >
+      <View style={{ flex: 1, justifyContent: "center", paddingVertical: theme.spacing.stackLg }}>
+
+        {/* Header */}
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.titleLg.fontSize,
+          fontWeight: "700",
+          fontFamily: "Inter_700Bold",
+          letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+          textTransform: "uppercase",
+          marginBottom: theme.spacing.unit,
+        }}>
           {t("signup.title")}
         </Text>
-        <Text style={{ color: theme.text.secondary, fontSize: 15, marginBottom: 40 }}>
+        <Text style={{
+          color: theme.text.secondary,
+          fontSize: theme.typography.scale.bodyMain.fontSize,
+          fontFamily: "Inter_400Regular",
+          lineHeight: theme.typography.scale.bodyMain.lineHeight,
+          marginBottom: theme.spacing.stackLg,
+        }}>
           {t("signup.tagline")}
         </Text>
 
+        {/* Fields */}
         <Controller
           control={control}
           name="displayName"
@@ -70,7 +80,7 @@ export default function SignupScreen() {
               value={value}
               autoComplete="name"
               error={errors.displayName?.message}
-              containerStyle={{ marginBottom: 16 }}
+              containerStyle={{ marginBottom: theme.spacing.stackMd }}
             />
           )}
         />
@@ -87,7 +97,7 @@ export default function SignupScreen() {
               autoCapitalize="none"
               autoComplete="email"
               error={errors.email?.message}
-              containerStyle={{ marginBottom: 16 }}
+              containerStyle={{ marginBottom: theme.spacing.stackMd }}
             />
           )}
         />
@@ -103,7 +113,7 @@ export default function SignupScreen() {
               secureTextEntry
               autoComplete="new-password"
               error={errors.password?.message}
-              containerStyle={{ marginBottom: 16 }}
+              containerStyle={{ marginBottom: theme.spacing.stackMd }}
             />
           )}
         />
@@ -119,13 +129,18 @@ export default function SignupScreen() {
               secureTextEntry
               autoComplete="new-password"
               error={errors.confirmPassword?.message}
-              containerStyle={{ marginBottom: 24 }}
+              containerStyle={{ marginBottom: theme.spacing.stackMd }}
             />
           )}
         />
 
         {error ? (
-          <Text style={{ color: theme.status.danger, marginBottom: 16, fontSize: 14 }}>
+          <Text style={{
+            color: theme.status.danger,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: "Inter_500Medium",
+            marginBottom: theme.spacing.stackSm,
+          }}>
             {error}
           </Text>
         ) : null}
@@ -134,11 +149,19 @@ export default function SignupScreen() {
           label={t("signup.submit")}
           onPress={handleSubmit(onSubmit)}
           loading={loading}
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: theme.spacing.stackMd }}
         />
 
         <Link href="/(auth)/login" asChild>
-          <Text style={{ color: theme.accent.primary, textAlign: "center", fontSize: 14 }}>
+          <Text style={{
+            color: theme.accent.primary,
+            textAlign: "center",
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: "Inter_500Medium",
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+            textTransform: "uppercase",
+            textDecorationLine: "underline",
+          }}>
             {t("signup.go_login")}
           </Text>
         </Link>

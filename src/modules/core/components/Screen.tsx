@@ -27,7 +27,7 @@ export const Screen: React.FC<ScreenProps> = ({
     return (
       <SafeAreaView style={[baseStyle, style]}>
         <ScrollView
-          contentContainerStyle={[{ padding: 16 }, contentStyle]}
+          contentContainerStyle={[{ padding: t.spacing.marginMobile }, contentStyle]}
           showsVerticalScrollIndicator={false}
         >
           {children}
@@ -38,7 +38,7 @@ export const Screen: React.FC<ScreenProps> = ({
 
   return (
     <SafeAreaView style={[baseStyle, style]}>
-      <View style={[{ flex: 1, padding: 16 }, contentStyle]}>{children}</View>
+      <View style={[{ flex: 1, padding: t.spacing.marginMobile }, contentStyle]}>{children}</View>
     </SafeAreaView>
   );
 };
