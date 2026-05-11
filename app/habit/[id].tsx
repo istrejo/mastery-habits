@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { View, Text, ActivityIndicator, Alert } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { format, subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { Screen, Button, Card } from "@core/components";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Screen, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useHabit, useHabits, HabitForm, CategoryBadge } from "@habits/index";
 import type { HabitInsert } from "@habits/index";
@@ -29,14 +30,14 @@ function CheckInGrid({ checkIns }: { checkIns: { check_date: string; status: str
   };
 
   return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: theme.spacing.unit }}>
       {days.map((d) => (
         <View
           key={d.dateStr}
           style={{
-            width: 20,
-            height: 20,
-            borderRadius: 4,
+            width: theme.spacing.gutter,
+            height: theme.spacing.gutter,
+            borderRadius: theme.radius.sm,
             backgroundColor: colorForStatus(d.status),
           }}
         />
@@ -122,15 +123,32 @@ export default function HabitDetailScreen() {
 
   return (
     <Screen scrollable>
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24, gap: 12 }}>
-        <Text onPress={() => router.back()} style={{ color: theme.accent.primary, fontSize: 15 }}>
+      {/* TopAppBar */}
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={{ flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 24 }}
+      >
+        <MaterialIcons name="arrow-back" size={20} color={theme.accent.primary} />
+        <Text style={{
+          color: theme.accent.primary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontFamily: "Inter_600SemiBold",
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: "uppercase",
+        }}>
           {t("common.back")}
         </Text>
-      </View>
+      </TouchableOpacity>
 
       {editing ? (
         <>
-          <Text style={{ color: theme.text.primary, fontSize: 20, fontWeight: "700", marginBottom: 20 }}>
+          <Text style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.titleSm.fontSize,
+            fontFamily: "Inter_700Bold",
+            letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+            marginBottom: 20,
+          }}>
             {t("habit_detail.edit_title")}
           </Text>
           <HabitForm
@@ -156,15 +174,28 @@ export default function HabitDetailScreen() {
       ) : (
         <>
           {/* Header */}
-          <Card style={{ marginBottom: 16 }}>
+          <View style={{
+            backgroundColor: theme.bg.surfaceAlt,
+            borderWidth: theme.borderWidth.default,
+            borderColor: theme.border.subtle,
+            borderRadius: theme.radius.lg,
+            padding: theme.spacing.marginMobile,
+            marginBottom: 16,
+          }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-              <Text style={{ color: theme.text.primary, fontSize: 22, fontWeight: "800", flex: 1 }}>
+              <Text style={{
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.titleSm.fontSize,
+                fontFamily: "Inter_700Bold",
+                letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+                flex: 1,
+              }}>
                 {habit.name}
               </Text>
               <MasteryBadge score={score} style={{ marginLeft: 8 }} />
             </View>
             {habit.description ? (
-              <Text style={{ color: theme.text.secondary, fontSize: 14, marginBottom: 8 }}>
+              <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, marginBottom: 8 }}>
                 {habit.description}
               </Text>
             ) : null}
@@ -181,34 +212,63 @@ export default function HabitDetailScreen() {
                 borderLeftColor: theme.status.skip,
                 borderRadius: theme.radius.sm,
               }}>
-                <Text style={{ color: theme.text.secondary, fontSize: 12, flex: 1 }}>
+                <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, flex: 1 }}>
                   💡 {t('custom_category.uncategorized_banner')}
                 </Text>
               </View>
             )}
-          </Card>
+          </View>
 
           {/* Score */}
-          <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+          <View style={{
+            backgroundColor: theme.bg.surfaceAlt,
+            borderWidth: theme.borderWidth.default,
+            borderColor: theme.border.subtle,
+            borderRadius: theme.radius.lg,
+            padding: theme.spacing.marginMobile,
+            marginBottom: 16,
+          }}>
+            <Text style={{
+              color: theme.text.tertiary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+              marginBottom: 12,
+            }}>
               {t("habit_detail.commitment_score")}
             </Text>
             <Text style={{
               color: score >= 71 ? theme.score.excellent : score >= 46 ? theme.score.good : score >= 21 ? theme.score.warning : theme.score.critical,
-              fontSize: 48,
-              fontWeight: "800",
+              fontSize: theme.typography.scale.displayXl.fontSize,
+              fontFamily: "Inter_900Black",
+              letterSpacing: theme.typography.scale.displayXl.letterSpacing,
+              lineHeight: theme.typography.scale.displayXl.lineHeight,
               fontVariant: ["tabular-nums"],
-              fontFamily: theme.typography.displayFontFamily,
               marginBottom: 16,
             }}>
               {score.toFixed(1)}
             </Text>
             <LevelProgress score={score} />
-          </Card>
+          </View>
 
           {/* Check-in */}
-          <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+          <View style={{
+            backgroundColor: theme.bg.surfaceAlt,
+            borderWidth: theme.borderWidth.default,
+            borderColor: theme.border.subtle,
+            borderRadius: theme.radius.lg,
+            padding: theme.spacing.marginMobile,
+            marginBottom: 16,
+          }}>
+            <Text style={{
+              color: theme.text.tertiary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+              marginBottom: 12,
+            }}>
               {t("habit_detail.today_section")}
             </Text>
             <CheckInButton
@@ -220,11 +280,25 @@ export default function HabitDetailScreen() {
               onComplete={markCompleted}
               onSkip={markSkipped}
             />
-          </Card>
+          </View>
 
           {/* History */}
-          <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
+          <View style={{
+            backgroundColor: theme.bg.surfaceAlt,
+            borderWidth: theme.borderWidth.default,
+            borderColor: theme.border.subtle,
+            borderRadius: theme.radius.lg,
+            padding: theme.spacing.marginMobile,
+            marginBottom: 16,
+          }}>
+            <Text style={{
+              color: theme.text.tertiary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+              marginBottom: 12,
+            }}>
               {t("habit_detail.history_section")}
             </Text>
             <View style={{ flexDirection: "row", gap: 12, marginBottom: 10 }}>
@@ -235,22 +309,36 @@ export default function HabitDetailScreen() {
               ].map((item) => (
                 <View key={item.label} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                   <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: item.color }} />
-                  <Text style={{ color: theme.text.tertiary, fontSize: 11 }}>{item.label}</Text>
+                  <Text style={{ color: theme.text.tertiary, fontSize: theme.typography.scale.microBold.fontSize }}>{item.label}</Text>
                 </View>
               ))}
             </View>
             <CheckInGrid checkIns={last30Days} />
-          </Card>
+          </View>
 
           {/* Frequency */}
-          <Card style={{ marginBottom: 16 }}>
-            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 6 }}>
+          <View style={{
+            backgroundColor: theme.bg.surfaceAlt,
+            borderWidth: theme.borderWidth.default,
+            borderColor: theme.border.subtle,
+            borderRadius: theme.radius.lg,
+            padding: theme.spacing.marginMobile,
+            marginBottom: 16,
+          }}>
+            <Text style={{
+              color: theme.text.tertiary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+              marginBottom: 6,
+            }}>
               {t("habit_detail.frequency_section")}
             </Text>
-            <Text style={{ color: theme.text.secondary, fontSize: 14 }}>
+            <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize }}>
               {days.map((d) => DAY_NAMES[d]).join(" · ")}
             </Text>
-          </Card>
+          </View>
 
           <Button label={t("habit_detail.edit_button")} variant="secondary" onPress={() => setEditing(true)} style={{ marginBottom: 8 }} />
           <Button label={t("habit_detail.archive_button")} variant="danger" onPress={handleArchive} />
