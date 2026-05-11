@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile - Mastery Habits</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#ffdb79",
+                        "background": "#131313",
+                        "on-tertiary-fixed": "#241a00",
+                        "on-tertiary-container": "#795f01",
+                        "on-secondary-fixed-variant": "#454747",
+                        "error": "#ffb4ab",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "tertiary": "#fffaf7",
+                        "outline": "#849585",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "primary-fixed": "#60ff99",
+                        "on-primary-fixed-variant": "#005228",
+                        "on-secondary-container": "#b4b5b5",
+                        "surface-variant": "#353534",
+                        "surface-container-highest": "#353534",
+                        "surface": "#131313",
+                        "outline-variant": "#3b4b3d",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary-fixed-dim": "#00e479",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#00e479",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-surface-variant": "#b9cbb9",
+                        "on-tertiary": "#3d2f00",
+                        "inverse-primary": "#006d37",
+                        "tertiary-fixed-dim": "#e5c364",
+                        "on-primary-container": "#007139",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary-fixed": "#00210c",
+                        "primary": "#f1ffef",
+                        "on-surface": "#e5e2e1",
+                        "primary-container": "#00ff88",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#454747",
+                        "surface-container-low": "#1c1b1b",
+                        "on-secondary": "#2f3131",
+                        "secondary": "#c6c6c7",
+                        "tertiary-fixed": "#ffe08d",
+                        "on-background": "#e5e2e1",
+                        "on-primary": "#003919",
+                        "error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "gutter": "16px",
+                        "stack-lg": "48px",
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "stack-md": "24px"
+                    },
+                    "fontFamily": {
+                        "micro-bold": ["Inter"],
+                        "body-main": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "micro-bold": ["11px", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-main": ["16px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "display-sm": ["56px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "title-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-xl": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "title-sm": ["22px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.08em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #131313; color: #e5e2e1; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-main min-h-screen flex flex-col pt-16 pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background border-b border-outline-variant flex justify-between items-center px-margin-mobile py-unit max-w-7xl mx-auto md:hidden h-14">
+<h1 class="font-label-caps text-label-caps text-on-background">MASTERY HABITS</h1>
+<button class="text-primary-container hover:bg-surface-container transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</header>
+<header class="hidden md:flex fixed top-0 w-full z-50 bg-background border-b border-outline-variant justify-between items-center px-margin-desktop py-unit max-w-7xl mx-auto h-16">
+<h1 class="font-label-caps text-label-caps text-on-background">MASTERY HABITS</h1>
+<nav class="flex space-x-8 items-center">
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary-fixed transition-colors" href="#">DASHBOARD</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary-fixed transition-colors" href="#">HABITS</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary-fixed transition-colors" href="#">LEADERBOARD</a>
+<a class="font-label-caps text-label-caps text-primary-container hover:bg-surface-container transition-colors" href="#">PROFILE</a>
+</nav>
+<button class="text-primary-container hover:bg-surface-container transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</header>
+<main class="flex-grow px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto w-full pt-stack-md flex flex-col gap-stack-lg">
+<!-- Header Card -->
+<section class="bg-surface-container-low rounded-lg p-stack-md flex flex-col md:flex-row items-center gap-stack-md border border-outline-variant">
+<div class="w-24 h-24 rounded-full bg-surface-variant flex items-center justify-center text-primary-container font-title-lg text-title-lg border-2 border-primary-container">
+                JD
+            </div>
+<div class="text-center md:text-left flex flex-col gap-unit">
+<h2 class="font-title-lg text-title-lg text-on-surface">John Doe</h2>
+<p class="font-body-main text-body-main text-secondary">john@example.com</p>
+</div>
+<div class="md:ml-auto mt-stack-sm md:mt-0">
+<button class="px-6 py-3 border border-outline-variant text-on-surface font-label-caps text-label-caps rounded hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
+                    EDIT PROFILE
+                    <span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Stats Card "GLOBAL SCORE" -->
+<section class="bg-surface-container-low rounded-lg p-stack-md border border-outline-variant flex flex-col justify-between">
+<div>
+<h3 class="font-label-caps text-label-caps text-secondary mb-stack-sm tracking-widest">GLOBAL SCORE</h3>
+<div class="flex items-baseline gap-unit">
+<span class="font-display-xl text-display-xl text-primary-container tracking-tighter">92.4</span>
+</div>
+</div>
+<div class="mt-stack-md flex flex-col gap-stack-sm">
+<div class="flex items-center gap-2 bg-surface-variant px-3 py-2 rounded w-fit">
+<span class="text-xl">🌱</span>
+<span class="font-label-caps text-label-caps text-on-surface">SPROUT LEVEL</span>
+</div>
+<p class="font-body-main text-body-main text-secondary">12 active habits tracking</p>
+</div>
+</section>
+<!-- Distribution "HABIT LEVELS" -->
+<section class="bg-surface-container-low rounded-lg p-stack-md border border-outline-variant flex flex-col">
+<h3 class="font-label-caps text-label-caps text-secondary mb-stack-md tracking-widest">HABIT LEVELS</h3>
+<div class="flex flex-col gap-stack-sm flex-grow justify-center">
+<div class="flex justify-between items-center p-3 bg-surface hover:bg-surface-variant transition-colors rounded border border-outline-variant">
+<div class="flex items-center gap-3">
+<span class="text-xl">🌱</span>
+<span class="font-body-main text-body-main text-on-surface">Seed</span>
+</div>
+<span class="font-title-sm text-title-sm text-secondary">4</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface hover:bg-surface-variant transition-colors rounded border border-outline-variant border-l-4 border-l-primary-container">
+<div class="flex items-center gap-3">
+<span class="text-xl">🌿</span>
+<span class="font-body-main text-body-main text-on-surface">Sprout</span>
+</div>
+<span class="font-title-sm text-title-sm text-primary-container">6</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface hover:bg-surface-variant transition-colors rounded border border-outline-variant">
+<div class="flex items-center gap-3">
+<span class="text-xl">🌳</span>
+<span class="font-body-main text-body-main text-on-surface">Grow</span>
+</div>
+<span class="font-title-sm text-title-sm text-secondary">2</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-stack-sm bg-background border-t border-outline-variant">
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-fixed transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-fixed transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-fixed transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary-container hover:text-primary-fixed transition-colors p-2 scale-110" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</a>
+</nav>
+</body></html>

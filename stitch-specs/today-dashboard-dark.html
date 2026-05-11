@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Today - Mastery Habits</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#ffdb79",
+                    "background": "#131313",
+                    "on-tertiary-fixed": "#241a00",
+                    "on-tertiary-container": "#795f01",
+                    "on-secondary-fixed-variant": "#454747",
+                    "error": "#ffb4ab",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "tertiary": "#fffaf7",
+                    "outline": "#849585",
+                    "on-tertiary-fixed-variant": "#584400",
+                    "primary-fixed": "#60ff99",
+                    "on-primary-fixed-variant": "#005228",
+                    "on-secondary-container": "#b4b5b5",
+                    "surface-variant": "#353534",
+                    "surface-container-highest": "#353534",
+                    "surface": "#131313",
+                    "outline-variant": "#3b4b3d",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-container-lowest": "#0e0e0e",
+                    "primary-fixed-dim": "#00e479",
+                    "on-error": "#690005",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-tint": "#00e479",
+                    "surface-bright": "#3a3939",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "secondary-fixed": "#e2e2e2",
+                    "on-surface-variant": "#b9cbb9",
+                    "on-tertiary": "#3d2f00",
+                    "inverse-primary": "#006d37",
+                    "tertiary-fixed-dim": "#e5c364",
+                    "on-primary-container": "#007139",
+                    "on-error-container": "#ffdad6",
+                    "surface-dim": "#131313",
+                    "surface-container": "#201f1f",
+                    "on-primary-fixed": "#00210c",
+                    "primary": "#f1ffef",
+                    "on-surface": "#e5e2e1",
+                    "primary-container": "#00ff88",
+                    "inverse-on-surface": "#313030",
+                    "secondary-container": "#454747",
+                    "surface-container-low": "#1c1b1b",
+                    "on-secondary": "#2f3131",
+                    "secondary": "#c6c6c7",
+                    "tertiary-fixed": "#ffe08d",
+                    "on-background": "#e5e2e1",
+                    "on-primary": "#003919",
+                    "error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "gutter": "16px",
+                    "stack-lg": "48px",
+                    "unit": "4px",
+                    "margin-mobile": "20px",
+                    "stack-sm": "8px",
+                    "stack-md": "24px"
+            },
+            "fontFamily": {
+                    "micro-bold": ["Inter"],
+                    "body-main": ["Inter"],
+                    "display-sm": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "display-xl": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "label-caps": ["Inter"]
+            },
+            "fontSize": {
+                    "micro-bold": ["11px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-main": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "display-sm": ["56px", {"lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900"}],
+                    "title-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-xl": ["72px", {"lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900"}],
+                    "title-sm": ["22px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.08em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #0D0D0D;
+            color: #e5e2e1;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen pb-[80px] md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background docked full-width top-0 border-b border-outline-variant dark:border-outline-variant flat no shadows flex justify-between items-center w-full px-margin-mobile py-unit max-w-7xl mx-auto z-40 sticky">
+<div>
+<h1 class="font-label-caps text-label-caps text-on-background dark:text-on-background">MASTERY HABITS</h1>
+</div>
+<button class="w-10 h-10 bg-primary-container text-background rounded flex items-center justify-center hover:bg-surface-container transition-colors active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">add</span>
+</button>
+</header>
+<main class="max-w-7xl mx-auto px-margin-mobile pt-stack-md flex flex-col gap-stack-lg">
+<!-- Header Section -->
+<section class="flex flex-col gap-unit">
+<h2 class="font-title-lg text-title-lg text-on-background">Monday, May 11</h2>
+</section>
+<!-- Score Card -->
+<section class="bg-[#161616] border border-[#262626] rounded-[12px] p-[20px] flex flex-col gap-stack-sm">
+<h3 class="font-label-caps text-label-caps text-secondary tracking-widest">TODAY'S SCORE</h3>
+<div class="flex items-baseline gap-unit">
+<span class="font-display-xl text-display-xl text-primary-container">85.0</span>
+<span class="font-title-sm text-title-sm text-secondary">/ 100</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant">4 habits planned for today</p>
+</section>
+<!-- Habits List -->
+<section class="flex flex-col gap-stack-md">
+<h3 class="font-label-caps text-label-caps text-secondary tracking-widest border-b border-[#262626] pb-unit">MY HABITS</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
+<!-- Habit Card 1 -->
+<div class="bg-[#161616] border border-[#262626] rounded-[12px] p-[20px] flex flex-col gap-stack-md hover:border-primary-container transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="text-title-sm">🧘</span>
+<h4 class="font-title-sm text-title-sm text-on-background">Daily Meditation</h4>
+</div>
+<span class="font-micro-bold text-micro-bold bg-surface-container-high text-primary-container px-2 py-1 rounded">SPROUT</span>
+</div>
+<div class="flex flex-col gap-unit">
+<div class="flex justify-between items-center">
+<span class="font-body-main text-body-main text-on-surface-variant">Score: 12.4</span>
+<span class="font-micro-bold text-micro-bold text-primary-container">60%</span>
+</div>
+<div class="w-full h-[3px] bg-[#262626] rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 60%;"></div>
+</div>
+</div>
+</div>
+<!-- Habit Card 2 -->
+<div class="bg-[#161616] border border-[#262626] rounded-[12px] p-[20px] flex flex-col gap-stack-md hover:border-primary-container transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="text-title-sm">💧</span>
+<h4 class="font-title-sm text-title-sm text-on-background">Hydration</h4>
+</div>
+<span class="font-micro-bold text-micro-bold bg-surface-container-high text-primary-container px-2 py-1 rounded">GROW</span>
+</div>
+<div class="flex flex-col gap-unit">
+<div class="flex justify-between items-center">
+<span class="font-body-main text-body-main text-on-surface-variant">Score: 28.1</span>
+<span class="font-micro-bold text-micro-bold text-primary-container">90%</span>
+</div>
+<div class="w-full h-[3px] bg-[#262626] rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 90%;"></div>
+</div>
+</div>
+</div>
+<!-- Habit Card 3 (Completed) -->
+<div class="bg-[#161616] border border-[#262626] rounded-[12px] p-[20px] flex flex-col gap-stack-md opacity-50 relative overflow-hidden">
+<div class="absolute inset-0 bg-primary-container/10 flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-primary-container text-display-sm" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+<div class="flex justify-between items-start relative z-0">
+<div class="flex items-center gap-sm">
+<span class="text-title-sm">🏃</span>
+<h4 class="font-title-sm text-title-sm text-on-background line-through">Morning Run</h4>
+</div>
+</div>
+</div>
+<!-- Habit Card 4 -->
+<div class="bg-[#161616] border border-[#262626] rounded-[12px] p-[20px] flex flex-col gap-stack-md hover:border-primary-container transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="text-title-sm">📚</span>
+<h4 class="font-title-sm text-title-sm text-on-background">Deep Work</h4>
+</div>
+<span class="font-micro-bold text-micro-bold bg-surface-container-high text-primary-container px-2 py-1 rounded">SEED</span>
+</div>
+<div class="flex flex-col gap-unit">
+<div class="flex justify-between items-center">
+<span class="font-body-main text-body-main text-on-surface-variant">Score: 5.0</span>
+<span class="font-micro-bold text-micro-bold text-primary-container">20%</span>
+</div>
+<div class="w-full h-[3px] bg-[#262626] rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 20%;"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-background dark:bg-background fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-stack-sm border-t border-outline-variant dark:border-outline-variant flat no shadows">
+<a class="flex flex-col items-center justify-center text-primary-container dark:text-primary-container Active: scale-110 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">grid_view</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">leaderboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">person</span>
+</a>
+</nav>
+</body></html>

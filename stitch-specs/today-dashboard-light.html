@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Today - Mastery Habits</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e5e2e1",
+                        "surface": "#fdf8f8",
+                        "surface-variant": "#e5e2e1",
+                        "surface-container-high": "#ebe7e6",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "on-secondary-fixed-variant": "#464747",
+                        "tertiary": "#000000",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1d1b1a",
+                        "background": "#fdf8f8",
+                        "tertiary-container": "#1d1b1a",
+                        "on-tertiary-container": "#868381",
+                        "on-secondary-container": "#626262",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#484645",
+                        "outline": "#747878",
+                        "on-primary-fixed-variant": "#474646",
+                        "tertiary-fixed": "#e6e1df",
+                        "surface-container-low": "#f7f3f2",
+                        "secondary-container": "#e1dfdf",
+                        "secondary": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#444748",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#e4e2e2",
+                        "on-primary-container": "#858383",
+                        "inverse-primary": "#c8c6c5",
+                        "tertiary-fixed-dim": "#cac6c3",
+                        "surface-tint": "#5f5e5e",
+                        "inverse-surface": "#313030",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "surface-bright": "#fdf8f8",
+                        "on-surface": "#1c1b1b",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#f4f0ef",
+                        "primary-container": "#1c1b1b",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#f1edec",
+                        "on-primary-fixed": "#1c1b1b",
+                        "surface-dim": "#ddd9d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "40px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "container-max": "1200px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Anton"],
+                        "headline-md": ["Anton"],
+                        "display": ["Anton"],
+                        "label-bold": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-sm": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "headline-lg": ["Anton"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "display": ["64px", {"lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Lexend', sans-serif; background-color: #FAFAFA; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0; }
+        .material-symbols-outlined[data-weight="fill"] { font-variation-settings: 'FILL' 1; }
+        
+        /* Specific overrides for this exact request since theme config colors might not strictly match the prompt's explicit hex codes */
+        .bg-light-base { background-color: #FAFAFA; }
+        .bg-surface-white { background-color: #FFFFFF; }
+        .text-black-accent { color: #111111; }
+        .bg-black-accent { background-color: #111111; }
+        .border-light-gray { border-color: #E5E5E5; }
+        .accent-muted { background-color: rgba(0,0,0,0.1); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-light-base text-black-accent min-h-screen pb-24 relative selection:bg-black-accent selection:text-white">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background text-primary-container dark:text-primary-container docked full-width top-0 border-b border-outline-variant dark:border-outline-variant flat no shadows sticky z-40">
+<div class="flex justify-between items-center w-full px-lg py-sm max-w-container-max mx-auto h-[64px]">
+<h1 class="font-headline-md text-headline-md text-on-background dark:text-on-background uppercase">MASTERY HABITS</h1>
+<button class="hover:bg-surface-container dark:hover:bg-surface-container transition-colors w-10 h-10 flex items-center justify-center rounded-full active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-black-accent">add</span>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-lg pt-lg pb-xl space-y-xl">
+<!-- Score Card Bento -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Main Score -->
+<div class="md:col-span-8 bg-surface-white border border-light-gray rounded-[12px] p-lg flex flex-col justify-between min-h-[240px]">
+<div>
+<h2 class="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-2">Today's Protocol</h2>
+<p class="font-body-md text-body-md text-secondary">Optimal alignment detected.</p>
+</div>
+<div class="mt-8 flex items-end justify-between">
+<div>
+<div class="font-display text-display text-black-accent leading-none">85.0</div>
+<div class="font-label-bold text-label-bold text-secondary mt-1">/ 100 MASTERY INDEX</div>
+</div>
+<div class="w-16 h-16 rounded-full border-4 border-black-accent flex items-center justify-center relative">
+<span class="material-symbols-outlined text-black-accent text-3xl">trending_up</span>
+<!-- Subtle progress arc representation -->
+<div class="absolute inset-0 border-4 border-transparent border-t-black-accent border-r-black-accent rounded-full transform rotate-45"></div>
+</div>
+</div>
+</div>
+<!-- Context / Weather / Time Bento -->
+<div class="md:col-span-4 flex flex-col gap-gutter">
+<div class="bg-surface-white border border-light-gray rounded-[12px] p-md flex items-center justify-between flex-1">
+<div>
+<div class="font-label-bold text-label-bold text-secondary mb-1">ENVIRONMENT</div>
+<div class="font-headline-md text-headline-md text-black-accent">Clear, 68°</div>
+</div>
+<span class="material-symbols-outlined text-black-accent text-3xl" data-weight="fill">light_mode</span>
+</div>
+<div class="bg-surface-white border border-light-gray rounded-[12px] p-md flex items-center justify-between flex-1 relative overflow-hidden group cursor-pointer hover:border-black-accent transition-colors">
+<div class="relative z-10">
+<div class="font-label-bold text-label-bold text-secondary mb-1">NEXT BLOCK</div>
+<div class="font-headline-md text-headline-md text-black-accent">Deep Work</div>
+<div class="font-label-sm text-label-sm text-secondary mt-1">09:00 - 11:30</div>
+</div>
+<span class="material-symbols-outlined text-black-accent text-3xl relative z-10">timer</span>
+<!-- Decorative progress fill -->
+<div class="absolute bottom-0 left-0 h-1 bg-black-accent w-[30%]"></div>
+</div>
+</div>
+</section>
+<!-- Habits List -->
+<section>
+<div class="flex items-center justify-between mb-md border-b border-light-gray pb-sm">
+<h3 class="font-headline-md text-headline-md text-black-accent">ACTIVE HABITS</h3>
+<span class="font-label-bold text-label-bold text-secondary">3 / 5 COMPLETED</span>
+</div>
+<div class="space-y-0">
+<!-- Habit 1: Completed -->
+<div class="group flex items-center py-md border-b border-light-gray hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded-lg cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-black-accent flex items-center justify-center mr-md shrink-0">
+<span class="material-symbols-outlined text-white text-sm" data-weight="fill">check</span>
+</div>
+<div class="flex-1">
+<div class="font-body-lg text-body-lg text-black-accent line-through opacity-70">Morning Hydration</div>
+<div class="font-label-sm text-label-sm text-secondary">1 Liter • 06:00 AM</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-bold text-label-bold text-black-accent">🔥 12</span>
+<span class="material-symbols-outlined text-outline group-hover:text-black-accent transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Habit 2: Completed -->
+<div class="group flex items-center py-md border-b border-light-gray hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded-lg cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-black-accent flex items-center justify-center mr-md shrink-0">
+<span class="material-symbols-outlined text-white text-sm" data-weight="fill">check</span>
+</div>
+<div class="flex-1">
+<div class="font-body-lg text-body-lg text-black-accent line-through opacity-70">Mobility Routine</div>
+<div class="font-label-sm text-label-sm text-secondary">20 Mins • Stretching</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-bold text-label-bold text-black-accent">🔥 45</span>
+<span class="material-symbols-outlined text-outline group-hover:text-black-accent transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Habit 3: Active -->
+<div class="group flex items-center py-md border-b border-light-gray hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded-lg cursor-pointer relative overflow-hidden">
+<!-- Active Indicator Left -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-black-accent"></div>
+<div class="w-8 h-8 rounded-full border-2 border-black-accent flex items-center justify-center mr-md shrink-0 pl-1">
+<!-- Empty circle waiting to be checked -->
+</div>
+<div class="flex-1">
+<div class="font-body-lg text-body-lg text-black-accent font-medium">Deep Work</div>
+<div class="font-label-sm text-label-sm text-secondary">90 Mins • Focused Output</div>
+<!-- Progress Bar Inline -->
+<div class="mt-3 flex items-center gap-2 w-full max-w-xs">
+<div class="h-2 flex-1 rounded-full accent-muted overflow-hidden">
+<div class="h-full bg-black-accent w-[30%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-black-accent">30%</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-bold text-label-bold text-black-accent">🔥 8</span>
+<button class="bg-black-accent text-white px-3 py-1 rounded-[4px] font-label-bold text-label-bold ml-2 hover:opacity-90">START</button>
+</div>
+</div>
+<!-- Habit 4: Pending -->
+<div class="group flex items-center py-md border-b border-light-gray hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded-lg cursor-pointer">
+<div class="w-8 h-8 rounded-full border-2 border-light-gray flex items-center justify-center mr-md shrink-0">
+</div>
+<div class="flex-1">
+<div class="font-body-lg text-body-lg text-black-accent">Zone 2 Cardio</div>
+<div class="font-label-sm text-label-sm text-secondary">45 Mins • Run/Cycle</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-bold text-label-bold text-secondary">🔥 22</span>
+<span class="material-symbols-outlined text-outline group-hover:text-black-accent transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-black-accent rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:scale-105 transition-transform z-40 md:hidden">
+<span class="material-symbols-outlined text-white text-2xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 border-t border-outline-variant dark:border-outline-variant flat no shadows fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-stack-sm bg-background h-[72px]">
+<button class="flex flex-col items-center justify-center text-primary-container dark:text-primary-container scale-110 transition-transform duration-200">
+<span class="material-symbols-outlined" data-weight="fill">bolt</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">leaderboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">person</span>
+</button>
+</nav>
+</body></html>
