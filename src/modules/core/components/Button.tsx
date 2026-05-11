@@ -4,8 +4,10 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
+  View,
   type ViewStyle,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -19,6 +21,8 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
+  iconRight?: keyof typeof MaterialIcons.glyphMap;
+  iconLeft?: keyof typeof MaterialIcons.glyphMap;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -29,9 +33,12 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   style,
+  iconRight,
+  iconLeft,
 }) => {
   const t = useTheme();
 
+  const iconSizeMap: Record<ButtonSize, number> = { sm: 16, md: 18, lg: 20 };
   const paddingMap: Record<ButtonSize, { v: number; h: number }> = {
     sm: { v: 8,  h: 14 },
     md: { v: 12, h: 20 },
@@ -81,15 +88,23 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <Text style={{
-          color: textColor,
-          fontWeight: '600',
-          fontSize: fontSizeMap[size],
-          fontFamily: 'Inter_600SemiBold',
-          letterSpacing: 0.2,
-        }}>
-          {label}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: t.spacing.unit * 2 }}>
+          {iconLeft && (
+            <MaterialIcons name={iconLeft} size={iconSizeMap[size]} color={textColor} />
+          )}
+          <Text style={{
+            color: textColor,
+            fontWeight: '600',
+            fontSize: fontSizeMap[size],
+            fontFamily: 'Inter_600SemiBold',
+            letterSpacing: 0.2,
+          }}>
+            {label}
+          </Text>
+          {iconRight && (
+            <MaterialIcons name={iconRight} size={iconSizeMap[size]} color={textColor} />
+          )}
+        </View>
       )}
     </TouchableOpacity>
   );
