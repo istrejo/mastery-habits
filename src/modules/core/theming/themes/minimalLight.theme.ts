@@ -45,5 +45,16 @@ export const minimalLightTheme: ThemeTokens = {
   radius: { sm: 6, md: 10, lg: 14, pill: 999 },
   borderWidth: { hairline: 0.5, default: 1, bold: 1 },
   typography: { numericFeatures: 'tnum' },
+  categoryColors: {
+    green:   { fg: '#15803d', bg: '#f0fdf4', border: '#bbf7d0' },
+    violet:  { fg: '#6b21a8', bg: '#faf5ff', border: '#e9d5ff' },
+    blue:    { fg: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' },
+    yellow:  { fg: '#a16207', bg: '#fefce8', border: '#fef08a' },
+    orange:  { fg: '#c2410c', bg: '#fff7ed', border: '#fed7aa' },
+    pink:    { fg: '#be185d', bg: '#fdf2f8', border: '#fbcfe8' },
+    cyan:    { fg: '#0e7490', bg: '#ecfeff', border: '#a5f3fc' },
+    emerald: { fg: '#047857', bg: '#ecfdf5', border: '#a7f3d0' },
+    neutral: { fg: '#57534e', bg: '#f5f5f4', border: '#e7e5e4' },
+  },
   meta: { id: 'minimal-light', name: 'Minimal Light', mode: 'light', tier: 'free' },
 };

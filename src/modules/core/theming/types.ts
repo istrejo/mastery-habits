@@ -1,3 +1,14 @@
+export type CategoryColorToken =
+  | 'green'
+  | 'violet'
+  | 'blue'
+  | 'yellow'
+  | 'orange'
+  | 'pink'
+  | 'cyan'
+  | 'emerald'
+  | 'neutral';
+
 export type ThemeId =
   | 'tech-neon'
   | 'organic-growth'
@@ -7,6 +18,12 @@ export type ThemeId =
   | 'terminal-phosphor';
 
 export type MasteryLevel = 'seed' | 'sprout' | 'tree' | 'forest' | 'ancient';
+
+export interface CategoryColorPair {
+  fg: string;
+  bg: string;
+  border: string;
+}
 
 export interface ThemeTokens {
   bg: {
@@ -67,6 +84,7 @@ export interface ThemeTokens {
     bodyFontFamily?: string;
     numericFeatures: string;
   };
+  categoryColors: Record<CategoryColorToken, CategoryColorPair>;
   meta: {
     id: ThemeId;
     name: string;

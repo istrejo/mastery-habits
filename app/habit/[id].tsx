@@ -5,8 +5,9 @@ import { format, subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Screen, Button, Card } from "@core/components";
 import { useTheme } from "@core/theming";
-import { useHabit, useHabits, HabitForm } from "@habits/index";
+import { useHabit, useHabits, HabitForm, CategoryBadge } from "@habits/index";
 import type { HabitInsert } from "@habits/index";
+import type { HabitCategoryId } from "@habits/constants/categories";
 import { useCheckIn, CheckInButton } from "@checkin/index";
 import { LevelProgress, MasteryBadge } from "@progression/index";
 
@@ -136,7 +137,9 @@ export default function HabitDetailScreen() {
             defaultValues={{
               name: habit.name,
               description: habit.description ?? "",
-              category: habit.category ?? "",
+              category: habit.category as HabitCategoryId,
+              custom_label: habit.custom_label ?? '',
+              custom_emoji: habit.custom_emoji ?? '✨',
               frequency_days: days,
             }}
             onSubmit={handleUpdate}
@@ -165,19 +168,24 @@ export default function HabitDetailScreen() {
                 {habit.description}
               </Text>
             ) : null}
-            {habit.category ? (
+            <CategoryBadge habit={habit} size="md" showLabel />
+            {habit.category === 'custom' && habit.custom_label === 'Sin categorizar' && (
               <View style={{
-                alignSelf: "flex-start",
-                backgroundColor: theme.accent.muted,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 8,
+                padding: 10,
+                backgroundColor: theme.bg.surfaceAlt,
+                borderLeftWidth: 3,
+                borderLeftColor: theme.status.skip,
                 borderRadius: theme.radius.sm,
-                paddingHorizontal: 8,
-                paddingVertical: 2,
               }}>
-                <Text style={{ color: theme.accent.primary, fontSize: 11, fontWeight: "600" }}>
-                  {habit.category}
+                <Text style={{ color: theme.text.secondary, fontSize: 12, flex: 1 }}>
+                  💡 {t('custom_category.uncategorized_banner')}
                 </Text>
               </View>
-            ) : null}
+            )}
           </Card>
 
           {/* Score */}

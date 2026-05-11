@@ -5,6 +5,6 @@ export type Score = Database['public']['Tables']['mastery_scores']['Row'];
 export type HabitWithScore = Habit & { mastery_scores: Score | null };
 
 export type HabitInsert = Pick<Habit, 'name' | 'frequency_days'> &
-  Partial<Pick<Habit, 'description' | 'category'>>;
+  Partial<Pick<Habit, 'description' | 'category' | 'custom_label' | 'custom_emoji'>>;
 
 export type HabitUpdate = Partial<HabitInsert>;
