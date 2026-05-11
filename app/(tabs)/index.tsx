@@ -7,7 +7,7 @@ import { Screen, Card, Skeleton } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useDateLocale } from "@core/i18n";
 import { useHabits, HabitCard } from "@habits/index";
-import { isPlannedDay } from "@checkin/index";
+import { isPlannedDay, useTodayCheckIns } from "@checkin/index";
 
 function DashboardSkeleton() {
   const theme = useTheme();
@@ -41,6 +41,7 @@ export default function DashboardScreen() {
   const dateLocale = useDateLocale();
   const router = useRouter();
   const { habits, loading } = useHabits();
+  const { completedToday } = useTodayCheckIns();
   const today = new Date();
 
   const formatStr = i18n.language === "en" ? "EEEE, MMMM d" : "EEEE d 'de' MMMM";
@@ -224,6 +225,7 @@ export default function DashboardScreen() {
               renderItem={({ item }) => (
                 <HabitCard
                   habit={item}
+                  completed={completedToday.has(item.id)}
                   onPress={() => router.push(`/habit/${item.id}`)}
                 />
               )}

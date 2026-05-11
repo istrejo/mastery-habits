@@ -39,6 +39,19 @@ export const checkinService = {
     return (data ?? []) as CheckInRecord[];
   },
 
+  getTodayForHabits: async (habitIds: string[], date: Date = new Date()): Promise<CheckInRecord[]> => {
+    if (habitIds.length === 0) return [];
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const { data, error } = await supabase
+      .from('check_ins')
+      .select('id, habit_id, check_date, status')
+      .eq('check_date', dateStr)
+      .in('habit_id', habitIds);
+
+    if (error) throw new Error(error.message);
+    return (data ?? []) as CheckInRecord[];
+  },
+
   register: async (
     habitId: string,
     date: Date,

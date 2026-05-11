@@ -1,6 +1,7 @@
 /* stitch: habit-card */
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { ProgressBar } from '@core/components';
 import type { HabitWithScore } from '../types';
@@ -18,9 +19,10 @@ const LEVEL_LABELS: Record<MasteryLevel, string> = {
 interface HabitCardProps {
   habit: HabitWithScore;
   onPress?: () => void;
+  completed?: boolean;
 }
 
-export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
+export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed = false }) => {
   const t = useTheme();
   const score = habit.mastery_scores?.score ?? 0;
   const level = (habit.mastery_scores?.level ?? 'seed') as MasteryLevel;
@@ -35,6 +37,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.8}
       style={{
         backgroundColor: t.bg.surface,
         borderColor: t.border.default,
@@ -43,6 +46,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
         padding: t.spacing.marginMobile,
         marginBottom: t.spacing.stackMd,
         gap: t.spacing.stackMd,
+        opacity: completed ? 0.5 : 1,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
       {/* Header row */}
@@ -55,6 +61,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
             fontWeight: '600',
             fontFamily: 'Inter_600SemiBold',
             flex: 1,
+            textDecorationLine: completed ? 'line-through' : 'none',
           }}>
             {habit.name}
           </Text>
@@ -103,6 +110,23 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
           {score.toFixed(1)}
         </Text>
       </View>
+
+      {/* Completed overlay */}
+      {completed && (
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: `${t.accent.primary}1A`,
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+        }}>
+          <MaterialIcons name="check" size={56} color={t.accent.primary} />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
