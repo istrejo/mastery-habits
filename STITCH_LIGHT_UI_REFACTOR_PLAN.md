@@ -319,33 +319,43 @@ Auth screens alineadas al sistema light. Typecheck global y tests pasan.
 
 ### Checklist
 
-- [ ] Today Dashboard:
+- [x] Today Dashboard:
   - protocol/score card,
   - active habits section,
   - completed count real,
   - `HabitCard` nuevo.
-- [ ] Power Grid:
+- [x] Power Grid:
   - grid light editorial,
   - active/empty visual states,
   - summary cards reales cuando aplique.
-- [ ] Stats Dashboard:
+- [x] Stats Dashboard:
   - current streak hero,
   - completion/summary card si se puede calcular sin nueva lógica,
   - activity grid,
   - top habits.
-- [ ] Profile:
+- [x] Profile:
   - identity block,
   - global score,
   - habit levels list,
   - settings route preservada.
-- [ ] Tab bar light con icons actuales alineados a Stitch.
+- [x] Tab bar light con icons actuales alineados a Stitch.
 
 ### Validación
 
-- [ ] `npx tsc --noEmit`.
-- [ ] `npm test`.
-- [ ] QA visual contra Today/Stats/Power Grid/Profile light.
-- [ ] No se ejecutó build.
+- [x] `npx tsc --noEmit`.
+- [x] `npm test -- --runInBand`.
+- [!] QA visual manual pendiente en simulador; código alineado contra specs light de Stitch.
+- [x] No se ejecutó build.
+
+### Resultado Fase 6
+
+- `app/(tabs)/index.tsx`: Today Dashboard migrado a composición editorial light con score/protocol, bloques contextuales y `HabitCard` refactorizado.
+- `app/(tabs)/grid.tsx`: Power Grid migrado a surface light con resumen real y estados activos/vacíos.
+- `app/(tabs)/stats.tsx`: Stats Dashboard migrado a hero de racha, summary cards, activity grid y top habits con tokens light.
+- `app/(tabs)/profile.tsx`: Profile migrado a identity card, global score y listado de niveles.
+- `app/(tabs)/_layout.tsx`: Tab bar alineada al sistema Stitch Light.
+- `npx tsc --noEmit` pasó sin errores.
+- `npm test -- --runInBand` pasó: 3 suites, 48 tests.
 
 ### Gate
 
