@@ -1,3 +1,4 @@
+/* stitch: input */
 import React, { useState } from 'react';
 import {
   TextInput,
@@ -24,7 +25,7 @@ export const Input: React.FC<InputProps> = ({
   const t = useTheme();
   const [focused, setFocused] = useState(false);
 
-  const borderColor = error
+  const borderBottomColor = error
     ? t.status.danger
     : focused
       ? t.accent.primary
@@ -33,23 +34,30 @@ export const Input: React.FC<InputProps> = ({
   return (
     <View style={containerStyle}>
       {label ? (
-        <Text
-          style={{ color: t.text.secondary, fontSize: 13, marginBottom: 6, fontWeight: '500' }}
-        >
+        <Text style={{
+          color: t.text.secondary,
+          fontSize: t.typography.scale.labelCaps.fontSize,
+          fontWeight: '600',
+          fontFamily: 'Inter_600SemiBold',
+          letterSpacing: t.typography.scale.labelCaps.letterSpacing,
+          textTransform: 'uppercase',
+          marginBottom: t.spacing.stackSm,
+        }}>
           {label}
         </Text>
       ) : null}
       <TextInput
         style={[
           {
-            backgroundColor: t.bg.surfaceAlt,
-            borderColor,
-            borderWidth: t.borderWidth.default,
-            borderRadius: t.radius.md,
+            backgroundColor: 'transparent',
+            borderBottomWidth: t.borderWidth.default,
+            borderBottomColor,
+            borderRadius: 0,
             color: t.text.primary,
-            paddingVertical: 12,
-            paddingHorizontal: 14,
-            fontSize: 15,
+            fontFamily: 'Inter_400Regular',
+            fontSize: t.typography.scale.bodyMain.fontSize,
+            paddingVertical: t.spacing.stackSm,
+            paddingHorizontal: 0,
           },
           style,
         ]}
@@ -59,7 +67,12 @@ export const Input: React.FC<InputProps> = ({
         {...rest}
       />
       {error ? (
-        <Text style={{ color: t.status.danger, fontSize: 12, marginTop: 4 }}>
+        <Text style={{
+          color: t.status.danger,
+          fontSize: t.typography.scale.microBold.fontSize,
+          fontFamily: 'Inter_500Medium',
+          marginTop: 4,
+        }}>
           {error}
         </Text>
       ) : null}
