@@ -7,7 +7,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Screen, Card, Skeleton, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useDateLocale } from "@core/i18n";
-import { useHabits, HabitCard } from "@habits/index";
+import { useHabits, DashboardHabitRow, type DashboardHabitStatus } from "@habits/index";
 import { isPlannedDay, useTodayCheckIns } from "@checkin/index";
 
 function Header({ onAdd }: { onAdd: () => void }) {
@@ -48,7 +48,7 @@ function FloatingAddButton({ onPress }: { onPress: () => void }) {
       style={{
         position: "absolute",
         right: 24,
-        bottom: 96,
+        bottom: -5,
         width: 56,
         height: 56,
         borderRadius: theme.radius.pill,
@@ -83,6 +83,13 @@ export default function DashboardScreen() {
   const avgScore = habits.length > 0 ? habits.reduce((sum, h) => sum + (h.mastery_scores?.score ?? 0), 0) / habits.length : 0;
   const nextHabit = pendingToday.find((h) => !completedToday.has(h.id));
   const completedAllToday = completedCount === pendingToday.length && pendingToday.length > 0;
+  const activeHabitId = nextHabit?.id;
+
+  const getHabitStatus = (habitId: string): DashboardHabitStatus => {
+    if (completedToday.has(habitId)) return "completed";
+    if (activeHabitId === habitId) return "active";
+    return "pending";
+  };
 
   return (
     <Screen contentStyle={{ paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }}>
@@ -183,7 +190,15 @@ export default function DashboardScreen() {
               </View>
 
               {habits.map((habit) => (
-                <HabitCard key={habit.id} habit={habit} completed={completedToday.has(habit.id)} onPress={() => router.push(`/habit/${habit.id}`)} />
+                <DashboardHabitRow
+                  key={habit.id}
+                  habit={habit}
+                  status={getHabitStatus(habit.id)}
+                  score={habit.mastery_scores?.score ?? 0}
+                  showStartAction={activeHabitId === habit.id}
+                  inlineProgressPercent={activeHabitId === habit.id ? 30 : undefined}
+                  onPress={() => router.push(`/habit/${habit.id}`)}
+                />
               ))}
             </View>
           </View>
