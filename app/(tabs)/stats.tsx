@@ -13,15 +13,15 @@ function ActivityGrid() {
   const theme = useTheme();
   const { habits } = useHabits();
   const today = new Date();
-  const COLS = 10;
-  const ROWS = 7;
-  const TOTAL = COLS * ROWS;
+  const WEEKS = 14;
+  const DAYS = 7;
+  const TOTAL = WEEKS * DAYS;
 
   const cells = Array.from({ length: TOTAL }, (_, i) => {
     const date = subDays(today, TOTAL - 1 - i);
     const planned = habits.filter((h) => isPlannedDay(h, date)).length;
     const intensity = habits.length > 0 ? planned / habits.length : 0;
-    return intensity;
+    return { intensity, isToday: i === TOTAL - 1 };
   });
 
   const cellColor = (intensity: number) => {
@@ -33,17 +33,28 @@ function ActivityGrid() {
   };
 
   return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 3 }}>
-      {cells.map((intensity, i) => (
-        <View
-          key={i}
-          style={{
-            width: 12,
-            height: 12,
-            borderRadius: theme.radius.sm / 2,
-            backgroundColor: cellColor(intensity),
-          }}
-        />
+    <View style={{ flexDirection: "row", gap: 3 }}>
+      {Array.from({ length: WEEKS }, (_, weekIdx) => (
+        <View key={weekIdx} style={{ flexDirection: "column", gap: 3 }}>
+          {Array.from({ length: DAYS }, (_, dayIdx) => {
+            const { intensity, isToday } = cells[weekIdx * DAYS + dayIdx];
+            return (
+              <View
+                key={dayIdx}
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: theme.radius.sm / 2,
+                  backgroundColor: cellColor(intensity),
+                  ...(isToday && {
+                    borderWidth: 1.5,
+                    borderColor: theme.accent.primary,
+                  }),
+                }}
+              />
+            );
+          })}
+        </View>
       ))}
     </View>
   );
