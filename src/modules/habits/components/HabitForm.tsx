@@ -1,17 +1,22 @@
 import React, { useMemo } from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@core/theming';
 import { Input, Button } from '@core/components';
 import { FrequencySelector } from './FrequencySelector';
+import { CategoryPicker } from './CategoryPicker';
 import type { HabitInsert } from '../types';
+import type { HabitCategoryId } from '../constants/categories';
 
 export type HabitFormData = {
   name: string;
   description?: string;
-  category?: string;
+  category: HabitCategoryId;
+  custom_label?: string;
+  custom_emoji?: string;
   frequency_days: number[];
 };
 
@@ -22,6 +27,8 @@ interface HabitFormProps {
   loading?: boolean;
 }
 
+const CATEGORY_IDS = ['health', 'mind', 'learning', 'productivity', 'nutrition', 'creativity', 'social', 'finance', 'custom'] as const;
+
 export const HabitForm: React.FC<HabitFormProps> = ({
   defaultValues,
   onSubmit,
@@ -29,41 +36,60 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   loading = false,
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const schema = useMemo(
     () =>
-      z.object({
-        name: z.string().min(1, t('habit_form.error_required')).max(80, t('habit_form.error_name_max')),
-        description: z.string().max(300).optional(),
-        category: z.string().max(40).optional(),
-        frequency_days: z
-          .array(z.number().int().min(1).max(7))
-          .min(1, t('habit_form.error_days_min')),
-      }),
+      z
+        .object({
+          name: z.string().min(1, t('habit_form.error_required')).max(80, t('habit_form.error_name_max')),
+          description: z.string().max(300).optional(),
+          category: z.enum(CATEGORY_IDS),
+          custom_label: z.string().max(30).optional(),
+          custom_emoji: z.string().max(8).optional(),
+          frequency_days: z
+            .array(z.number().int().min(1).max(7))
+            .min(1, t('habit_form.error_days_min')),
+        })
+        .refine(
+          (data) =>
+            data.category !== 'custom' || (!!data.custom_label && !!data.custom_emoji),
+          { message: 'Custom requiere label y emoji', path: ['custom_label'] }
+        ),
     [t]
   );
 
   const {
     control,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<HabitFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
       description: '',
-      category: '',
+      category: 'health',
+      custom_label: '',
+      custom_emoji: '✨',
       frequency_days: [1, 2, 3, 4, 5],
       ...defaultValues,
     },
   });
 
+  const watchedCustomLabel = watch('custom_label');
+  const watchedCustomEmoji = watch('custom_emoji');
+
   const handleFormSubmit = (data: HabitFormData) => {
+    const isCustom = data.category === 'custom';
     const payload: HabitInsert = {
       name: data.name,
       frequency_days: data.frequency_days,
-      ...(data.description ? { description: data.description } : {}),
-      ...(data.category ? { category: data.category } : {}),
+      category: data.category,
+      description: data.description || undefined,
+      custom_label: isCustom ? (data.custom_label ?? null) : null,
+      custom_emoji: isCustom ? (data.custom_emoji ?? null) : null,
     };
     onSubmit(payload);
   };
@@ -99,18 +125,32 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         )}
       />
 
-      <Controller
-        control={control}
-        name="category"
-        render={({ field: { onChange, value } }) => (
-          <Input
-            label={t('habit_form.category_label')}
-            onChangeText={onChange}
-            value={value ?? ''}
-            placeholder={t('habit_form.category_placeholder')}
-          />
+      <View style={{ gap: 6 }}>
+        <Text style={{ color: theme.text.secondary, fontSize: 13, fontWeight: '600' }}>
+          {t('habit_form.category_label')}
+        </Text>
+        <Controller
+          control={control}
+          name="category"
+          render={({ field: { onChange, value } }) => (
+            <CategoryPicker
+              value={value}
+              onChange={onChange}
+              customLabel={watchedCustomLabel ?? ''}
+              customEmoji={watchedCustomEmoji ?? '✨'}
+              onCustomChange={({ label, emoji }) => {
+                setValue('custom_label', label, { shouldValidate: true });
+                setValue('custom_emoji', emoji, { shouldValidate: true });
+              }}
+            />
+          )}
+        />
+        {errors.custom_label && (
+          <Text style={{ color: theme.status.danger, fontSize: 12 }}>
+            {errors.custom_label.message}
+          </Text>
         )}
-      />
+      </View>
 
       <Controller
         control={control}

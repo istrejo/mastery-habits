@@ -23,7 +23,7 @@ export const habitsService = {
     const userId = useSessionStore.getState().user?.id ?? '';
     return supabase
       .from('habits')
-      .insert({ ...data, user_id: userId })
+      .insert({ ...data, user_id: userId, category: data.category ?? 'custom' })
       .select(HABIT_SELECT)
       .single();
   },

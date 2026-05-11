@@ -4,6 +4,7 @@ import { useTheme } from '@core/theming';
 import { ProgressBar } from '@core/components';
 import type { HabitWithScore } from '../types';
 import type { MasteryLevel } from '@core/theming';
+import { CategoryBadge } from './CategoryBadge';
 
 const LEVEL_LABELS: Record<MasteryLevel, string> = {
   seed: '🌱 Seed',
@@ -37,9 +38,12 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
       }}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <Text style={{ color: t.text.primary, fontSize: 16, fontWeight: '600', flex: 1 }}>
-          {habit.name}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+          <CategoryBadge habit={habit} size="sm" showLabel={false} />
+          <Text style={{ color: t.text.primary, fontSize: 16, fontWeight: '600', flex: 1 }}>
+            {habit.name}
+          </Text>
+        </View>
         <View
           style={{
             backgroundColor: levelTokens.bg,

@@ -45,5 +45,16 @@ export const brutalistEditorialTheme: ThemeTokens = {
   radius: { sm: 0, md: 0, lg: 0, pill: 0 },
   borderWidth: { hairline: 1.5, default: 1.5, bold: 2 },
   typography: { displayFontFamily: 'Georgia', numericFeatures: 'tnum' },
+  categoryColors: {
+    green:   { fg: '#000', bg: '#86efac', border: '#000' },
+    violet:  { fg: '#000', bg: '#d8b4fe', border: '#000' },
+    blue:    { fg: '#000', bg: '#93c5fd', border: '#000' },
+    yellow:  { fg: '#000', bg: '#fde047', border: '#000' },
+    orange:  { fg: '#000', bg: '#fb923c', border: '#000' },
+    pink:    { fg: '#000', bg: '#f9a8d4', border: '#000' },
+    cyan:    { fg: '#000', bg: '#67e8f9', border: '#000' },
+    emerald: { fg: '#000', bg: '#6ee7b7', border: '#000' },
+    neutral: { fg: '#000', bg: '#ebe6da', border: '#000' },
+  },
   meta: { id: 'brutalist-editorial', name: 'Brutalist Editorial', mode: 'light', tier: 'premium' },
 };

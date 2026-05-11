@@ -95,12 +95,31 @@ export const en: TranslationKeys = {
     name_placeholder: 'E.g.: Meditation',
     description_label: 'Description (optional)',
     description_placeholder: 'What is this habit for?',
-    category_label: 'Category (optional)',
+    category_label: 'Category',
     category_placeholder: 'E.g.: Health, Mind, Work',
     error_required: 'Required',
     error_name_max: 'Maximum 80 characters',
     error_days_min: 'Select at least one day',
     save_default: 'Save',
+  },
+
+  categories: {
+    health:       { label: 'Health',        description: 'Exercise, sleep, movement' },
+    mind:         { label: 'Mind',          description: 'Meditation, journaling, therapy' },
+    learning:     { label: 'Learning',      description: 'Reading, courses, languages' },
+    productivity: { label: 'Productivity',  description: 'Deep work, planning, focus' },
+    nutrition:    { label: 'Nutrition',     description: 'Hydration, mindful eating' },
+    creativity:   { label: 'Creativity',    description: 'Writing, creating, side projects' },
+    social:       { label: 'Social',        description: 'Family, friends, networking' },
+    finance:      { label: 'Finance',       description: 'Savings, spending, investing' },
+    custom:       { label: 'Custom',        description: 'Define your own' },
+  },
+
+  custom_category: {
+    emoji_label: 'Emoji',
+    name_label: 'Name',
+    name_placeholder: 'My category',
+    uncategorized_banner: 'This habit has no category. Edit it to classify it.',
   },
 
   frequency: {

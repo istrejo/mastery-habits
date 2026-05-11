@@ -1,3 +1,3 @@
 export { ThemeProvider, useTheme, THEMES } from './ThemeProvider';
 export { useThemeStore } from './theme.store';
-export type { ThemeId, ThemeTokens, MasteryLevel } from './types';
+export type { ThemeId, ThemeTokens, MasteryLevel, CategoryColorToken, CategoryColorPair } from './types';

@@ -93,12 +93,31 @@ export const es = {
     name_placeholder: 'Ej: Meditación',
     description_label: 'Descripción (opcional)',
     description_placeholder: '¿Para qué querés este hábito?',
-    category_label: 'Categoría (opcional)',
+    category_label: 'Categoría',
     category_placeholder: 'Ej: Salud, Mente, Trabajo',
     error_required: 'Requerido',
     error_name_max: 'Máximo 80 caracteres',
     error_days_min: 'Seleccioná al menos un día',
     save_default: 'Guardar',
+  },
+
+  categories: {
+    health:       { label: 'Salud',         description: 'Ejercicio, sueño, movimiento' },
+    mind:         { label: 'Mente',         description: 'Meditación, journaling, terapia' },
+    learning:     { label: 'Aprendizaje',   description: 'Lectura, cursos, idiomas' },
+    productivity: { label: 'Productividad', description: 'Deep work, planificación, foco' },
+    nutrition:    { label: 'Nutrición',     description: 'Hidratación, alimentación consciente' },
+    creativity:   { label: 'Creatividad',   description: 'Escribir, crear, side projects' },
+    social:       { label: 'Social',        description: 'Familia, amigos, networking' },
+    finance:      { label: 'Finanzas',      description: 'Ahorro, gastos, inversión' },
+    custom:       { label: 'Personalizado', description: 'Definí el tuyo' },
+  },
+
+  custom_category: {
+    emoji_label: 'Emoji',
+    name_label: 'Nombre',
+    name_placeholder: 'Mi categoría',
+    uncategorized_banner: 'Este hábito no tiene categoría asignada. Editalo para clasificarlo.',
   },
 
   frequency: {
