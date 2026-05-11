@@ -8,13 +8,6 @@ import type { HabitWithScore } from '../types';
 import type { MasteryLevel } from '@core/theming';
 import { CategoryBadge } from './CategoryBadge';
 
-const LEVEL_LABELS: Record<MasteryLevel, string> = {
-  seed: '🌱 Seed',
-  sprout: '🌿 Sprout',
-  tree: '🌳 Tree',
-  forest: '🌲 Forest',
-  ancient: '🗿 Ancient',
-};
 
 interface HabitCardProps {
   habit: HabitWithScore;
@@ -80,15 +73,12 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed 
             fontWeight: '700',
             fontFamily: 'Inter_700Bold',
           }}>
-            {LEVEL_LABELS[level]}
+            {level.toUpperCase()}
           </Text>
         </View>
       </View>
 
-      {/* Progress */}
-      <ProgressBar value={score} />
-
-      {/* Score footer */}
+      {/* Score + compliance row */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <Text style={{
           color: t.text.secondary,
@@ -98,7 +88,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed 
           letterSpacing: t.typography.scale.labelCaps.letterSpacing,
           textTransform: 'uppercase',
         }}>
-          Score
+          {`Score: ${score.toFixed(1)}`}
         </Text>
         <Text style={{
           color: scoreColor,
@@ -107,9 +97,12 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed 
           fontFamily: 'Inter_700Bold',
           fontVariant: ['tabular-nums'],
         }}>
-          {score.toFixed(1)}
+          {`${Math.round(score)}%`}
         </Text>
       </View>
+
+      {/* Progress */}
+      <ProgressBar value={score} />
 
       {/* Completed overlay */}
       {completed && (
