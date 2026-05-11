@@ -183,6 +183,7 @@ export const en: TranslationKeys = {
 
   tabs: {
     habits: 'Habits',
+    stats: 'Stats',
     profile: 'Profile',
   },
 };

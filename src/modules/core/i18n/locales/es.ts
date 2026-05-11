@@ -181,6 +181,7 @@ export const es = {
 
   tabs: {
     habits: 'Hábitos',
+    stats: 'Stats',
     profile: 'Perfil',
   },
 };
