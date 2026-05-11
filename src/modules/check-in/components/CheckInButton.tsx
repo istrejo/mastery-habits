@@ -42,7 +42,7 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
           style,
         ]}
       >
-        <Text style={{ color: theme.text.tertiary, fontSize: 13 }}>
+        <Text style={{ color: theme.text.tertiary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: 'Inter_500Medium' }}>
           {t('checkin.not_planned')}
         </Text>
       </View>
@@ -65,7 +65,7 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
           style,
         ]}
       >
-        <Text style={{ color: isSkipped ? theme.status.skip : theme.status.success, fontSize: 15, fontWeight: '700' }}>
+        <Text style={{ color: isSkipped ? theme.status.skip : theme.status.success, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: 'Inter_700Bold' }}>
           {isSkipped ? t('checkin.skip_used') : t('checkin.completed')}
         </Text>
       </View>
@@ -86,7 +86,7 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
             opacity: loading ? 0.6 : 1,
           })}
         >
-          <Text style={{ color: theme.text.inverse, fontSize: 16, fontWeight: '700' }}>
+          <Text style={{ color: theme.text.inverse, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: 'Inter_700Bold' }}>
             {t('checkin.complete_action')}
           </Text>
         </Pressable>
@@ -105,7 +105,7 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
               opacity: loading ? 0.6 : 1,
             })}
           >
-            <Text style={{ color: theme.status.skip, fontSize: 14, fontWeight: '600' }}>
+            <Text style={{ color: theme.status.skip, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: 'Inter_600SemiBold' }}>
               {t('checkin.use_skip')}
             </Text>
           </Pressable>
@@ -120,10 +120,10 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
       >
         <View style={{ flex: 1, backgroundColor: '#00000080', justifyContent: 'center', padding: 24 }}>
           <View style={{ backgroundColor: theme.bg.surface, borderRadius: theme.radius.lg, padding: 24 }}>
-            <Text style={{ color: theme.text.primary, fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
+            <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleSm.fontSize, fontFamily: 'Inter_700Bold', letterSpacing: theme.typography.scale.titleSm.letterSpacing, marginBottom: 8 }}>
               {t('checkin.skip_modal_title')}
             </Text>
-            <Text style={{ color: theme.text.secondary, fontSize: 14, marginBottom: 24 }}>
+            <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, marginBottom: 24 }}>
               {t('checkin.skip_modal_body')}
             </Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>

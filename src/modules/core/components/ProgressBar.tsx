@@ -37,7 +37,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         {
           height,
           backgroundColor: t.border.default,
-          borderRadius: 0,
+          borderRadius: t.radius.pill,
           overflow: 'hidden',
         },
         style,

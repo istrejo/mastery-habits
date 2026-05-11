@@ -31,8 +31,8 @@ export const MasteryBadge: React.FC<MasteryBadgeProps> = ({ score, style }) => {
         style,
       ]}
     >
-      <Text style={{ fontSize: 12 }}>{level.emoji}</Text>
-      <Text style={{ fontSize: 11, color: lv.fg, fontWeight: '600' }}>
+      <Text style={{ fontSize: t.typography.scale.labelCaps.fontSize }}>{level.emoji}</Text>
+      <Text style={{ fontSize: t.typography.scale.labelCaps.fontSize, color: lv.fg, fontFamily: 'Inter_600SemiBold', letterSpacing: t.typography.scale.labelCaps.letterSpacing }}>
         {level.label}
       </Text>
     </View>

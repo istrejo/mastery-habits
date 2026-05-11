@@ -26,11 +26,11 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
           marginBottom: 6,
         }}
       >
-        <Text style={{ fontSize: 12, color: lv.fg, fontWeight: '600' }}>
+        <Text style={{ fontSize: t.typography.scale.labelCaps.fontSize, color: lv.fg, fontFamily: 'Inter_600SemiBold', letterSpacing: t.typography.scale.labelCaps.letterSpacing }}>
           {level.emoji} {level.label}
         </Text>
         {nextLevel && (
-          <Text style={{ fontSize: 12, color: t.text.tertiary }}>
+          <Text style={{ fontSize: t.typography.scale.labelCaps.fontSize, color: t.text.tertiary, fontFamily: 'Inter_600SemiBold', letterSpacing: t.typography.scale.labelCaps.letterSpacing }}>
             {nextLevel.emoji} {nextLevel.label}
           </Text>
         )}
@@ -52,7 +52,7 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
           }}
         />
       </View>
-      <Text style={{ fontSize: 11, color: t.text.tertiary, marginTop: 4 }}>
+      <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: t.text.tertiary, marginTop: 4 }}>
         {Math.round(score)}/100
       </Text>
     </View>
