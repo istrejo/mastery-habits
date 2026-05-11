@@ -1,5 +1,5 @@
 /* stitch: power-grid */
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@core/components";
@@ -32,16 +32,6 @@ export default function PowerGridScreen() {
         alignItems: "center",
         marginBottom: theme.spacing.stackMd,
       }}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{
-            color: theme.accent.primary,
-            fontSize: theme.typography.scale.bodyMain.fontSize,
-            fontFamily: "Inter_600SemiBold",
-            fontWeight: "600",
-          }}>
-            ← BACK
-          </Text>
-        </TouchableOpacity>
         <Text style={{
           color: theme.text.primary,
           fontSize: theme.typography.scale.labelCaps.fontSize,
@@ -50,7 +40,7 @@ export default function PowerGridScreen() {
           letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
           textTransform: "uppercase",
         }}>
-          POWER GRID
+          {t("dashboard.app_name")}
         </Text>
         <TouchableOpacity
           onPress={() => router.push("/habit/new")}

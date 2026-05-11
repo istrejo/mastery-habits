@@ -181,6 +181,7 @@ export const es = {
 
   tabs: {
     habits: 'Hábitos',
+    power_grid: 'Grid',
     stats: 'Stats',
     profile: 'Perfil',
   },

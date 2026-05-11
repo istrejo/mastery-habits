@@ -183,6 +183,7 @@ export const en: TranslationKeys = {
 
   tabs: {
     habits: 'Habits',
+    power_grid: 'Grid',
     stats: 'Stats',
     profile: 'Profile',
   },

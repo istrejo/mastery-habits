@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { useTheme } from "@core/theming";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 
 export default function TabsLayout() {
@@ -23,12 +23,17 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: tr("tabs.habits"),
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "checkmark-circle" : "checkmark-circle-outline"}
-              size={24}
-              color={color}
-            />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="bolt" size={26} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="grid"
+        options={{
+          title: tr("tabs.power_grid"),
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="grid-view" size={22} color={color} />
           ),
         }}
       />
@@ -36,12 +41,8 @@ export default function TabsLayout() {
         name="stats"
         options={{
           title: tr("tabs.stats"),
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "bar-chart" : "bar-chart-outline"}
-              size={24}
-              color={color}
-            />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="leaderboard" size={24} color={color} />
           ),
         }}
       />
@@ -49,12 +50,8 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: tr("tabs.profile"),
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              size={24}
-              color={color}
-            />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="person" size={24} color={color} />
           ),
         }}
       />
