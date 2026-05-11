@@ -1,3 +1,4 @@
+/* stitch: today-dashboard */
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { format } from "date-fns";
@@ -11,21 +12,22 @@ import { isPlannedDay } from "@checkin/index";
 function DashboardSkeleton() {
   const theme = useTheme();
   return (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: theme.spacing.stackMd }}>
       <Card>
-        <Skeleton width="40%" height={12} style={{ marginBottom: 8 }} />
-        <Skeleton width="30%" height={44} />
+        <Skeleton width="50%" height={theme.typography.scale.labelCaps.fontSize} style={{ marginBottom: theme.spacing.stackSm }} />
+        <Skeleton width="35%" height={theme.typography.scale.displayXl.fontSize} style={{ marginBottom: theme.spacing.unit }} />
+        <Skeleton width="60%" height={theme.typography.scale.bodyMain.fontSize} />
       </Card>
       {[1, 2, 3].map((i) => (
         <Card key={i}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 12 }}>
-            <Skeleton width="55%" height={16} />
-            <Skeleton width="22%" height={22} borderRadius={theme.radius.pill} />
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: theme.spacing.stackMd }}>
+            <Skeleton width="55%" height={theme.typography.scale.bodyMain.fontSize} />
+            <Skeleton width="22%" height={20} borderRadius={theme.radius.pill} />
           </View>
-          <Skeleton height={8} style={{ marginBottom: 6 }} />
+          <Skeleton height={3} style={{ marginBottom: theme.spacing.unit }} />
           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Skeleton width="20%" height={12} />
-            <Skeleton width="12%" height={12} />
+            <Skeleton width="20%" height={theme.typography.scale.labelCaps.fontSize} />
+            <Skeleton width="12%" height={theme.typography.scale.labelCaps.fontSize} />
           </View>
         </Card>
       ))}
@@ -59,110 +61,177 @@ export default function DashboardScreen() {
 
   return (
     <Screen scrollable>
-      {/* Header */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-        <View>
-          <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 2 }}>
-            {t("dashboard.app_name")}
-          </Text>
-          <Text style={{ color: theme.text.secondary, fontSize: 13 }}>
-            {todayLabel}
-          </Text>
-        </View>
+      {/* TopAppBar */}
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: theme.spacing.stackMd,
+      }}>
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontWeight: "600",
+          fontFamily: "Inter_600SemiBold",
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: "uppercase",
+        }}>
+          {t("dashboard.app_name")}
+        </Text>
         <TouchableOpacity
           onPress={() => router.push("/habit/new")}
           style={{
             backgroundColor: theme.accent.primary,
             width: 40,
             height: 40,
-            borderRadius: theme.radius.pill,
+            borderRadius: theme.radius.md,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Text style={{ color: theme.accent.onPrimary, fontSize: 22, lineHeight: 26 }}>+</Text>
+          <Text style={{ color: theme.accent.onPrimary, fontSize: 22, lineHeight: 26, fontWeight: "700" }}>+</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Date */}
+      <View style={{ marginBottom: theme.spacing.stackLg }}>
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.titleLg.fontSize,
+          fontWeight: "700",
+          fontFamily: "Inter_700Bold",
+          letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+          lineHeight: theme.typography.scale.titleLg.lineHeight,
+        }}>
+          {todayLabel}
+        </Text>
       </View>
 
       {loading ? (
         <DashboardSkeleton />
       ) : habits.length === 0 ? (
         /* Empty state */
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: 80 }}>
-          <Text style={{ fontSize: 48, marginBottom: 16 }}>🌱</Text>
-          <Text style={{ color: theme.text.primary, fontSize: 18, fontWeight: "700", marginBottom: 8, textAlign: "center" }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: theme.spacing.stackLg * 2 }}>
+          <Text style={{ fontSize: 48, marginBottom: theme.spacing.stackMd }}>🌱</Text>
+          <Text style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.titleSm.fontSize,
+            fontWeight: "700",
+            fontFamily: "Inter_700Bold",
+            marginBottom: theme.spacing.stackSm,
+            textAlign: "center",
+          }}>
             {t("dashboard.empty_title")}
           </Text>
-          <Text style={{ color: theme.text.tertiary, fontSize: 14, textAlign: "center", marginBottom: 28, lineHeight: 20 }}>
+          <Text style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.bodyMain.fontSize,
+            fontFamily: "Inter_400Regular",
+            lineHeight: theme.typography.scale.bodyMain.lineHeight,
+            textAlign: "center",
+            marginBottom: theme.spacing.stackLg,
+          }}>
             {t("dashboard.empty_body")}
           </Text>
           <TouchableOpacity
             onPress={() => router.push("/habit/new")}
             style={{
               backgroundColor: theme.accent.primary,
-              paddingHorizontal: 24,
-              paddingVertical: 12,
+              paddingHorizontal: theme.spacing.stackLg / 2,
+              paddingVertical: theme.spacing.stackSm * 2,
               borderRadius: theme.radius.md,
             }}
           >
-            <Text style={{ color: theme.accent.onPrimary, fontWeight: "700", fontSize: 15 }}>
+            <Text style={{
+              color: theme.accent.onPrimary,
+              fontWeight: "700",
+              fontFamily: "Inter_700Bold",
+              fontSize: theme.typography.scale.bodyMain.fontSize,
+            }}>
               {t("dashboard.create_habit")}
             </Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <>
-          {/* Global score */}
-          <Card style={{ marginBottom: 20 }}>
-            <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 4 }}>
+        <View style={{ gap: theme.spacing.stackLg }}>
+          {/* Score Card */}
+          <Card>
+            <Text style={{
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontWeight: "600",
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+              marginBottom: theme.spacing.stackSm,
+            }}>
               {t("dashboard.score_avg")}
             </Text>
-            <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 8 }}>
+
+            <View style={{ flexDirection: "row", alignItems: "baseline", gap: theme.spacing.unit }}>
               <Text style={{
                 color: scoreColor,
-                fontSize: 52,
-                fontWeight: "800",
-                fontFamily: theme.typography.displayFontFamily,
+                fontSize: theme.typography.scale.displayXl.fontSize,
+                fontWeight: "900",
+                fontFamily: "Inter_900Black",
+                letterSpacing: theme.typography.scale.displayXl.letterSpacing,
+                lineHeight: theme.typography.scale.displayXl.lineHeight,
                 fontVariant: ["tabular-nums"],
-                lineHeight: 60,
               }}>
                 {avgScore.toFixed(1)}
               </Text>
-              <Text style={{ color: theme.text.tertiary, fontSize: 13, marginBottom: 8 }}>
+              <Text style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.titleSm.fontSize,
+                fontWeight: "700",
+                fontFamily: "Inter_700Bold",
+              }}>
                 {t("common.score_suffix")}
               </Text>
             </View>
+
             {pendingToday.length > 0 && (
-              <View style={{
-                marginTop: 10,
-                paddingTop: 10,
-                borderTopWidth: theme.borderWidth.hairline,
-                borderTopColor: theme.border.subtle,
+              <Text style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.bodyMain.fontSize,
+                fontFamily: "Inter_400Regular",
+                marginTop: theme.spacing.stackSm,
               }}>
-                <Text style={{ color: theme.text.tertiary, fontSize: 12 }}>
-                  {t("dashboard.habits_today", { count: pendingToday.length })}
-                </Text>
-              </View>
+                {t("dashboard.habits_today", { count: pendingToday.length })}
+              </Text>
             )}
           </Card>
 
-          {/* Habits list */}
-          <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
-            {t("dashboard.my_habits")}
-          </Text>
-          <FlatList
-            data={habits}
-            keyExtractor={(h) => h.id}
-            renderItem={({ item }) => (
-              <HabitCard
-                habit={item}
-                onPress={() => router.push(`/habit/${item.id}`)}
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}
-          />
-        </>
+          {/* Habits section */}
+          <View>
+            <Text style={{
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontWeight: "600",
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+              paddingBottom: theme.spacing.unit,
+              borderBottomWidth: theme.borderWidth.default,
+              borderBottomColor: theme.border.default,
+              marginBottom: theme.spacing.stackMd,
+            }}>
+              {t("dashboard.my_habits")}
+            </Text>
+            <FlatList
+              data={habits}
+              keyExtractor={(h) => h.id}
+              renderItem={({ item }) => (
+                <HabitCard
+                  habit={item}
+                  onPress={() => router.push(`/habit/${item.id}`)}
+                />
+              )}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+            />
+          </View>
+        </View>
       )}
     </Screen>
   );
