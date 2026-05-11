@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Screen, Card, Button, ThemePicker, LanguageSelector } from "@core/components";
@@ -36,58 +36,69 @@ export default function SettingsScreen() {
 
   return (
     <Screen scrollable>
-      {/* Header */}
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24, gap: 12 }}>
-        <Text
-          onPress={() => router.back()}
-          style={{ color: theme.accent.primary, fontSize: 15 }}
-        >
-          {t("common.back")}
-        </Text>
-        <Text style={{ color: theme.text.primary, fontSize: 20, fontWeight: "700" }}>
+      {/* TopAppBar */}
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: theme.spacing.stackMd,
+      }}>
+        <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
+          <Text style={{
+            color: theme.accent.primary,
+            fontSize: theme.typography.scale.bodyMain.fontSize,
+            fontFamily: "Inter_600SemiBold",
+            fontWeight: "600",
+          }}>
+            ← {t("common.back")}
+          </Text>
+        </TouchableOpacity>
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontWeight: "600",
+          fontFamily: "Inter_600SemiBold",
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: "uppercase",
+        }}>
           {t("settings.title")}
         </Text>
+        <View style={{ width: 60 }} />
       </View>
 
-      {/* Language */}
-      <Card style={{ marginBottom: 16 }}>
-        <Text
-          style={{
-            color: theme.text.tertiary,
-            fontSize: 11,
-            fontWeight: "600",
-            letterSpacing: 1,
-            marginBottom: 12,
-          }}
-        >
-          {t("settings.language_section")}
-        </Text>
-        <LanguageSelector />
-      </Card>
+      <View style={{ gap: theme.spacing.stackMd }}>
+        {/* Language */}
+        <View style={{
+          backgroundColor: theme.bg.surfaceAlt,
+          borderColor: theme.border.subtle,
+          borderWidth: theme.borderWidth.default,
+          borderRadius: theme.radius.lg,
+          padding: theme.spacing.marginMobile,
+          gap: theme.spacing.stackSm,
+        }}>
+          <Text style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.labelCaps.fontSize,
+            fontFamily: "Inter_600SemiBold",
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+            textTransform: "uppercase",
+          }}>
+            {t("settings.language_section")}
+          </Text>
+          <LanguageSelector />
+        </View>
 
-      {/* Theme */}
-      <Card style={{ marginBottom: 16 }}>
-        <Text
-          style={{
-            color: theme.text.tertiary,
-            fontSize: 11,
-            fontWeight: "600",
-            letterSpacing: 1,
-            marginBottom: 12,
-          }}
-        >
-          {t("settings.theme_section")}
-        </Text>
+        {/* Theme */}
         <ThemePicker />
-      </Card>
 
-      {/* Logout */}
-      <Button
-        label={loggingOut ? t("settings.logging_out") : t("settings.logout")}
-        variant="danger"
-        onPress={handleLogout}
-        disabled={loggingOut}
-      />
+        {/* Logout */}
+        <Button
+          label={loggingOut ? t("settings.logging_out") : t("settings.logout")}
+          variant="danger"
+          onPress={handleLogout}
+          disabled={loggingOut}
+        />
+      </View>
     </Screen>
   );
 }

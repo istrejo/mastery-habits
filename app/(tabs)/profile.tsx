@@ -1,12 +1,16 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { Screen, Card, Skeleton } from "@core/components";
+import { Screen, Skeleton } from "@core/components";
 import { useTheme, type MasteryLevel } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
 import { useHabits } from "@habits/index";
 import { getLevel } from "@progression/index";
+
+const LEVEL_SCORE: Record<string, number> = {
+  ancient: 100, forest: 80, tree: 58, sprout: 33, seed: 10,
+};
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -22,122 +26,219 @@ export default function ProfileScreen() {
 
   const globalLevel = getLevel(avgScore);
 
-  const scoreColor =
-    avgScore >= 71 ? theme.score.excellent
-    : avgScore >= 46 ? theme.score.good
-    : avgScore >= 21 ? theme.score.warning
-    : theme.score.critical;
-
   const displayName = user?.user_metadata?.["display_name"] as string | undefined;
   const email = user?.email ?? "";
   const initials = displayName
     ? displayName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : email.slice(0, 2).toUpperCase();
 
+  const cardStyle = {
+    backgroundColor: theme.bg.surfaceAlt,
+    borderColor: theme.border.subtle,
+    borderWidth: theme.borderWidth.default,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.marginMobile,
+  } as const;
+
   return (
     <Screen scrollable>
-      {/* Header row */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1 }}>
-          {t("profile.title")}
+      {/* TopAppBar */}
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: theme.spacing.stackMd,
+      }}>
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontWeight: "600",
+          fontFamily: "Inter_600SemiBold",
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: "uppercase",
+        }}>
+          {t("dashboard.app_name")}
         </Text>
-        <Pressable
+        <TouchableOpacity
           onPress={() => router.push("/settings")}
           hitSlop={12}
-          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: theme.radius.md,
+            borderWidth: theme.borderWidth.default,
+            borderColor: theme.border.default,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          <Ionicons name="settings-outline" size={22} color={theme.text.tertiary} />
-        </Pressable>
+          <Ionicons name="settings-outline" size={20} color={theme.accent.primary} />
+        </TouchableOpacity>
       </View>
 
-      {/* Avatar + identity */}
-      <Card style={{ marginBottom: 16, alignItems: "center" }}>
-        <View style={{
-          width: 72,
-          height: 72,
-          borderRadius: theme.radius.pill,
-          backgroundColor: theme.accent.muted,
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 12,
-        }}>
-          <Text style={{ color: theme.accent.primary, fontSize: 26, fontWeight: "800" }}>
-            {initials}
+      <View style={{ gap: theme.spacing.stackMd }}>
+        {/* Identity card */}
+        <View style={[cardStyle, { alignItems: "center", gap: theme.spacing.stackSm }]}>
+          <View style={{
+            width: 96,
+            height: 96,
+            borderRadius: theme.radius.pill,
+            backgroundColor: theme.bg.elevated,
+            borderWidth: 2,
+            borderColor: theme.accent.primary,
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            <Text style={{
+              color: theme.accent.primary,
+              fontSize: theme.typography.scale.titleLg.fontSize,
+              fontWeight: "700",
+              fontFamily: "Inter_700Bold",
+            }}>
+              {initials}
+            </Text>
+          </View>
+          {displayName ? (
+            <Text style={{
+              color: theme.text.primary,
+              fontSize: theme.typography.scale.titleLg.fontSize,
+              fontWeight: "700",
+              fontFamily: "Inter_700Bold",
+              letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+            }}>
+              {displayName}
+            </Text>
+          ) : null}
+          <Text style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.bodyMain.fontSize,
+            fontFamily: "Inter_400Regular",
+          }}>
+            {email}
           </Text>
         </View>
-        {displayName ? (
-          <Text style={{ color: theme.text.primary, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
-            {displayName}
-          </Text>
-        ) : null}
-        <Text style={{ color: theme.text.secondary, fontSize: 14 }}>
-          {email}
-        </Text>
-      </Card>
 
-      {/* Global score */}
-      <Card style={{ marginBottom: 16 }}>
-        <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
-          {t("profile.score_global")}
-        </Text>
-        {loading ? (
-          <View style={{ gap: 8 }}>
-            <Skeleton width="35%" height={52} />
-            <Skeleton width="50%" height={14} />
-          </View>
-        ) : (
-          <>
-            <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 8, marginBottom: 8 }}>
+        {/* Global Score */}
+        <View style={[cardStyle, { gap: theme.spacing.stackMd }]}>
+          <Text style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.labelCaps.fontSize,
+            fontFamily: "Inter_600SemiBold",
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+            textTransform: "uppercase",
+          }}>
+            {t("profile.score_global")}
+          </Text>
+          {loading ? (
+            <View style={{ gap: theme.spacing.stackSm }}>
+              <Skeleton width="35%" height={theme.typography.scale.displayXl.fontSize} />
+              <Skeleton width="50%" height={theme.typography.scale.bodyMain.fontSize} />
+            </View>
+          ) : (
+            <View style={{ gap: theme.spacing.stackSm }}>
               <Text style={{
-                color: scoreColor,
-                fontSize: 52,
-                fontWeight: "800",
-                fontFamily: theme.typography.displayFontFamily,
+                color: theme.accent.primary,
+                fontSize: theme.typography.scale.displayXl.fontSize,
+                fontWeight: "900",
+                fontFamily: "Inter_900Black",
+                letterSpacing: theme.typography.scale.displayXl.letterSpacing,
+                lineHeight: theme.typography.scale.displayXl.lineHeight,
                 fontVariant: ["tabular-nums"],
-                lineHeight: 60,
               }}>
                 {avgScore.toFixed(1)}
               </Text>
-              <Text style={{ color: theme.text.tertiary, fontSize: 13, marginBottom: 8 }}>
-                {t("common.score_suffix")}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Text style={{ fontSize: 16 }}>{globalLevel.emoji}</Text>
-              <Text style={{ color: theme.level[globalLevel.key as MasteryLevel].fg, fontSize: 13, fontWeight: "600" }}>
-                {globalLevel.label}
-              </Text>
-              <Text style={{ color: theme.text.tertiary, fontSize: 13 }}>
-                · {t("profile.habits_count", { count: habits.length })}
-              </Text>
-            </View>
-          </>
-        )}
-      </Card>
-
-      {/* Stats distribution */}
-      {!loading && habits.length > 0 && (
-        <Card style={{ marginBottom: 16 }}>
-          <Text style={{ color: theme.text.tertiary, fontSize: 11, fontWeight: "600", letterSpacing: 1, marginBottom: 12 }}>
-            {t("profile.distribution")}
-          </Text>
-          {["ancient", "forest", "tree", "sprout", "seed"].map((key) => {
-            const count = habits.filter((h) => (h.mastery_scores?.level ?? "seed") === key).length;
-            if (count === 0) return null;
-            const level = getLevel(key === "ancient" ? 100 : key === "forest" ? 80 : key === "tree" ? 58 : key === "sprout" ? 33 : 10);
-            return (
-              <View key={key} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <Text style={{ color: theme.level[level.key as MasteryLevel].fg, fontSize: 13 }}>
-                  {level.emoji} {level.label}
-                </Text>
-                <Text style={{ color: theme.text.secondary, fontSize: 13, fontWeight: "600" }}>
-                  {count}
+              <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing.unit,
+                backgroundColor: theme.bg.elevated,
+                paddingHorizontal: theme.spacing.stackSm,
+                paddingVertical: theme.spacing.unit,
+                borderRadius: theme.radius.sm,
+                alignSelf: "flex-start",
+              }}>
+                <Text style={{ fontSize: 16 }}>{globalLevel.emoji}</Text>
+                <Text style={{
+                  color: theme.text.primary,
+                  fontSize: theme.typography.scale.labelCaps.fontSize,
+                  fontFamily: "Inter_600SemiBold",
+                  letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                  textTransform: "uppercase",
+                }}>
+                  {globalLevel.label}
                 </Text>
               </View>
-            );
-          })}
-        </Card>
-      )}
+              <Text style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.bodyMain.fontSize,
+                fontFamily: "Inter_400Regular",
+              }}>
+                {t("profile.habits_count", { count: habits.length })}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Habit Levels distribution */}
+        {!loading && habits.length > 0 && (
+          <View style={[cardStyle, { gap: theme.spacing.stackMd }]}>
+            <Text style={{
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+            }}>
+              {t("profile.distribution")}
+            </Text>
+            <View style={{ gap: theme.spacing.stackSm }}>
+              {["ancient", "forest", "tree", "sprout", "seed"].map((key) => {
+                const count = habits.filter((h) => (h.mastery_scores?.level ?? "seed") === key).length;
+                if (count === 0) return null;
+                const level = getLevel(LEVEL_SCORE[key]!);
+                const isActive = globalLevel.key === level.key;
+                return (
+                  <View
+                    key={key}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: theme.bg.base,
+                      borderRadius: theme.radius.sm,
+                      borderWidth: theme.borderWidth.default,
+                      borderColor: isActive ? theme.accent.primary : theme.border.subtle,
+                      borderLeftWidth: isActive ? 4 : theme.borderWidth.default,
+                      borderLeftColor: isActive ? theme.accent.primary : theme.border.subtle,
+                      paddingHorizontal: theme.spacing.stackSm,
+                      paddingVertical: theme.spacing.stackSm,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.stackSm }}>
+                      <Text style={{ fontSize: 20 }}>{level.emoji}</Text>
+                      <Text style={{
+                        color: theme.text.primary,
+                        fontSize: theme.typography.scale.bodyMain.fontSize,
+                        fontFamily: "Inter_400Regular",
+                      }}>
+                        {level.label}
+                      </Text>
+                    </View>
+                    <Text style={{
+                      color: isActive ? theme.accent.primary : theme.text.secondary,
+                      fontSize: theme.typography.scale.titleSm.fontSize,
+                      fontWeight: "700",
+                      fontFamily: "Inter_700Bold",
+                    }}>
+                      {count}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
+      </View>
     </Screen>
   );
 }
