@@ -59,6 +59,7 @@ export const es = {
 
   new_habit: {
     title: 'Nuevo hábito',
+    subtitle: 'Construí un hábito que dure.',
     create_button: 'Crear hábito',
   },
 

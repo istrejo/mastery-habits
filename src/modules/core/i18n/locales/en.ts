@@ -61,6 +61,7 @@ export const en: TranslationKeys = {
 
   new_habit: {
     title: 'New habit',
+    subtitle: 'Build a habit that sticks.',
     create_button: 'Create habit',
   },
 

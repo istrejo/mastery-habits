@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Screen } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useHabits, HabitForm } from "@habits/index";
@@ -23,15 +24,39 @@ export default function NewHabitScreen() {
 
   return (
     <Screen scrollable>
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24, gap: 12 }}>
-        <Text
-          onPress={() => router.back()}
-          style={{ color: theme.accent.primary, fontSize: 15 }}
-        >
+      {/* TopAppBar */}
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={{ flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 24 }}
+      >
+        <MaterialIcons name="arrow-back" size={20} color={theme.accent.primary} />
+        <Text style={{
+          color: theme.accent.primary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontFamily: "Inter_600SemiBold",
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: "uppercase",
+        }}>
           {t("common.back")}
         </Text>
-        <Text style={{ color: theme.text.primary, fontSize: 20, fontWeight: "700" }}>
+      </TouchableOpacity>
+
+      {/* Header */}
+      <View style={{ marginBottom: 24 }}>
+        <Text style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.titleLg.fontSize,
+          fontFamily: "Inter_700Bold",
+          letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+          marginBottom: 4,
+        }}>
           {t("new_habit.title")}
+        </Text>
+        <Text style={{
+          color: theme.text.secondary,
+          fontSize: theme.typography.scale.bodyMain.fontSize,
+        }}>
+          {t("new_habit.subtitle")}
         </Text>
       </View>
 
