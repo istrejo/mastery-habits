@@ -16,27 +16,18 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   max = 100,
   scoreColor,
   style,
-  height = 3,
+  height = 8,
 }) => {
   const t = useTheme();
   const pct = Math.min(Math.max(value / max, 0), 1);
-
-  const fillColor =
-    scoreColor ??
-    (value >= 71
-      ? t.score.excellent
-      : value >= 46
-        ? t.score.good
-        : value >= 21
-          ? t.score.warning
-          : t.score.critical);
+  const fillColor = scoreColor ?? t.accent.primary;
 
   return (
     <View
       style={[
         {
           height,
-          backgroundColor: t.border.default,
+          backgroundColor: t.accent.muted,
           borderRadius: t.radius.pill,
           overflow: 'hidden',
         },
@@ -48,6 +39,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           width: `${pct * 100}%`,
           height: '100%',
           backgroundColor: fillColor,
+          borderRadius: t.radius.pill,
         }}
       />
     </View>

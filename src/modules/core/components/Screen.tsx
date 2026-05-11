@@ -23,11 +23,17 @@ export const Screen: React.FC<ScreenProps> = ({
     backgroundColor: t.bg.base,
   };
 
+  const contentBase: ViewStyle = {
+    paddingHorizontal: t.spacing.marginMobile,
+    paddingTop: t.spacing.stackMd,
+    paddingBottom: t.spacing.stackLg,
+  };
+
   if (scrollable) {
     return (
       <SafeAreaView style={[baseStyle, style]}>
         <ScrollView
-          contentContainerStyle={[{ padding: t.spacing.marginMobile }, contentStyle]}
+          contentContainerStyle={[contentBase, contentStyle]}
           showsVerticalScrollIndicator={false}
         >
           {children}
@@ -38,7 +44,7 @@ export const Screen: React.FC<ScreenProps> = ({
 
   return (
     <SafeAreaView style={[baseStyle, style]}>
-      <View style={[{ flex: 1, padding: t.spacing.marginMobile }, contentStyle]}>{children}</View>
+      <View style={[{ flex: 1 }, contentBase, contentStyle]}>{children}</View>
     </SafeAreaView>
   );
 };
