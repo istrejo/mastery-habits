@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@auth/index";
-import { Screen, Input, Button } from "@core/components";
+import { Screen, Input, Button, Card } from "@core/components";
 import { useTheme } from "@core/theming";
 
 export default function SignupScreen() {
@@ -15,188 +15,49 @@ export default function SignupScreen() {
   const { t } = useTranslation();
   const { signUp, loading, error } = useAuth();
 
-  const schema = useMemo(
-    () =>
-      z
-        .object({
-          displayName: z.string().min(2, t("signup.error_name_min")).max(40),
-          email: z.string().email(t("signup.error_email")),
-          password: z.string().min(6, t("signup.error_password_min")),
-          confirmPassword: z.string(),
-        })
-        .refine((d) => d.password === d.confirmPassword, {
-          message: t("signup.error_passwords_match"),
-          path: ["confirmPassword"],
-        }),
-    [t]
-  );
+  const schema = useMemo(() => z.object({
+    displayName: z.string().min(2, t("signup.error_name_min")).max(40),
+    email: z.string().email(t("signup.error_email")),
+    password: z.string().min(6, t("signup.error_password_min")),
+    confirmPassword: z.string(),
+  }).refine((d) => d.password === d.confirmPassword, { message: t("signup.error_passwords_match"), path: ["confirmPassword"] }), [t]);
 
   type FormData = z.infer<typeof schema>;
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
-
-  const onSubmit = (data: FormData) => {
-    signUp(data.email, data.password, data.displayName);
-  };
+  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const onSubmit = (data: FormData) => signUp(data.email, data.password, data.displayName);
 
   return (
-    <Screen scrollable={false}>
-      <View style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: theme.spacing.marginMobile,
-      }}>
-
-        {/* Header */}
-        <Text style={{
-          color: theme.text.primary,
-          fontSize: theme.typography.scale.titleLg.fontSize,
-          fontWeight: "700",
-          fontFamily: "Inter_700Bold",
-          letterSpacing: theme.typography.scale.titleLg.letterSpacing,
-          textTransform: "uppercase",
-          textAlign: "center",
-          marginBottom: theme.spacing.unit,
-        }}>
-          {t("signup.title")}
-        </Text>
-
-        {/* Tagline */}
-        <Text style={{
-          color: theme.text.secondary,
-          fontSize: theme.typography.scale.bodyMain.fontSize,
-          fontFamily: "Inter_400Regular",
-          lineHeight: theme.typography.scale.bodyMain.lineHeight,
-          textAlign: "center",
-          marginBottom: theme.spacing.stackLg,
-        }}>
-          {t("signup.tagline")}
-        </Text>
-
-        {/* Form card */}
-        <View style={{
-          backgroundColor: theme.bg.surfaceAlt,
-          borderColor: theme.border.subtle,
-          borderWidth: theme.borderWidth.default,
-          borderRadius: theme.radius.lg,
-          padding: theme.spacing.marginMobile,
-          width: "100%",
-          maxWidth: 480,
-          gap: theme.spacing.stackMd,
-        }}>
-
-          <Controller
-            control={control}
-            name="displayName"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                label={t("signup.name_label")}
-                onChangeText={onChange}
-                value={value}
-                autoComplete="name"
-                error={errors.displayName?.message}
-              />
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                label={t("signup.email_label")}
-                onChangeText={onChange}
-                value={value}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-                error={errors.email?.message}
-              />
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                label={t("signup.password_label")}
-                onChangeText={onChange}
-                value={value}
-                secureTextEntry
-                autoComplete="new-password"
-                error={errors.password?.message}
-              />
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="confirmPassword"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                label={t("signup.confirm_password_label")}
-                onChangeText={onChange}
-                value={value}
-                secureTextEntry
-                autoComplete="new-password"
-                error={errors.confirmPassword?.message}
-              />
-            )}
-          />
-
-          {error ? (
-            <Text style={{
-              color: theme.status.danger,
-              fontSize: theme.typography.scale.microBold.fontSize,
-              fontFamily: "Inter_500Medium",
-            }}>
-              {error}
-            </Text>
-          ) : null}
-
-          <Button
-            label={t("signup.submit")}
-            onPress={handleSubmit(onSubmit)}
-            loading={loading}
-            iconRight="arrow-forward"
-          />
+    <Screen scrollable contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
+      <View style={{ width: "100%", maxWidth: 440, alignSelf: "center" }}>
+        <View style={{ marginBottom: theme.spacing.stackLg }}>
+          <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: theme.spacing.stackSm }}>
+            {t("login.app_title")}
+          </Text>
+          <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleLg.fontSize, lineHeight: theme.typography.scale.titleLg.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.titleLg.letterSpacing, textTransform: "uppercase" }}>
+            {t("signup.title")}
+          </Text>
+          <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: "Lexend_400Regular", marginTop: theme.spacing.stackSm }}>
+            {t("signup.tagline")}
+          </Text>
         </View>
 
-        {/* Footer link */}
-        <View style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: theme.spacing.unit,
-          marginTop: theme.spacing.stackLg,
-        }}>
-          <Text style={{
-            color: theme.text.secondary,
-            fontSize: theme.typography.scale.microBold.fontSize,
-            fontFamily: "Inter_400Regular",
-          }}>
-            {t("signup.have_account")}
-          </Text>
+        <Card style={{ gap: theme.spacing.stackMd }}>
+          <Controller control={control} name="displayName" render={({ field: { onChange, value } }) => <Input label={t("signup.name_label")} onChangeText={onChange} value={value} autoComplete="name" error={errors.displayName?.message} />} />
+          <Controller control={control} name="email" render={({ field: { onChange, value } }) => <Input label={t("signup.email_label")} onChangeText={onChange} value={value} keyboardType="email-address" autoCapitalize="none" autoComplete="email" error={errors.email?.message} />} />
+          <Controller control={control} name="password" render={({ field: { onChange, value } }) => <Input label={t("signup.password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="new-password" error={errors.password?.message} />} />
+          <Controller control={control} name="confirmPassword" render={({ field: { onChange, value } }) => <Input label={t("signup.confirm_password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="new-password" error={errors.confirmPassword?.message} />} />
+          {error ? <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{error}</Text> : null}
+          <Button label={t("signup.submit")} onPress={handleSubmit(onSubmit)} loading={loading} iconRight="arrow-forward" />
+        </Card>
+
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: theme.spacing.unit, marginTop: theme.spacing.stackLg }}>
+          <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_400Regular" }}>{t("signup.have_account")}</Text>
           <Link href="/(auth)/login" asChild>
             <Pressable>
-              <Text style={{
-                color: theme.accent.primary,
-                fontSize: theme.typography.scale.microBold.fontSize,
-                fontFamily: "Inter_600SemiBold",
-                borderBottomWidth: 1,
-                borderBottomColor: theme.accent.primary,
-              }}>
-                {t("signup.go_login")}
-              </Text>
+              <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", borderBottomWidth: 1, borderBottomColor: theme.text.primary }}>{t("signup.go_login")}</Text>
             </Pressable>
           </Link>
         </View>
-
       </View>
     </Screen>
   );

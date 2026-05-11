@@ -268,7 +268,7 @@ Componentes de dominio alineados al sistema light y tests de negocio pasando. Ty
 
 ### Checklist
 
-- [ ] Login:
+- [x] Login:
   - centered vertical,
   - masthead Anton,
   - tagline uppercase,
@@ -276,20 +276,28 @@ Componentes de dominio alineados al sistema light y tests de negocio pasando. Ty
   - forgot link,
   - primary CTA con icon right,
   - footer link.
-- [ ] Register:
+- [x] Register:
   - centered layout,
   - card form,
   - boxed inputs,
   - primary CTA con icon right,
   - footer login link.
-- [ ] Reusar validación actual con `react-hook-form` + `zod`.
-- [ ] No cambiar lógica auth.
+- [x] Reusar validación actual con `react-hook-form` + `zod`.
+- [x] No cambiar lógica auth.
 
 ### Validación
 
-- [ ] `npx tsc --noEmit`.
-- [ ] QA visual contra assets Stitch light de login/register.
-- [ ] No se ejecutó build.
+- [x] `npx tsc --noEmit`.
+- [!] QA visual manual pendiente en simulador; estructura/código alineados contra specs.
+- [x] No se ejecutó build.
+
+
+### Resultado Fase 5
+
+Auth screens alineadas al sistema light. Typecheck global y tests pasan.
+
+- `npx tsc --noEmit` pasó.
+- `npm test -- --runInBand` pasó: 3 suites, 48 tests.
 
 ### Gate
 
