@@ -5,7 +5,7 @@ export const en: TranslationKeys = {
     cancel: 'Cancel',
     confirm: 'Confirm',
     save: 'Save',
-    back: '← Back',
+    back: 'Back',
     score_suffix: '/ 100',
   },
 
@@ -156,6 +156,8 @@ export const en: TranslationKeys = {
     coming_soon_title: 'Coming soon',
     coming_soon_body: 'Premium themes will be available in the full version of Mastery Habits.',
     understood: 'Got it',
+    light_active: 'Light active',
+    theming_soon_body: 'Light theme is locked for this version. Full theming will return in a future release.',
   },
 
   language_picker: {

@@ -26,7 +26,7 @@ function CheckInGrid({ checkIns }: { checkIns: { check_date: string; status: str
     if (status === "completed") return theme.status.success;
     if (status === "skipped") return theme.status.skip;
     if (status === "missed") return theme.status.danger;
-    return theme.bg.surfaceAlt;
+    return theme.bg.surface;
   };
 
   return (
@@ -105,7 +105,7 @@ export default function HabitDetailScreen() {
   if (loading) {
     return (
       <Screen>
-        <ActivityIndicator color={theme.accent.primary} style={{ marginTop: 40 }} />
+        <ActivityIndicator color={theme.text.primary} style={{ marginTop: 40 }} />
       </Screen>
     );
   }
@@ -128,11 +128,11 @@ export default function HabitDetailScreen() {
         onPress={() => router.back()}
         style={{ flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 24 }}
       >
-        <MaterialIcons name="arrow-back" size={20} color={theme.accent.primary} />
+        <MaterialIcons name="arrow-back" size={20} color={theme.text.primary} />
         <Text style={{
-          color: theme.accent.primary,
+          color: theme.text.primary,
           fontSize: theme.typography.scale.labelCaps.fontSize,
-          fontFamily: "Inter_600SemiBold",
+          fontFamily: "Lexend_600SemiBold",
           letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
           textTransform: "uppercase",
         }}>
@@ -145,7 +145,7 @@ export default function HabitDetailScreen() {
           <Text style={{
             color: theme.text.primary,
             fontSize: theme.typography.scale.titleSm.fontSize,
-            fontFamily: "Inter_700Bold",
+            fontFamily: "Anton_400Regular",
             letterSpacing: theme.typography.scale.titleSm.letterSpacing,
             marginBottom: 20,
           }}>
@@ -175,9 +175,9 @@ export default function HabitDetailScreen() {
         <>
           {/* Header */}
           <View style={{
-            backgroundColor: theme.bg.surfaceAlt,
+            backgroundColor: theme.bg.surface,
             borderWidth: theme.borderWidth.default,
-            borderColor: theme.border.subtle,
+            borderColor: theme.border.default,
             borderRadius: theme.radius.lg,
             padding: theme.spacing.marginMobile,
             marginBottom: 16,
@@ -186,7 +186,7 @@ export default function HabitDetailScreen() {
               <Text style={{
                 color: theme.text.primary,
                 fontSize: theme.typography.scale.titleSm.fontSize,
-                fontFamily: "Inter_700Bold",
+                fontFamily: "Anton_400Regular",
                 letterSpacing: theme.typography.scale.titleSm.letterSpacing,
                 flex: 1,
               }}>
@@ -207,7 +207,7 @@ export default function HabitDetailScreen() {
                 gap: 6,
                 marginTop: 8,
                 padding: 10,
-                backgroundColor: theme.bg.surfaceAlt,
+                backgroundColor: theme.bg.surface,
                 borderLeftWidth: 3,
                 borderLeftColor: theme.status.skip,
                 borderRadius: theme.radius.sm,
@@ -221,9 +221,9 @@ export default function HabitDetailScreen() {
 
           {/* Score */}
           <View style={{
-            backgroundColor: theme.bg.surfaceAlt,
+            backgroundColor: theme.bg.surface,
             borderWidth: theme.borderWidth.default,
-            borderColor: theme.border.subtle,
+            borderColor: theme.border.default,
             borderRadius: theme.radius.lg,
             padding: theme.spacing.marginMobile,
             marginBottom: 16,
@@ -231,7 +231,7 @@ export default function HabitDetailScreen() {
             <Text style={{
               color: theme.text.tertiary,
               fontSize: theme.typography.scale.labelCaps.fontSize,
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: "Lexend_600SemiBold",
               letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
               textTransform: "uppercase",
               marginBottom: 12,
@@ -241,7 +241,7 @@ export default function HabitDetailScreen() {
             <Text style={{
               color: score >= 71 ? theme.score.excellent : score >= 46 ? theme.score.good : score >= 21 ? theme.score.warning : theme.score.critical,
               fontSize: theme.typography.scale.displayXl.fontSize,
-              fontFamily: "Inter_900Black",
+              fontFamily: "Anton_400Regular",
               letterSpacing: theme.typography.scale.displayXl.letterSpacing,
               lineHeight: theme.typography.scale.displayXl.lineHeight,
               fontVariant: ["tabular-nums"],
@@ -254,9 +254,9 @@ export default function HabitDetailScreen() {
 
           {/* Check-in */}
           <View style={{
-            backgroundColor: theme.bg.surfaceAlt,
+            backgroundColor: theme.bg.surface,
             borderWidth: theme.borderWidth.default,
-            borderColor: theme.border.subtle,
+            borderColor: theme.border.default,
             borderRadius: theme.radius.lg,
             padding: theme.spacing.marginMobile,
             marginBottom: 16,
@@ -264,7 +264,7 @@ export default function HabitDetailScreen() {
             <Text style={{
               color: theme.text.tertiary,
               fontSize: theme.typography.scale.labelCaps.fontSize,
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: "Lexend_600SemiBold",
               letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
               textTransform: "uppercase",
               marginBottom: 12,
@@ -284,9 +284,9 @@ export default function HabitDetailScreen() {
 
           {/* History */}
           <View style={{
-            backgroundColor: theme.bg.surfaceAlt,
+            backgroundColor: theme.bg.surface,
             borderWidth: theme.borderWidth.default,
-            borderColor: theme.border.subtle,
+            borderColor: theme.border.default,
             borderRadius: theme.radius.lg,
             padding: theme.spacing.marginMobile,
             marginBottom: 16,
@@ -294,7 +294,7 @@ export default function HabitDetailScreen() {
             <Text style={{
               color: theme.text.tertiary,
               fontSize: theme.typography.scale.labelCaps.fontSize,
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: "Lexend_600SemiBold",
               letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
               textTransform: "uppercase",
               marginBottom: 12,
@@ -318,9 +318,9 @@ export default function HabitDetailScreen() {
 
           {/* Frequency */}
           <View style={{
-            backgroundColor: theme.bg.surfaceAlt,
+            backgroundColor: theme.bg.surface,
             borderWidth: theme.borderWidth.default,
-            borderColor: theme.border.subtle,
+            borderColor: theme.border.default,
             borderRadius: theme.radius.lg,
             padding: theme.spacing.marginMobile,
             marginBottom: 16,
@@ -328,7 +328,7 @@ export default function HabitDetailScreen() {
             <Text style={{
               color: theme.text.tertiary,
               fontSize: theme.typography.scale.labelCaps.fontSize,
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: "Lexend_600SemiBold",
               letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
               textTransform: "uppercase",
               marginBottom: 6,

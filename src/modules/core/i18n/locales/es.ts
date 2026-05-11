@@ -3,7 +3,7 @@ export const es = {
     cancel: 'Cancelar',
     confirm: 'Confirmar',
     save: 'Guardar',
-    back: '← Volver',
+    back: 'Volver',
     score_suffix: '/ 100',
   },
 
@@ -154,6 +154,8 @@ export const es = {
     coming_soon_title: 'Próximamente',
     coming_soon_body: 'Los temas premium estarán disponibles en la versión completa de Mastery Habits.',
     understood: 'Entendido',
+    light_active: 'Light activo',
+    theming_soon_body: 'El tema light queda fijo en esta versión. El theming completo vuelve más adelante.',
   },
 
   language_picker: {

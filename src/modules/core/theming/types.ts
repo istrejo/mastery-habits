@@ -75,6 +75,13 @@ export interface ThemeTokens {
     danger: string;
     info: string;
   };
+  activity: {
+    none: string;
+    low: string;
+    medium: string;
+    high: string;
+    veryHigh: string;
+  };
   radius: {
     sm: number;
     md: number;
