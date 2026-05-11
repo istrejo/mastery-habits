@@ -17,6 +17,15 @@ export const THEMES: Record<ThemeId, ThemeTokens> = {
   'terminal-phosphor': terminalPhosphorTheme,
 };
 
+export const THEMES_BY_MODE: Record<'light' | 'dark', ThemeId[]> = {
+  dark: (Object.entries(THEMES) as [ThemeId, ThemeTokens][])
+    .filter(([, t]) => t.meta.mode === 'dark')
+    .map(([id]) => id),
+  light: (Object.entries(THEMES) as [ThemeId, ThemeTokens][])
+    .filter(([, t]) => t.meta.mode === 'light')
+    .map(([id]) => id),
+};
+
 export const ThemeContext = createContext<ThemeTokens>(techNeonTheme);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -30,3 +39,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useTheme = (): ThemeTokens => useContext(ThemeContext);
+
+export const useCurrentMode = (): 'light' | 'dark' => {
+  const theme = useContext(ThemeContext);
+  return theme.meta.mode;
+};
