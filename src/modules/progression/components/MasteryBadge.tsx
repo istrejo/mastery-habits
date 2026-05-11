@@ -20,8 +20,8 @@ export const MasteryBadge: React.FC<MasteryBadgeProps> = ({ score, style }) => {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 4,
-          paddingHorizontal: 8,
-          paddingVertical: 4,
+          paddingHorizontal: 10,
+          paddingVertical: 5,
           borderRadius: t.radius.pill,
           backgroundColor: lv.bg,
           borderWidth: t.borderWidth.default,
@@ -31,8 +31,8 @@ export const MasteryBadge: React.FC<MasteryBadgeProps> = ({ score, style }) => {
         style,
       ]}
     >
-      <Text style={{ fontSize: t.typography.scale.labelCaps.fontSize }}>{level.emoji}</Text>
-      <Text style={{ fontSize: t.typography.scale.labelCaps.fontSize, color: lv.fg, fontFamily: 'Inter_600SemiBold', letterSpacing: t.typography.scale.labelCaps.letterSpacing }}>
+      <Text style={{ fontSize: t.typography.scale.microBold.fontSize }}>{level.emoji}</Text>
+      <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: lv.fg, fontFamily: 'Lexend_600SemiBold', letterSpacing: t.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
         {level.label}
       </Text>
     </View>

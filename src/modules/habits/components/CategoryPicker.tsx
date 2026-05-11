@@ -13,11 +13,7 @@ interface CategoryPickerProps {
   onCustomChange?: (data: { label: string; emoji: string }) => void;
 }
 
-const ROWS = [
-  HABIT_CATEGORIES.slice(0, 3),
-  HABIT_CATEGORIES.slice(3, 6),
-  HABIT_CATEGORIES.slice(6, 9),
-] as const;
+const ROWS = [HABIT_CATEGORIES.slice(0, 3), HABIT_CATEGORIES.slice(3, 6), HABIT_CATEGORIES.slice(6, 9)] as const;
 
 export const CategoryPicker: React.FC<CategoryPickerProps> = ({
   value,
@@ -30,53 +26,34 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
   const { t } = useTranslation();
 
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: theme.spacing.stackSm }}>
       {ROWS.map((row, rowIndex) => (
-        <View key={rowIndex} style={{ flexDirection: 'row', gap: 8 }}>
+        <View key={rowIndex} style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
           {row.map((cat) => {
             const isSelected = value === cat.id;
-            const colors = theme.categoryColors[cat.colorToken];
-
             return (
               <TouchableOpacity
                 key={cat.id}
                 onPress={() => onChange(cat.id)}
+                activeOpacity={0.78}
                 style={{
                   flex: 1,
-                  backgroundColor: isSelected ? colors.bg : theme.bg.surfaceAlt,
-                  borderColor: isSelected ? colors.border : theme.border.default,
+                  backgroundColor: theme.bg.surface,
+                  borderColor: isSelected ? theme.border.strong : theme.border.default,
                   borderWidth: isSelected ? theme.borderWidth.bold : theme.borderWidth.default,
                   borderRadius: theme.radius.md,
                   padding: 10,
                   alignItems: 'center',
-                  gap: 4,
+                  gap: 5,
                 }}
               >
-                {isSelected && (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      top: 5,
-                      right: 5,
-                      backgroundColor: colors.border,
-                      borderRadius: 999,
-                      width: 14,
-                      height: 14,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Text style={{ color: colors.fg, fontSize: 8, fontWeight: '700', lineHeight: 14 }}>
-                      ✓
-                    </Text>
-                  </View>
-                )}
-                <Text style={{ fontSize: 26 }}>{cat.emoji}</Text>
+                <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
                 <Text
+                  numberOfLines={1}
                   style={{
-                    color: isSelected ? colors.fg : theme.text.primary,
-                    fontSize: 10,
-                    fontWeight: '600',
+                    color: theme.text.primary,
+                    fontSize: theme.typography.scale.microBold.fontSize,
+                    fontFamily: 'Lexend_500Medium',
                     textAlign: 'center',
                   }}
                 >
@@ -89,11 +66,7 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
       ))}
 
       {value === 'custom' && onCustomChange && (
-        <CustomCategoryInput
-          label={customLabel}
-          emoji={customEmoji}
-          onChange={onCustomChange}
-        />
+        <CustomCategoryInput label={customLabel} emoji={customEmoji} onChange={onCustomChange} />
       )}
     </View>
   );

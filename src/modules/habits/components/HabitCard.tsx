@@ -5,9 +5,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { ProgressBar } from '@core/components';
 import type { HabitWithScore } from '../types';
-import type { MasteryLevel } from '@core/theming';
 import { CategoryBadge } from './CategoryBadge';
-
+import { resolveCategory } from '../utils/resolveCategory';
 
 interface HabitCardProps {
   habit: HabitWithScore;
@@ -18,93 +17,88 @@ interface HabitCardProps {
 export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed = false }) => {
   const t = useTheme();
   const score = habit.mastery_scores?.score ?? 0;
-  const level = (habit.mastery_scores?.level ?? 'seed') as MasteryLevel;
-  const levelTokens = t.level[level];
-
-  const scoreColor =
-    score >= 71 ? t.score.excellent
-    : score >= 46 ? t.score.good
-    : score >= 21 ? t.score.warning
-    : t.score.critical;
+  const { label } = resolveCategory(habit);
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={0.82}
       style={{
         backgroundColor: t.bg.surface,
         borderColor: t.border.default,
         borderWidth: t.borderWidth.default,
         borderRadius: t.radius.lg,
         padding: t.spacing.marginMobile,
-        marginBottom: t.spacing.stackMd,
+        marginBottom: t.spacing.stackSm,
         gap: t.spacing.stackMd,
-        opacity: completed ? 0.5 : 1,
+        opacity: completed ? 0.58 : 1,
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Header row */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: t.spacing.stackSm, flex: 1 }}>
-          <CategoryBadge habit={habit} size="sm" showLabel={false} />
-          <Text style={{
-            color: t.text.primary,
-            fontSize: t.typography.scale.bodyMain.fontSize,
-            fontWeight: '600',
-            fontFamily: 'Inter_600SemiBold',
-            flex: 1,
-            textDecorationLine: completed ? 'line-through' : 'none',
-          }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: t.spacing.stackSm }}>
+        <View style={{
+          width: 22,
+          height: 22,
+          borderRadius: t.radius.pill,
+          borderWidth: t.borderWidth.default,
+          borderColor: completed ? t.accent.primary : t.border.default,
+          backgroundColor: completed ? t.accent.primary : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          {completed && <MaterialIcons name="check" size={14} color={t.accent.onPrimary} />}
+        </View>
+
+        <View style={{ flex: 1, gap: 3 }}>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: t.text.primary,
+              fontSize: t.typography.scale.bodyMain.fontSize,
+              lineHeight: t.typography.scale.bodyMain.lineHeight,
+              fontFamily: 'Lexend_500Medium',
+              textDecorationLine: completed ? 'line-through' : 'none',
+            }}
+          >
             {habit.name}
           </Text>
-        </View>
-        <View style={{
-          backgroundColor: levelTokens.bg,
-          borderColor: levelTokens.border,
-          borderWidth: t.borderWidth.default,
-          borderRadius: t.radius.pill,
-          paddingHorizontal: 10,
-          paddingVertical: 3,
-        }}>
-          <Text style={{
-            color: levelTokens.fg,
-            fontSize: t.typography.scale.microBold.fontSize,
-            fontWeight: '700',
-            fontFamily: 'Inter_700Bold',
-          }}>
-            {level.toUpperCase()}
+          <Text
+            numberOfLines={1}
+            style={{
+              color: t.text.secondary,
+              fontSize: t.typography.scale.microBold.fontSize,
+              lineHeight: t.typography.scale.microBold.lineHeight,
+              fontFamily: 'Lexend_400Regular',
+            }}
+          >
+            {habit.description || label}
           </Text>
         </View>
+
+        <View style={{ alignItems: 'flex-end', gap: 4 }}>
+          <Text style={{ color: t.text.primary, fontSize: 12, fontFamily: 'Lexend_600SemiBold' }}>
+            🔥 {Math.round(score)}
+          </Text>
+          <MaterialIcons name="chevron-right" size={20} color={t.text.tertiary} />
+        </View>
       </View>
 
-      {/* Score + compliance row */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{
-          color: t.text.secondary,
-          fontSize: t.typography.scale.labelCaps.fontSize,
-          fontWeight: '600',
-          fontFamily: 'Inter_600SemiBold',
-          letterSpacing: t.typography.scale.labelCaps.letterSpacing,
-          textTransform: 'uppercase',
-        }}>
-          {`Score: ${score.toFixed(1)}`}
-        </Text>
-        <Text style={{
-          color: scoreColor,
-          fontSize: t.typography.scale.labelCaps.fontSize,
-          fontWeight: '700',
-          fontFamily: 'Inter_700Bold',
-          fontVariant: ['tabular-nums'],
-        }}>
-          {`${Math.round(score)}%`}
-        </Text>
+      <View style={{ gap: t.spacing.stackSm }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <CategoryBadge habit={habit} size="sm" showLabel />
+          <Text style={{
+            color: t.text.secondary,
+            fontSize: t.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_500Medium',
+            fontVariant: ['tabular-nums'],
+          }}>
+            {score.toFixed(1)} / 100
+          </Text>
+        </View>
+        <ProgressBar value={score} />
       </View>
 
-      {/* Progress */}
-      <ProgressBar value={score} />
-
-      {/* Completed overlay */}
       {completed && (
         <View style={{
           position: 'absolute',
@@ -112,13 +106,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed 
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: `${t.accent.primary}1A`,
-          alignItems: 'center',
-          justifyContent: 'center',
+          backgroundColor: 'rgba(17, 17, 17, 0.04)',
           pointerEvents: 'none',
-        }}>
-          <MaterialIcons name="check" size={56} color={t.accent.primary} />
-        </View>
+        }} />
       )}
     </TouchableOpacity>
   );
