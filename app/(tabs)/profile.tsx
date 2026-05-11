@@ -1,7 +1,7 @@
 import { View, Text, Pressable, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Screen, Skeleton } from "@core/components";
 import { useTheme, type MasteryLevel } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
@@ -116,6 +116,31 @@ export default function ProfileScreen() {
           }}>
             {email}
           </Text>
+          <Pressable
+            onPress={() => router.push("/settings")}
+            style={({ pressed }) => ({
+              flexDirection: "row",
+              alignItems: "center",
+              gap: theme.spacing.unit,
+              borderWidth: theme.borderWidth.default,
+              borderColor: pressed ? theme.accent.primary : theme.border.default,
+              borderRadius: theme.radius.md,
+              paddingHorizontal: theme.spacing.stackMd,
+              paddingVertical: theme.spacing.unit * 1.5,
+            })}
+          >
+            <Text style={{
+              color: theme.text.primary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontWeight: "600",
+              fontFamily: "Inter_600SemiBold",
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: "uppercase",
+            }}>
+              {t("profile.edit")}
+            </Text>
+            <MaterialIcons name="edit" size={14} color={theme.text.primary} />
+          </Pressable>
         </View>
 
         {/* Global Score */}

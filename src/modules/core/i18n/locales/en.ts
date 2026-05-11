@@ -22,6 +22,7 @@ export const en: TranslationKeys = {
 
   profile: {
     title: 'PROFILE',
+    edit: 'Edit profile',
     score_global: 'GLOBAL SCORE',
     habits_count_one: '{{count}} habit',
     habits_count_other: '{{count}} habits',

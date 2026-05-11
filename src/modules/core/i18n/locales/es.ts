@@ -20,6 +20,7 @@ export const es = {
 
   profile: {
     title: 'PERFIL',
+    edit: 'Editar perfil',
     score_global: 'SCORE GLOBAL',
     habits_count_one: '{{count}} hábito',
     habits_count_other: '{{count}} hábitos',
