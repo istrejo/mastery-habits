@@ -195,6 +195,16 @@ export const es = {
     top_habits: 'Top Hábitos',
     activity: 'Actividad',
   },
+
+  power_grid: {
+    title: 'Power Grid',
+    subtitle_one: 'Energía de tus hábitos — {{count}} activo',
+    subtitle_other: 'Energía de tus hábitos — {{count}} activos',
+    subtitle: 'Energía de tus hábitos — {{count}} activos',
+    empty: 'Aún no hay hábitos. Agregá uno para cargar energía.',
+    low_energy: 'Baja Energía',
+    full_power: 'Máxima Energía',
+  },
 };
 
 export type TranslationKeys = typeof es;

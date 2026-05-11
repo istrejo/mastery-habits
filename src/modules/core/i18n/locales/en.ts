@@ -197,4 +197,14 @@ export const en: TranslationKeys = {
     top_habits: 'Top Habits',
     activity: 'Activity',
   },
+
+  power_grid: {
+    title: 'Power Grid',
+    subtitle_one: 'Your habit energy — {{count}} active habit',
+    subtitle_other: 'Your habit energy — {{count}} active habits',
+    subtitle: 'Your habit energy — {{count}} active habits',
+    empty: 'No habits yet. Add one to power up.',
+    low_energy: 'Low Energy',
+    full_power: 'Full Power',
+  },
 };
