@@ -1,6 +1,6 @@
 /* stitch: login */
 import { useMemo } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,96 +37,145 @@ export default function LoginScreen() {
   };
 
   return (
-    <Screen scrollable>
-      <View style={{ flex: 1, justifyContent: "center", paddingVertical: theme.spacing.stackLg }}>
+    <Screen scrollable={false}>
+      <View style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: theme.spacing.marginMobile,
+      }}>
 
-        {/* Header */}
+        {/* Display header */}
         <Text style={{
-          color: theme.text.primary,
-          fontSize: theme.typography.scale.titleLg.fontSize,
-          fontWeight: "700",
-          fontFamily: "Inter_700Bold",
-          letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+          color: theme.accent.primary,
+          fontSize: theme.typography.scale.displaySm.fontSize,
+          fontWeight: "900",
+          fontFamily: "Inter_900Black",
+          letterSpacing: theme.typography.scale.displaySm.letterSpacing,
           textTransform: "uppercase",
-          marginBottom: theme.spacing.unit,
+          textAlign: "center",
+          marginBottom: theme.spacing.stackSm,
         }}>
           {t("login.app_title")}
         </Text>
+
+        {/* Tagline */}
         <Text style={{
           color: theme.text.secondary,
-          fontSize: theme.typography.scale.bodyMain.fontSize,
-          fontFamily: "Inter_400Regular",
-          lineHeight: theme.typography.scale.bodyMain.lineHeight,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontWeight: "600",
+          fontFamily: "Inter_600SemiBold",
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: "uppercase",
+          textAlign: "center",
           marginBottom: theme.spacing.stackLg,
         }}>
           {t("login.tagline")}
         </Text>
 
-        {/* Fields */}
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("login.email_label")}
-              onChangeText={onChange}
-              value={value}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              error={errors.email?.message}
-              containerStyle={{ marginBottom: theme.spacing.stackMd }}
+        {/* Form card */}
+        <View style={{
+          backgroundColor: theme.bg.surfaceAlt,
+          borderColor: theme.border.subtle,
+          borderWidth: theme.borderWidth.default,
+          borderRadius: theme.radius.lg,
+          padding: theme.spacing.marginMobile,
+          width: "100%",
+          maxWidth: 480,
+          gap: theme.spacing.stackMd,
+        }}>
+
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label={t("login.email_label")}
+                onChangeText={onChange}
+                value={value}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                error={errors.email?.message}
+              />
+            )}
+          />
+
+          <View style={{ gap: theme.spacing.stackSm }}>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  label={t("login.password_label")}
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry
+                  autoComplete="current-password"
+                  error={errors.password?.message}
+                />
+              )}
             />
-          )}
-        />
+            <Link href="#" asChild>
+              <Pressable style={{ alignSelf: "flex-end" }}>
+                <Text style={{
+                  color: theme.text.secondary,
+                  fontSize: theme.typography.scale.microBold.fontSize,
+                  fontFamily: "Inter_500Medium",
+                }}>
+                  {t("login.forgot")}
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("login.password_label")}
-              onChangeText={onChange}
-              value={value}
-              secureTextEntry
-              autoComplete="current-password"
-              error={errors.password?.message}
-              containerStyle={{ marginBottom: theme.spacing.stackMd }}
-            />
-          )}
-        />
+          {error ? (
+            <Text style={{
+              color: theme.status.danger,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              fontFamily: "Inter_500Medium",
+            }}>
+              {error}
+            </Text>
+          ) : null}
 
-        {error ? (
+          <Button
+            label={t("login.submit")}
+            onPress={handleSubmit(onSubmit)}
+            loading={loading}
+            iconRight="arrow-forward"
+          />
+        </View>
+
+        {/* Footer link */}
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: theme.spacing.unit,
+          marginTop: theme.spacing.stackLg,
+        }}>
           <Text style={{
-            color: theme.status.danger,
+            color: theme.text.secondary,
             fontSize: theme.typography.scale.microBold.fontSize,
-            fontFamily: "Inter_500Medium",
-            marginBottom: theme.spacing.stackSm,
+            fontFamily: "Inter_400Regular",
           }}>
-            {error}
+            {t("login.no_account")}
           </Text>
-        ) : null}
+          <Link href="/(auth)/signup" asChild>
+            <Pressable>
+              <Text style={{
+                color: theme.accent.primary,
+                fontSize: theme.typography.scale.microBold.fontSize,
+                fontFamily: "Inter_600SemiBold",
+                borderBottomWidth: 1,
+                borderBottomColor: theme.accent.primary,
+              }}>
+                {t("login.go_signup")}
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
 
-        <Button
-          label={t("login.submit")}
-          onPress={handleSubmit(onSubmit)}
-          loading={loading}
-          style={{ marginBottom: theme.spacing.stackMd }}
-        />
-
-        <Link href="/(auth)/signup" asChild>
-          <Text style={{
-            color: theme.accent.primary,
-            textAlign: "center",
-            fontSize: theme.typography.scale.microBold.fontSize,
-            fontFamily: "Inter_500Medium",
-            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-            textTransform: "uppercase",
-            textDecorationLine: "underline",
-          }}>
-            {t("login.go_signup")}
-          </Text>
-        </Link>
       </View>
     </Screen>
   );

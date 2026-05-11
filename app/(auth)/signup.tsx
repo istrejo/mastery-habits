@@ -1,6 +1,6 @@
 /* stitch: register */
 import { useMemo } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -44,8 +44,13 @@ export default function SignupScreen() {
   };
 
   return (
-    <Screen scrollable>
-      <View style={{ flex: 1, justifyContent: "center", paddingVertical: theme.spacing.stackLg }}>
+    <Screen scrollable={false}>
+      <View style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: theme.spacing.marginMobile,
+      }}>
 
         {/* Header */}
         <Text style={{
@@ -55,116 +60,143 @@ export default function SignupScreen() {
           fontFamily: "Inter_700Bold",
           letterSpacing: theme.typography.scale.titleLg.letterSpacing,
           textTransform: "uppercase",
+          textAlign: "center",
           marginBottom: theme.spacing.unit,
         }}>
           {t("signup.title")}
         </Text>
+
+        {/* Tagline */}
         <Text style={{
           color: theme.text.secondary,
           fontSize: theme.typography.scale.bodyMain.fontSize,
           fontFamily: "Inter_400Regular",
           lineHeight: theme.typography.scale.bodyMain.lineHeight,
+          textAlign: "center",
           marginBottom: theme.spacing.stackLg,
         }}>
           {t("signup.tagline")}
         </Text>
 
-        {/* Fields */}
-        <Controller
-          control={control}
-          name="displayName"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("signup.name_label")}
-              onChangeText={onChange}
-              value={value}
-              autoComplete="name"
-              error={errors.displayName?.message}
-              containerStyle={{ marginBottom: theme.spacing.stackMd }}
-            />
-          )}
-        />
+        {/* Form card */}
+        <View style={{
+          backgroundColor: theme.bg.surfaceAlt,
+          borderColor: theme.border.subtle,
+          borderWidth: theme.borderWidth.default,
+          borderRadius: theme.radius.lg,
+          padding: theme.spacing.marginMobile,
+          width: "100%",
+          maxWidth: 480,
+          gap: theme.spacing.stackMd,
+        }}>
 
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("signup.email_label")}
-              onChangeText={onChange}
-              value={value}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              error={errors.email?.message}
-              containerStyle={{ marginBottom: theme.spacing.stackMd }}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="displayName"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label={t("signup.name_label")}
+                onChangeText={onChange}
+                value={value}
+                autoComplete="name"
+                error={errors.displayName?.message}
+              />
+            )}
+          />
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("signup.password_label")}
-              onChangeText={onChange}
-              value={value}
-              secureTextEntry
-              autoComplete="new-password"
-              error={errors.password?.message}
-              containerStyle={{ marginBottom: theme.spacing.stackMd }}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label={t("signup.email_label")}
+                onChangeText={onChange}
+                value={value}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                error={errors.email?.message}
+              />
+            )}
+          />
 
-        <Controller
-          control={control}
-          name="confirmPassword"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("signup.confirm_password_label")}
-              onChangeText={onChange}
-              value={value}
-              secureTextEntry
-              autoComplete="new-password"
-              error={errors.confirmPassword?.message}
-              containerStyle={{ marginBottom: theme.spacing.stackMd }}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label={t("signup.password_label")}
+                onChangeText={onChange}
+                value={value}
+                secureTextEntry
+                autoComplete="new-password"
+                error={errors.password?.message}
+              />
+            )}
+          />
 
-        {error ? (
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                label={t("signup.confirm_password_label")}
+                onChangeText={onChange}
+                value={value}
+                secureTextEntry
+                autoComplete="new-password"
+                error={errors.confirmPassword?.message}
+              />
+            )}
+          />
+
+          {error ? (
+            <Text style={{
+              color: theme.status.danger,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              fontFamily: "Inter_500Medium",
+            }}>
+              {error}
+            </Text>
+          ) : null}
+
+          <Button
+            label={t("signup.submit")}
+            onPress={handleSubmit(onSubmit)}
+            loading={loading}
+            iconRight="arrow-forward"
+          />
+        </View>
+
+        {/* Footer link */}
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: theme.spacing.unit,
+          marginTop: theme.spacing.stackLg,
+        }}>
           <Text style={{
-            color: theme.status.danger,
+            color: theme.text.secondary,
             fontSize: theme.typography.scale.microBold.fontSize,
-            fontFamily: "Inter_500Medium",
-            marginBottom: theme.spacing.stackSm,
+            fontFamily: "Inter_400Regular",
           }}>
-            {error}
+            {t("signup.have_account")}
           </Text>
-        ) : null}
+          <Link href="/(auth)/login" asChild>
+            <Pressable>
+              <Text style={{
+                color: theme.accent.primary,
+                fontSize: theme.typography.scale.microBold.fontSize,
+                fontFamily: "Inter_600SemiBold",
+                borderBottomWidth: 1,
+                borderBottomColor: theme.accent.primary,
+              }}>
+                {t("signup.go_login")}
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
 
-        <Button
-          label={t("signup.submit")}
-          onPress={handleSubmit(onSubmit)}
-          loading={loading}
-          style={{ marginBottom: theme.spacing.stackMd }}
-        />
-
-        <Link href="/(auth)/login" asChild>
-          <Text style={{
-            color: theme.accent.primary,
-            textAlign: "center",
-            fontSize: theme.typography.scale.microBold.fontSize,
-            fontFamily: "Inter_500Medium",
-            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-            textTransform: "uppercase",
-            textDecorationLine: "underline",
-          }}>
-            {t("signup.go_login")}
-          </Text>
-        </Link>
       </View>
     </Screen>
   );
