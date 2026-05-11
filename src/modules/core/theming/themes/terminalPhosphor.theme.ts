@@ -1,4 +1,5 @@
 import type { ThemeTokens } from '../types';
+import { SPACING, TYPE_SCALE } from '../tokens';
 
 export const terminalPhosphorTheme: ThemeTokens = {
   bg: {
@@ -30,10 +31,10 @@ export const terminalPhosphorTheme: ThemeTokens = {
     critical: '#aa0000',
   },
   level: {
-    seed: { fg: '#008822', bg: '#001a00', border: '#00aa2a' },
-    sprout: { fg: '#00aa2a', bg: '#001a00', border: '#00cc33' },
-    tree: { fg: '#00cc33', bg: '#001a00', border: '#00ff41' },
-    forest: { fg: '#00ff41', bg: '#002200', border: '#00ff41' },
+    seed:    { fg: '#008822', bg: '#001a00', border: '#00aa2a' },
+    sprout:  { fg: '#00aa2a', bg: '#001a00', border: '#00cc33' },
+    tree:    { fg: '#00cc33', bg: '#001a00', border: '#00ff41' },
+    forest:  { fg: '#00ff41', bg: '#002200', border: '#00ff41' },
     ancient: { fg: '#001100', bg: '#00ff41', border: '#00ff41' },
   },
   status: {
@@ -44,10 +45,20 @@ export const terminalPhosphorTheme: ThemeTokens = {
   },
   radius: { sm: 0, md: 0, lg: 0, pill: 0 },
   borderWidth: { hairline: 1, default: 1, bold: 1 },
+  spacing: SPACING,
   typography: {
     displayFontFamily: 'Courier New',
     bodyFontFamily: 'Courier New',
     numericFeatures: 'tnum',
+    scale: {
+      displayXl: TYPE_SCALE.displayXl,
+      displaySm: TYPE_SCALE.displaySm,
+      titleLg:   TYPE_SCALE.titleLg,
+      titleSm:   TYPE_SCALE.titleSm,
+      labelCaps: TYPE_SCALE.labelCaps,
+      bodyMain:  TYPE_SCALE.bodyMain,
+      microBold: TYPE_SCALE.microBold,
+    },
   },
   categoryColors: {
     green:   { fg: '#00ff41', bg: '#001a00', border: '#00ff41' },

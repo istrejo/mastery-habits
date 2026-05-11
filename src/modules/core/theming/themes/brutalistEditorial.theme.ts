@@ -1,4 +1,5 @@
 import type { ThemeTokens } from '../types';
+import { SPACING, TYPE_SCALE } from '../tokens';
 
 export const brutalistEditorialTheme: ThemeTokens = {
   bg: {
@@ -30,11 +31,11 @@ export const brutalistEditorialTheme: ThemeTokens = {
     critical: '#dc2626',
   },
   level: {
-    seed: { fg: '#000', bg: '#ebe6da', border: '#000' },
-    sprout: { fg: '#000', bg: '#fbbf24', border: '#000' },
-    tree: { fg: '#000', bg: '#fb923c', border: '#000' },
-    forest: { fg: '#fff', bg: '#ff5722', border: '#000' },
-    ancient: { fg: '#fff', bg: '#000', border: '#000' },
+    seed:    { fg: '#000', bg: '#ebe6da', border: '#000' },
+    sprout:  { fg: '#000', bg: '#fbbf24', border: '#000' },
+    tree:    { fg: '#000', bg: '#fb923c', border: '#000' },
+    forest:  { fg: '#fff', bg: '#ff5722', border: '#000' },
+    ancient: { fg: '#fff', bg: '#000',    border: '#000' },
   },
   status: {
     success: '#ff5722',
@@ -44,7 +45,20 @@ export const brutalistEditorialTheme: ThemeTokens = {
   },
   radius: { sm: 0, md: 0, lg: 0, pill: 0 },
   borderWidth: { hairline: 1.5, default: 1.5, bold: 2 },
-  typography: { displayFontFamily: 'Georgia', numericFeatures: 'tnum' },
+  spacing: SPACING,
+  typography: {
+    displayFontFamily: 'Georgia',
+    numericFeatures: 'tnum',
+    scale: {
+      displayXl: TYPE_SCALE.displayXl,
+      displaySm: TYPE_SCALE.displaySm,
+      titleLg:   TYPE_SCALE.titleLg,
+      titleSm:   TYPE_SCALE.titleSm,
+      labelCaps: TYPE_SCALE.labelCaps,
+      bodyMain:  TYPE_SCALE.bodyMain,
+      microBold: TYPE_SCALE.microBold,
+    },
+  },
   categoryColors: {
     green:   { fg: '#000', bg: '#86efac', border: '#000' },
     violet:  { fg: '#000', bg: '#d8b4fe', border: '#000' },
