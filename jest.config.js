@@ -12,6 +12,6 @@ module.exports = {
   },
   testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { tsconfig: { strict: true } }],
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: { strict: true, jsx: 'react-jsx' } }],
   },
 };
