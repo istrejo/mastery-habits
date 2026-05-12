@@ -11,13 +11,13 @@ interface SkeletonProps {
 
 export const Skeleton: React.FC<SkeletonProps> = ({ width = '100%', height = 16, borderRadius, style }) => {
   const t = useTheme();
-  const opacity = useRef(new Animated.Value(0.4)).current;
+  const opacity = useRef(new Animated.Value(0.45)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.9, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.45, duration: 700, useNativeDriver: true }),
       ]),
     );
     anim.start();
@@ -31,7 +31,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({ width = '100%', height = 16,
           width,
           height,
           borderRadius: borderRadius ?? t.radius.sm,
-          backgroundColor: t.bg.surfaceAlt,
+          backgroundColor: t.accent.muted,
           opacity,
         },
         style,

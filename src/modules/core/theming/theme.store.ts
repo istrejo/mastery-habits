@@ -8,15 +8,18 @@ interface ThemeState {
   setTheme: (id: ThemeId) => void;
 }
 
+export const FORCED_THEME_ID: ThemeId = 'minimal-light';
+
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      themeId: 'tech-neon',
-      setTheme: (id) => set({ themeId: id }),
+      themeId: FORCED_THEME_ID,
+      setTheme: () => set({ themeId: FORCED_THEME_ID }),
     }),
     {
       name: 'mastery-habits-theme',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: () => ({ themeId: FORCED_THEME_ID }),
     }
   )
 );

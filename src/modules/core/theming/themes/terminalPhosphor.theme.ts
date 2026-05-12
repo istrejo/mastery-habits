@@ -1,4 +1,5 @@
 import type { ThemeTokens } from '../types';
+import { SPACING, TYPE_SCALE } from '../tokens';
 
 export const terminalPhosphorTheme: ThemeTokens = {
   bg: {
@@ -37,17 +38,50 @@ export const terminalPhosphorTheme: ThemeTokens = {
     ancient: { fg: '#001100', bg: '#00ff41', border: '#00ff41' },
   },
   status: {
-    success: '#00ff41',
-    skip: '#88aa00',
-    danger: '#aa0000',
-    info: '#00cc33',
+    success: '#0f0',
+    skip: '#ff0',
+    danger: '#f00',
+    info: '#0ff',
+  },
+  activity: {
+    none: '#001100',
+    low: '#002200',
+    medium: '#004400',
+    high: '#006600',
+    veryHigh: '#0f0',
   },
   radius: { sm: 0, md: 0, lg: 0, pill: 0 },
   borderWidth: { hairline: 1, default: 1, bold: 1 },
+  spacing: SPACING,
   typography: {
     displayFontFamily: 'Courier New',
     bodyFontFamily: 'Courier New',
     numericFeatures: 'tnum',
+    scale: {
+      displayXl: TYPE_SCALE.displayXl,
+      displaySm: TYPE_SCALE.displaySm,
+      titleLg: TYPE_SCALE.titleLg,
+      titleSm: TYPE_SCALE.titleSm,
+      labelCaps: TYPE_SCALE.labelCaps,
+      bodyMain: TYPE_SCALE.bodyMain,
+      microBold: TYPE_SCALE.microBold,
+    },
   },
-  meta: { id: 'terminal-phosphor', name: 'Terminal Phosphor', mode: 'dark', tier: 'premium' },
+  categoryColors: {
+    green: { fg: '#00ff41', bg: '#001a00', border: '#00ff41' },
+    violet: { fg: '#88ff66', bg: '#001a00', border: '#00cc33' },
+    blue: { fg: '#66ffaa', bg: '#001a00', border: '#00cc33' },
+    yellow: { fg: '#aaff00', bg: '#001a00', border: '#00cc33' },
+    orange: { fg: '#ccff00', bg: '#001a00', border: '#00cc33' },
+    pink: { fg: '#00ff88', bg: '#001a00', border: '#00cc33' },
+    cyan: { fg: '#00ffcc', bg: '#001a00', border: '#00cc33' },
+    emerald: { fg: '#33ff77', bg: '#001a00', border: '#00cc33' },
+    neutral: { fg: '#008822', bg: '#001a00', border: '#00aa2a' },
+  },
+  meta: {
+    id: 'terminal-phosphor',
+    name: 'Terminal Phosphor',
+    mode: 'dark',
+    tier: 'premium',
+  },
 };

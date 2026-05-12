@@ -72,8 +72,10 @@ export type Database = {
       habits: {
         Row: {
           archived_at: string | null
-          category: string | null
+          category: Database["public"]["Enums"]["habit_category"]
           created_at: string
+          custom_emoji: string | null
+          custom_label: string | null
           description: string | null
           frequency_days: number[]
           id: string
@@ -82,8 +84,10 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
-          category?: string | null
+          category: Database["public"]["Enums"]["habit_category"]
           created_at?: string
+          custom_emoji?: string | null
+          custom_label?: string | null
           description?: string | null
           frequency_days: number[]
           id?: string
@@ -92,8 +96,10 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
-          category?: string | null
+          category?: Database["public"]["Enums"]["habit_category"]
           created_at?: string
+          custom_emoji?: string | null
+          custom_label?: string | null
           description?: string | null
           frequency_days?: number[]
           id?: string
@@ -183,6 +189,16 @@ export type Database = {
     }
     Enums: {
       checkin_status: "completed" | "skipped" | "missed"
+      habit_category:
+        | "health"
+        | "mind"
+        | "learning"
+        | "productivity"
+        | "nutrition"
+        | "creativity"
+        | "social"
+        | "finance"
+        | "custom"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -314,6 +330,18 @@ export const Constants = {
   public: {
     Enums: {
       checkin_status: ["completed", "skipped", "missed"],
+      habit_category: [
+        "health",
+        "mind",
+        "learning",
+        "productivity",
+        "nutrition",
+        "creativity",
+        "social",
+        "finance",
+        "custom",
+      ],
     },
   },
 } as const
+

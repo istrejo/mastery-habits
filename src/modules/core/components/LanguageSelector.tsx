@@ -12,24 +12,9 @@ type LanguageOption = {
 };
 
 const OPTIONS: LanguageOption[] = [
-  {
-    value: 'es',
-    flag: '🇦🇷',
-    titleKey: 'language_picker.lang_es',
-    labelKey: 'settings.lang_es_subtitle',
-  },
-  {
-    value: 'en',
-    flag: '🇺🇸',
-    titleKey: 'language_picker.lang_en',
-    labelKey: 'settings.lang_en_subtitle',
-  },
-  {
-    value: null,
-    flag: '📱',
-    titleKey: 'language_picker.lang_system',
-    labelKey: 'settings.lang_system_subtitle',
-  },
+  { value: 'es', flag: '🇦🇷', titleKey: 'language_picker.lang_es', labelKey: 'settings.lang_es_subtitle' },
+  { value: 'en', flag: '🇺🇸', titleKey: 'language_picker.lang_en', labelKey: 'settings.lang_en_subtitle' },
+  { value: null, flag: '📱', titleKey: 'language_picker.lang_system', labelKey: 'settings.lang_system_subtitle' },
 ];
 
 export const LanguageSelector: React.FC = () => {
@@ -38,20 +23,14 @@ export const LanguageSelector: React.FC = () => {
   const { locale, setLocale, clearLocale } = useLocaleStore();
 
   const handleSelect = (value: LocaleId | null) => {
-    if (value === null) {
-      clearLocale();
-    } else {
-      setLocale(value);
-    }
+    if (value === null) clearLocale();
+    else setLocale(value);
   };
 
   return (
-    <View style={{ gap: 2 }}>
-      {OPTIONS.map((option, index) => {
+    <View style={{ gap: theme.spacing.stackSm }}>
+      {OPTIONS.map((option) => {
         const isActive = locale === option.value;
-        const isFirst = index === 0;
-        const isLast = index === OPTIONS.length - 1;
-
         return (
           <Pressable
             key={String(option.value)}
@@ -62,23 +41,17 @@ export const LanguageSelector: React.FC = () => {
               paddingVertical: 14,
               paddingHorizontal: 16,
               backgroundColor: pressed ? theme.bg.surfaceAlt : theme.bg.surface,
-              borderWidth: theme.borderWidth.hairline,
-              borderColor: isActive ? theme.accent.primary : theme.border.default,
-              borderRadius: isFirst
-                ? theme.radius.md
-                : isLast
-                ? theme.radius.md
-                : 0,
-              marginTop: isFirst ? 0 : -theme.borderWidth.hairline,
-              zIndex: isActive ? 1 : 0,
+              borderWidth: isActive ? theme.borderWidth.bold : theme.borderWidth.default,
+              borderColor: isActive ? theme.border.strong : theme.border.default,
+              borderRadius: theme.radius.md,
             })}
           >
             <Text style={{ fontSize: 22, marginRight: 14 }}>{option.flag}</Text>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: theme.text.primary, fontSize: 15, fontWeight: '600' }}>
+              <Text style={{ color: theme.text.primary, fontSize: 14, fontFamily: 'Lexend_600SemiBold' }}>
                 {t(option.titleKey)}
               </Text>
-              <Text style={{ color: theme.text.tertiary, fontSize: 12, marginTop: 1 }}>
+              <Text style={{ color: theme.text.secondary, fontSize: 12, marginTop: 2, fontFamily: 'Lexend_400Regular' }}>
                 {t(option.labelKey)}
               </Text>
             </View>
@@ -87,22 +60,15 @@ export const LanguageSelector: React.FC = () => {
                 width: 20,
                 height: 20,
                 borderRadius: theme.radius.pill,
-                borderWidth: isActive ? 0 : theme.borderWidth.default,
-                borderColor: theme.border.default,
+                borderWidth: theme.borderWidth.default,
+                borderColor: isActive ? theme.accent.primary : theme.border.default,
                 backgroundColor: isActive ? theme.accent.primary : 'transparent',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
               {isActive && (
-                <View
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: theme.radius.pill,
-                    backgroundColor: theme.accent.onPrimary,
-                  }}
-                />
+                <View style={{ width: 8, height: 8, borderRadius: theme.radius.pill, backgroundColor: theme.accent.onPrimary }} />
               )}
             </View>
           </Pressable>

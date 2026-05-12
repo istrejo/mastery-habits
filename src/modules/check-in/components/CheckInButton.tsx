@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, Modal, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@core/theming';
+import { Button } from '@core/components';
 import type { CheckInRecord } from '../services/checkin.service';
 
 interface CheckInButtonProps {
@@ -31,18 +32,8 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
 
   if (!canCheckIn) {
     return (
-      <View
-        style={[
-          {
-            padding: 16,
-            borderRadius: theme.radius.md,
-            backgroundColor: theme.bg.surfaceAlt,
-            alignItems: 'center',
-          },
-          style,
-        ]}
-      >
-        <Text style={{ color: theme.text.tertiary, fontSize: 13 }}>
+      <View style={[{ padding: 16, borderRadius: theme.radius.md, backgroundColor: theme.bg.surfaceAlt, borderWidth: theme.borderWidth.default, borderColor: theme.border.default, alignItems: 'center' }, style]}>
+        <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: 'Lexend_500Medium' }}>
           {t('checkin.not_planned')}
         </Text>
       </View>
@@ -52,20 +43,8 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
   if (alreadyCheckedIn) {
     const isSkipped = todayCheckIn?.status === 'skipped';
     return (
-      <View
-        style={[
-          {
-            padding: 16,
-            borderRadius: theme.radius.md,
-            backgroundColor: isSkipped ? `${theme.status.skip}22` : `${theme.status.success}22`,
-            borderWidth: theme.borderWidth.default,
-            borderColor: isSkipped ? theme.status.skip : theme.status.success,
-            alignItems: 'center',
-          },
-          style,
-        ]}
-      >
-        <Text style={{ color: isSkipped ? theme.status.skip : theme.status.success, fontSize: 15, fontWeight: '700' }}>
+      <View style={[{ padding: 16, borderRadius: theme.radius.md, backgroundColor: theme.bg.surfaceAlt, borderWidth: theme.borderWidth.default, borderColor: isSkipped ? theme.text.secondary : theme.accent.primary, alignItems: 'center' }, style]}>
+        <Text style={{ color: isSkipped ? theme.text.secondary : theme.accent.primary, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: 'Lexend_600SemiBold' }}>
           {isSkipped ? t('checkin.skip_used') : t('checkin.completed')}
         </Text>
       </View>
@@ -74,73 +53,26 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
 
   return (
     <>
-      <View style={[{ gap: 8 }, style]}>
-        <Pressable
-          onPress={onComplete}
-          disabled={loading}
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? `${theme.status.success}cc` : theme.status.success,
-            padding: 16,
-            borderRadius: theme.radius.md,
-            alignItems: 'center',
-            opacity: loading ? 0.6 : 1,
-          })}
-        >
-          <Text style={{ color: theme.text.inverse, fontSize: 16, fontWeight: '700' }}>
-            {t('checkin.complete_action')}
-          </Text>
-        </Pressable>
-
-        {skipAvailable && (
-          <Pressable
-            onPress={() => setSkipModalVisible(true)}
-            disabled={loading}
-            style={({ pressed }) => ({
-              backgroundColor: pressed ? `${theme.status.skip}22` : 'transparent',
-              padding: 12,
-              borderRadius: theme.radius.md,
-              borderWidth: theme.borderWidth.default,
-              borderColor: theme.status.skip,
-              alignItems: 'center',
-              opacity: loading ? 0.6 : 1,
-            })}
-          >
-            <Text style={{ color: theme.status.skip, fontSize: 14, fontWeight: '600' }}>
-              {t('checkin.use_skip')}
-            </Text>
-          </Pressable>
-        )}
+      <View style={[{ gap: theme.spacing.stackSm }, style]}>
+        <Button label={t('checkin.complete_action')} onPress={onComplete} loading={loading} />
+        {skipAvailable && <Button label={t('checkin.use_skip')} variant="secondary" onPress={() => setSkipModalVisible(true)} disabled={loading} />}
       </View>
 
-      <Modal
-        visible={skipModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setSkipModalVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: '#00000080', justifyContent: 'center', padding: 24 }}>
-          <View style={{ backgroundColor: theme.bg.surface, borderRadius: theme.radius.lg, padding: 24 }}>
-            <Text style={{ color: theme.text.primary, fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
+      <Modal visible={skipModalVisible} transparent animationType="fade" onRequestClose={() => setSkipModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(17,17,17,0.55)', justifyContent: 'center', padding: 24 }}>
+          <View style={{ backgroundColor: theme.bg.surface, borderRadius: theme.radius.lg, borderWidth: theme.borderWidth.default, borderColor: theme.border.default, padding: 24 }}>
+            <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleSm.fontSize, lineHeight: theme.typography.scale.titleSm.lineHeight, fontFamily: 'Anton_400Regular', letterSpacing: theme.typography.scale.titleSm.letterSpacing, textTransform: 'uppercase', marginBottom: 8 }}>
               {t('checkin.skip_modal_title')}
             </Text>
-            <Text style={{ color: theme.text.secondary, fontSize: 14, marginBottom: 24 }}>
+            <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: 'Lexend_400Regular', marginBottom: 24 }}>
               {t('checkin.skip_modal_body')}
             </Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Pressable
-                onPress={() => setSkipModalVisible(false)}
-                style={{ flex: 1, padding: 12, borderRadius: theme.radius.md, borderWidth: theme.borderWidth.default, borderColor: theme.border.default, alignItems: 'center' }}
-              >
-                <Text style={{ color: theme.text.secondary, fontWeight: '600' }}>{t('common.cancel')}</Text>
+              <Pressable onPress={() => setSkipModalVisible(false)} style={{ flex: 1, padding: 12, borderRadius: theme.radius.md, borderWidth: theme.borderWidth.default, borderColor: theme.border.default, alignItems: 'center' }}>
+                <Text style={{ color: theme.text.secondary, fontFamily: 'Lexend_600SemiBold' }}>{t('common.cancel')}</Text>
               </Pressable>
-              <Pressable
-                onPress={async () => {
-                  setSkipModalVisible(false);
-                  await onSkip();
-                }}
-                style={{ flex: 1, padding: 12, borderRadius: theme.radius.md, backgroundColor: theme.status.skip, alignItems: 'center' }}
-              >
-                <Text style={{ color: theme.text.inverse, fontWeight: '700' }}>{t('common.confirm')}</Text>
+              <Pressable onPress={async () => { setSkipModalVisible(false); await onSkip(); }} style={{ flex: 1, padding: 12, borderRadius: theme.radius.md, backgroundColor: theme.accent.primary, alignItems: 'center' }}>
+                <Text style={{ color: theme.accent.onPrimary, fontFamily: 'Lexend_600SemiBold' }}>{t('common.confirm')}</Text>
               </Pressable>
             </View>
           </View>

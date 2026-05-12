@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Theme Selector - Mastery Habits</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#ffdb79",
+                        "background": "#131313",
+                        "on-tertiary-fixed": "#241a00",
+                        "on-tertiary-container": "#795f01",
+                        "on-secondary-fixed-variant": "#454747",
+                        "error": "#ffb4ab",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "tertiary": "#fffaf7",
+                        "outline": "#849585",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "primary-fixed": "#60ff99",
+                        "on-primary-fixed-variant": "#005228",
+                        "on-secondary-container": "#b4b5b5",
+                        "surface-variant": "#353534",
+                        "surface-container-highest": "#353534",
+                        "surface": "#131313",
+                        "outline-variant": "#3b4b3d",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary-fixed-dim": "#00e479",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#00e479",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-surface-variant": "#b9cbb9",
+                        "on-tertiary": "#3d2f00",
+                        "inverse-primary": "#006d37",
+                        "tertiary-fixed-dim": "#e5c364",
+                        "on-primary-container": "#007139",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary-fixed": "#00210c",
+                        "primary": "#f1ffef",
+                        "on-surface": "#e5e2e1",
+                        "primary-container": "#00ff88",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#454747",
+                        "surface-container-low": "#1c1b1b",
+                        "on-secondary": "#2f3131",
+                        "secondary": "#c6c6c7",
+                        "tertiary-fixed": "#ffe08d",
+                        "on-background": "#e5e2e1",
+                        "on-primary": "#003919",
+                        "error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "gutter": "16px",
+                        "stack-lg": "48px",
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "stack-md": "24px"
+                    },
+                    "fontFamily": {
+                        "micro-bold": ["Inter"],
+                        "body-main": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "micro-bold": ["11px", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-main": ["16px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "display-sm": ["56px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "title-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-xl": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "title-sm": ["22px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.08em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased font-body-main selection:bg-primary-container selection:text-background min-h-screen flex flex-col">
+<!-- TopAppBar (Semantic Shell) -->
+<header class="bg-background dark:bg-background flex justify-between items-center w-full px-margin-mobile py-unit max-w-7xl mx-auto docked full-width top-0 border-b border-outline-variant dark:border-outline-variant flat no shadows z-50 sticky">
+<div class="flex items-center gap-4">
+<button class="text-secondary dark:text-secondary hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-2 rounded flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-label-caps text-label-caps text-on-background dark:text-on-background font-extrabold tracking-widest">MASTERY HABITS</h1>
+</div>
+<button class="text-primary-container dark:text-primary-container hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-2 rounded flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-margin-mobile py-stack-md max-w-3xl mx-auto w-full">
+<header class="mb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-background">SELECT THEME</h2>
+<p class="font-body-main text-body-main text-secondary mt-stack-sm">Customize your performance environment.</p>
+</header>
+<div class="flex flex-col gap-stack-md">
+<!-- Tech Neon (Active) -->
+<button class="text-left w-full bg-surface-container-high rounded-xl border-2 border-primary-container p-stack-md flex flex-col gap-stack-md relative overflow-hidden group">
+<div class="absolute top-stack-md right-stack-md text-primary-container">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex flex-col gap-unit">
+<h3 class="font-title-sm text-title-sm text-on-background">Tech Neon</h3>
+<p class="font-micro-bold text-micro-bold text-secondary uppercase tracking-widest">High Contrast · Default</p>
+</div>
+<div class="flex gap-unit">
+<div class="w-8 h-8 rounded-full bg-[#131313] border border-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#00FF88] border border-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#201f1f] border border-outline-variant"></div>
+</div>
+<div class="bg-[#131313] rounded-lg p-stack-sm border border-outline-variant flex items-center justify-between opacity-80 mt-stack-sm pointer-events-none">
+<div class="flex items-center gap-stack-sm">
+<div class="w-4 h-4 rounded-full border border-[#00FF88]"></div>
+<span class="font-label-caps text-label-caps text-[#e5e2e1]">Morning Routine</span>
+</div>
+<span class="font-micro-bold text-micro-bold text-[#00FF88]">4/5</span>
+</div>
+</button>
+<!-- Brutalist Editorial -->
+<button class="text-left w-full bg-surface-container-high rounded-xl border border-outline-variant p-stack-md flex flex-col gap-stack-md hover:border-secondary transition-colors group">
+<div class="flex flex-col gap-unit">
+<h3 class="font-title-sm text-title-sm text-on-background">Brutalist Editorial</h3>
+<p class="font-micro-bold text-micro-bold text-secondary uppercase tracking-widest">Monochrome · Raw</p>
+</div>
+<div class="flex gap-unit">
+<div class="w-8 h-8 rounded-full bg-[#000000] border border-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#FFFFFF] border border-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#1A1A1A] border border-outline-variant"></div>
+</div>
+<div class="bg-[#000000] rounded-lg p-stack-sm border border-[#333333] flex items-center justify-between opacity-80 mt-stack-sm pointer-events-none">
+<div class="flex items-center gap-stack-sm">
+<div class="w-4 h-4 border border-[#FFFFFF]"></div>
+<span class="font-label-caps text-label-caps text-[#FFFFFF] font-bold">Deep Work</span>
+</div>
+<span class="font-micro-bold text-micro-bold text-[#FFFFFF]">2/3</span>
+</div>
+</button>
+<!-- Terminal Phosphor -->
+<button class="text-left w-full bg-surface-container-high rounded-xl border border-outline-variant p-stack-md flex flex-col gap-stack-md hover:border-secondary transition-colors group">
+<div class="flex flex-col gap-unit">
+<h3 class="font-title-sm text-title-sm text-on-background">Terminal Phosphor</h3>
+<p class="font-micro-bold text-micro-bold text-secondary uppercase tracking-widest">Retro · Code</p>
+</div>
+<div class="flex gap-unit">
+<div class="w-8 h-8 rounded-full bg-[#0A0A0A] border border-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#FF3366] border border-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#111111] border border-outline-variant"></div>
+</div>
+<div class="bg-[#0A0A0A] rounded-lg p-stack-sm border border-[#222222] flex items-center justify-between opacity-80 mt-stack-sm pointer-events-none">
+<div class="flex items-center gap-stack-sm">
+<div class="w-4 h-4 rounded-sm border border-[#FF3366]"></div>
+<span class="font-label-caps text-label-caps text-[#CCCCCC] font-mono tracking-tight">Hydration</span>
+</div>
+<span class="font-micro-bold text-micro-bold text-[#FF3366] font-mono">1L/3L</span>
+</div>
+</button>
+</div>
+</main>
+<!-- Footer Toggle -->
+<footer class="mt-auto px-margin-mobile py-stack-md max-w-3xl mx-auto w-full border-t border-outline-variant">
+<div class="flex items-center justify-between bg-surface-container-high rounded-xl p-stack-md">
+<div class="flex flex-col gap-unit">
+<span class="font-title-sm text-title-sm text-on-background text-base">AUTO DARK/LIGHT</span>
+<span class="font-micro-bold text-micro-bold text-secondary">Match system settings</span>
+</div>
+<!-- Toggle Switch Structure -->
+<div class="relative inline-block w-12 h-6 rounded-full bg-surface-variant border border-outline-variant cursor-pointer">
+<div class="absolute left-1 top-1 w-4 h-4 bg-secondary rounded-full transition-transform"></div>
+</div>
+</div>
+</footer>
+</body></html>

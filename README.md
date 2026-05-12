@@ -156,14 +156,45 @@ Score_hoy = (Score_ayer × 0.8) + (Compliance_hoy × 20)
 
 ---
 
+## Categorías de hábitos
+
+Cada hábito pertenece a una de 8 áreas de vida predefinidas o a una categoría personalizada.
+
+| ID | Emoji | Color | Descripción |
+|---|---|---|---|
+| `health` | 💪 | green | Ejercicio, sueño, movimiento |
+| `mind` | 🧘 | violet | Meditación, journaling, terapia |
+| `learning` | 📚 | blue | Lectura, cursos, idiomas |
+| `productivity` | ⚡ | yellow | Deep work, planificación, foco |
+| `nutrition` | 🥗 | orange | Hidratación, alimentación consciente |
+| `creativity` | 🎨 | pink | Escribir, crear, side projects |
+| `social` | 👥 | cyan | Familia, amigos, networking |
+| `finance` | 💰 | emerald | Ahorro, gastos, inversión |
+| `custom` | ✨ | neutral | El usuario define label + emoji |
+
+**Comportamiento:**
+- Obligatoria al crear un hábito — no hay hábitos sin categoría
+- Editable sin perder histórico, score ni racha
+- `custom` requiere `custom_label` (máx 30 chars) y `custom_emoji`
+- Los hábitos migrados desde antes de esta feature aparecen como "Sin categorizar 📌" con un banner que invita a recategorizar
+
+**Implementación:**
+- Catálogo: `src/modules/habits/constants/categories.ts`
+- Resolver de display: `src/modules/habits/utils/resolveCategory.ts`
+- Componentes: `CategoryBadge`, `CategoryPicker`, `CustomCategoryInput` en `src/modules/habits/components/`
+- Colores por tema: `categoryColors` en cada `*.theme.ts` — cero hex hardcodeados en componentes
+
+---
+
 ## Base de datos
 
-3 migraciones en `supabase/migrations/`:
+4 migraciones en `supabase/migrations/`:
 
 | Migración | Qué hace |
 |---|---|
 | `0001_initial_schema.sql` | Tablas: `profiles`, `habits`, `check_ins`, `mastery_scores` |
 | `0002_rls_policies.sql` | RLS policies + trigger para crear perfil en signup |
 | `0003_rpc_functions.sql` | `register_check_in` RPC, `calculate_mastery_level`, `has_used_weekly_skip` |
+| `0004_habit_categories.sql` | Enum `habit_category`, columnas `custom_label`/`custom_emoji`, constraints e índice |
 
 RLS garantiza aislamiento total por usuario — ningún usuario puede leer datos de otro.

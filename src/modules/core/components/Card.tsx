@@ -1,3 +1,4 @@
+/* stitch: card */
 import React from 'react';
 import { View, type ViewProps } from 'react-native';
 import { useTheme } from '@core/theming';
@@ -19,9 +20,9 @@ export const Card: React.FC<CardProps> = ({
         {
           backgroundColor: elevated ? t.bg.elevated : t.bg.surface,
           borderColor: t.border.default,
-          borderWidth: t.borderWidth.hairline,
+          borderWidth: t.borderWidth.default,
           borderRadius: t.radius.lg,
-          padding: 14,
+          padding: t.spacing.marginMobile,
         },
         style,
       ]}

@@ -3,6 +3,7 @@ import { View, Text, type ViewStyle } from 'react-native';
 import { useTheme, type MasteryLevel } from '@core/theming';
 import { getLevel, getLevelProgress } from '../utils/getLevel';
 import { LEVELS } from '../utils/LEVELS';
+import { ProgressBar } from '@core/components';
 
 interface LevelProgressProps {
   score: number;
@@ -19,40 +20,18 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
 
   return (
     <View style={style}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginBottom: 6,
-        }}
-      >
-        <Text style={{ fontSize: 12, color: lv.fg, fontWeight: '600' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: t.spacing.stackSm }}>
+        <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: lv.fg, fontFamily: 'Lexend_600SemiBold', letterSpacing: t.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
           {level.emoji} {level.label}
         </Text>
         {nextLevel && (
-          <Text style={{ fontSize: 12, color: t.text.tertiary }}>
+          <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: t.text.tertiary, fontFamily: 'Lexend_500Medium', letterSpacing: t.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
             {nextLevel.emoji} {nextLevel.label}
           </Text>
         )}
       </View>
-      <View
-        style={{
-          height: 8,
-          backgroundColor: t.bg.surfaceAlt,
-          borderRadius: t.radius.pill,
-          overflow: 'hidden',
-        }}
-      >
-        <View
-          style={{
-            width: `${progress * 100}%`,
-            height: '100%',
-            backgroundColor: lv.fg,
-            borderRadius: t.radius.pill,
-          }}
-        />
-      </View>
-      <Text style={{ fontSize: 11, color: t.text.tertiary, marginTop: 4 }}>
+      <ProgressBar value={progress} max={1} scoreColor={lv.fg} />
+      <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: t.text.tertiary, marginTop: 6, fontFamily: 'Lexend_400Regular' }}>
         {Math.round(score)}/100
       </Text>
     </View>

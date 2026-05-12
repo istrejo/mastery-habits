@@ -9,11 +9,7 @@ interface FrequencySelectorProps {
   error?: string;
 }
 
-export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
-  value,
-  onChange,
-  error,
-}) => {
+export const FrequencySelector: React.FC<FrequencySelectorProps> = ({ value, onChange, error }) => {
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -38,43 +34,45 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({
 
   return (
     <View>
-      <Text style={{ color: theme.text.secondary, fontSize: 13, fontWeight: '500', marginBottom: 10 }}>
+      <Text style={{
+        color: theme.text.secondary,
+        fontSize: theme.typography.scale.microBold.fontSize,
+        fontFamily: 'Lexend_500Medium',
+        marginBottom: theme.spacing.stackSm,
+      }}>
         {t('frequency.label')}
       </Text>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
+      <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
         {DAYS.map(({ iso, labelKey }) => {
           const active = value.includes(iso);
           return (
             <TouchableOpacity
               key={iso}
               onPress={() => toggle(iso)}
+              activeOpacity={0.78}
               style={{
                 flex: 1,
                 aspectRatio: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: theme.radius.md,
-                borderWidth: theme.borderWidth.default,
-                backgroundColor: active ? theme.accent.primary : theme.bg.surfaceAlt,
+                borderRadius: theme.radius.sm,
+                borderWidth: active ? theme.borderWidth.bold : theme.borderWidth.default,
+                backgroundColor: active ? theme.accent.primary : theme.bg.surface,
                 borderColor: active ? theme.accent.primary : theme.border.default,
               }}
             >
-              <Text
-                style={{
-                  color: active ? theme.accent.onPrimary : theme.text.secondary,
-                  fontWeight: '600',
-                  fontSize: 13,
-                }}
-              >
+              <Text style={{
+                color: active ? theme.accent.onPrimary : theme.text.secondary,
+                fontFamily: 'Lexend_600SemiBold',
+                fontSize: theme.typography.scale.microBold.fontSize,
+              }}>
                 {t(labelKey)}
               </Text>
             </TouchableOpacity>
           );
         })}
       </View>
-      {error ? (
-        <Text style={{ color: theme.status.danger, fontSize: 12, marginTop: 4 }}>{error}</Text>
-      ) : null}
+      {error ? <Text style={{ color: theme.status.danger, fontSize: 12, marginTop: 6, fontFamily: 'Lexend_500Medium' }}>{error}</Text> : null}
     </View>
   );
 };

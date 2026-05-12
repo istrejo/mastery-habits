@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Power Grid - Mastery Habits</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e5e2e1",
+                    "surface": "#fdf8f8",
+                    "surface-variant": "#e5e2e1",
+                    "surface-container-high": "#ebe7e6",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c4c7c7",
+                    "on-secondary-fixed-variant": "#464747",
+                    "tertiary": "#000000",
+                    "secondary-fixed-dim": "#c7c6c6",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#1d1b1a",
+                    "background": "#fdf8f8",
+                    "tertiary-container": "#1d1b1a",
+                    "on-tertiary-container": "#868381",
+                    "on-secondary-container": "#626262",
+                    "primary-fixed": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#484645",
+                    "outline": "#747878",
+                    "on-primary-fixed-variant": "#474646",
+                    "tertiary-fixed": "#e6e1df",
+                    "surface-container-low": "#f7f3f2",
+                    "secondary-container": "#e1dfdf",
+                    "secondary": "#5e5e5e",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1c1b1b",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-surface-variant": "#444748",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#e4e2e2",
+                    "on-primary-container": "#858383",
+                    "inverse-primary": "#c8c6c5",
+                    "tertiary-fixed-dim": "#cac6c3",
+                    "surface-tint": "#5f5e5e",
+                    "inverse-surface": "#313030",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "surface-bright": "#fdf8f8",
+                    "on-surface": "#1c1b1b",
+                    "primary": "#000000",
+                    "inverse-on-surface": "#f4f0ef",
+                    "primary-container": "#1c1b1b",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#f1edec",
+                    "on-primary-fixed": "#1c1b1b",
+                    "surface-dim": "#ddd9d8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "40px",
+                    "unit": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "gutter": "20px",
+                    "container-max": "1200px",
+                    "md": "16px",
+                    "margin-mobile": "24px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Anton"],
+                    "headline-md": ["Anton"],
+                    "display": ["Anton"],
+                    "label-bold": ["Lexend"],
+                    "body-lg": ["Lexend"],
+                    "label-sm": ["Lexend"],
+                    "body-md": ["Lexend"],
+                    "headline-lg": ["Anton"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                    "display": ["64px", {"lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #FAFAFA;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background min-h-screen pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-mobile py-unit max-w-7xl mx-auto bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant sticky top-0 z-50">
+<div class="font-label-caps text-label-caps text-on-background dark:text-on-background font-headline-md text-headline-md tracking-tight uppercase">
+            MASTERY HABITS
+        </div>
+<nav class="flex gap-lg">
+<a class="text-secondary dark:text-secondary hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-sm rounded-DEFAULT flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined">bolt</span>
+<span class="font-label-bold text-label-bold">Energy</span>
+</a>
+<a class="text-primary-container font-bold hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-sm rounded-DEFAULT flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined fill">grid_view</span>
+<span class="font-label-bold text-label-bold">Grid</span>
+</a>
+<a class="text-secondary dark:text-secondary hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-sm rounded-DEFAULT flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-label-bold text-label-bold">Stats</span>
+</a>
+<a class="text-secondary dark:text-secondary hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-sm rounded-DEFAULT flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-bold text-label-bold">Profile</span>
+</a>
+</nav>
+<button class="text-primary-container dark:text-primary-container hover:bg-surface-container dark:hover:bg-surface-container transition-colors p-sm rounded-full Active: scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined">add</span>
+</button>
+</header>
+<!-- Mobile Top Header -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile py-lg bg-background border-b border-outline-variant">
+<div class="font-headline-lg-mobile text-headline-lg-mobile tracking-tight uppercase">
+            POWER GRID
+        </div>
+<button class="text-primary-container hover:bg-surface-container transition-colors p-sm rounded-full">
+<span class="material-symbols-outlined">add</span>
+</button>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile py-xl md:py-xl">
+<!-- Header Section -->
+<section class="mb-xl flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+<div>
+<h1 class="font-display text-display uppercase hidden md:block">Power Grid</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-sm">
+                    Your daily discipline mapped. Solid cells represent completed high-impact habits. Grey cells indicate missed opportunities. Maintain the unbroken chain.
+                </p>
+</div>
+<div class="flex items-center gap-sm">
+<div class="flex items-center gap-xs font-label-bold text-label-bold">
+<span class="w-3 h-3 rounded-full bg-primary inline-block"></span> Active
+                </div>
+<div class="flex items-center gap-xs font-label-bold text-label-bold text-on-surface-variant ml-sm">
+<span class="w-3 h-3 rounded-full bg-surface-container-high border border-outline-variant inline-block"></span> Empty
+                </div>
+</div>
+</section>
+<!-- The Grid Canvas -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg md:p-xl">
+<!-- Month Header -->
+<div class="flex justify-between items-center border-b border-outline-variant pb-md mb-lg">
+<h2 class="font-headline-md text-headline-md uppercase">October</h2>
+<div class="flex gap-sm">
+<button class="p-xs border border-primary rounded-DEFAULT text-primary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-xs border border-primary rounded-DEFAULT text-primary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid Layout for Days -->
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-sm md:gap-md">
+<!-- Day 1 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">01</span>
+<span class="material-symbols-outlined fill text-3xl">bolt</span>
+</div>
+<!-- Day 2 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">02</span>
+<span class="material-symbols-outlined fill text-3xl">fitness_center</span>
+</div>
+<!-- Day 3 (Empty) -->
+<div class="aspect-square bg-surface-container-high border border-outline-variant rounded-lg flex flex-col items-center justify-center p-sm text-on-surface-variant hover:bg-surface-container-highest transition-colors cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-50 mb-xs">03</span>
+<span class="material-symbols-outlined opacity-30 text-3xl">close</span>
+</div>
+<!-- Day 4 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">04</span>
+<span class="material-symbols-outlined fill text-3xl">book</span>
+</div>
+<!-- Day 5 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">05</span>
+<span class="material-symbols-outlined fill text-3xl">self_improvement</span>
+</div>
+<!-- Day 6 (Empty) -->
+<div class="aspect-square bg-surface-container-high border border-outline-variant rounded-lg flex flex-col items-center justify-center p-sm text-on-surface-variant hover:bg-surface-container-highest transition-colors cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-50 mb-xs">06</span>
+<span class="material-symbols-outlined opacity-30 text-3xl">close</span>
+</div>
+<!-- Day 7 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">07</span>
+<span class="material-symbols-outlined fill text-3xl">directions_run</span>
+</div>
+<!-- Day 8 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">08</span>
+<span class="material-symbols-outlined fill text-3xl">bolt</span>
+</div>
+<!-- Day 9 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">09</span>
+<span class="material-symbols-outlined fill text-3xl">water_drop</span>
+</div>
+<!-- Day 10 (Empty) -->
+<div class="aspect-square bg-surface-container-high border border-outline-variant rounded-lg flex flex-col items-center justify-center p-sm text-on-surface-variant hover:bg-surface-container-highest transition-colors cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-50 mb-xs">10</span>
+<span class="material-symbols-outlined opacity-30 text-3xl">close</span>
+</div>
+<!-- Day 11 (Active) -->
+<div class="aspect-square bg-primary rounded-lg flex flex-col items-center justify-center p-sm text-on-primary hover:opacity-90 transition-opacity cursor-pointer">
+<span class="font-label-bold text-label-bold opacity-70 mb-xs">11</span>
+<span class="material-symbols-outlined fill text-3xl">fitness_center</span>
+</div>
+<!-- Day 12 (Today) -->
+<div class="aspect-square bg-surface-container-lowest border-2 border-primary rounded-lg flex flex-col items-center justify-center p-sm text-primary hover:bg-surface-container-low transition-colors cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 w-4 h-4 bg-primary rounded-bl-lg"></div>
+<span class="font-label-bold text-label-bold mb-xs">12</span>
+<span class="material-symbols-outlined text-3xl animate-pulse">add_circle</span>
+</div>
+<!-- Future Days (Empty state style) -->
+<div class="aspect-square bg-transparent border border-outline-variant border-dashed rounded-lg flex flex-col items-center justify-center p-sm text-outline-variant opacity-50">
+<span class="font-label-bold text-label-bold mb-xs">13</span>
+</div>
+<div class="aspect-square bg-transparent border border-outline-variant border-dashed rounded-lg flex flex-col items-center justify-center p-sm text-outline-variant opacity-50">
+<span class="font-label-bold text-label-bold mb-xs">14</span>
+</div>
+</div>
+</section>
+<!-- Stats Snippet -->
+<section class="mt-lg grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex items-center justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Current Streak</div>
+<div class="font-headline-md text-headline-md">4 Days</div>
+</div>
+<span class="material-symbols-outlined fill text-primary text-4xl">local_fire_department</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex items-center justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Completion Rate</div>
+<div class="font-headline-md text-headline-md">75%</div>
+</div>
+<span class="material-symbols-outlined fill text-primary text-4xl">pie_chart</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex items-center justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Power</div>
+<div class="font-headline-md text-headline-md">1,240</div>
+</div>
+<span class="material-symbols-outlined fill text-primary text-4xl">battery_charging_full</span>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-stack-sm bg-background bg-background dark:bg-background border-t border-outline-variant dark:border-outline-variant">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors Active: scale-110 transition-transform duration-200 p-sm" href="#">
+<span class="material-symbols-outlined text-2xl">bolt</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary-container dark:text-primary-container Active: scale-110 transition-transform duration-200 p-sm relative" href="#">
+<div class="absolute -top-1 w-8 h-1 bg-primary rounded-b-full"></div>
+<span class="material-symbols-outlined fill text-2xl">grid_view</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors Active: scale-110 transition-transform duration-200 p-sm" href="#">
+<span class="material-symbols-outlined text-2xl">leaderboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary hover:text-primary-fixed dark:hover:text-primary-fixed transition-colors Active: scale-110 transition-transform duration-200 p-sm" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+</a>
+</nav>
+</body></html>

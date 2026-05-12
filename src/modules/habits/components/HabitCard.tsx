@@ -1,85 +1,115 @@
+/* stitch: habit-card */
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { ProgressBar } from '@core/components';
 import type { HabitWithScore } from '../types';
-import type { MasteryLevel } from '@core/theming';
-
-const LEVEL_LABELS: Record<MasteryLevel, string> = {
-  seed: '🌱 Seed',
-  sprout: '🌿 Sprout',
-  tree: '🌳 Tree',
-  forest: '🌲 Forest',
-  ancient: '🗿 Ancient',
-};
+import { CategoryBadge } from './CategoryBadge';
+import { resolveCategory } from '../utils/resolveCategory';
 
 interface HabitCardProps {
   habit: HabitWithScore;
   onPress?: () => void;
+  completed?: boolean;
 }
 
-export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress }) => {
+export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed = false }) => {
   const t = useTheme();
   const score = habit.mastery_scores?.score ?? 0;
-  const level = (habit.mastery_scores?.level ?? 'seed') as MasteryLevel;
-  const levelTokens = t.level[level];
+  const { label } = resolveCategory(habit);
 
   return (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.82}
       style={{
         backgroundColor: t.bg.surface,
         borderColor: t.border.default,
-        borderWidth: t.borderWidth.hairline,
+        borderWidth: t.borderWidth.default,
         borderRadius: t.radius.lg,
-        padding: 16,
-        marginBottom: 12,
+        padding: t.spacing.marginMobile,
+        marginBottom: t.spacing.stackSm,
+        gap: t.spacing.stackMd,
+        opacity: completed ? 0.58 : 1,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <Text style={{ color: t.text.primary, fontSize: 16, fontWeight: '600', flex: 1 }}>
-          {habit.name}
-        </Text>
-        <View
-          style={{
-            backgroundColor: levelTokens.bg,
-            borderColor: levelTokens.border,
-            borderWidth: t.borderWidth.default,
-            borderRadius: t.radius.pill,
-            paddingHorizontal: 10,
-            paddingVertical: 3,
-          }}
-        >
-          <Text style={{ color: levelTokens.fg, fontSize: 11, fontWeight: '700' }}>
-            {LEVEL_LABELS[level]}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: t.spacing.stackSm }}>
+        <View style={{
+          width: 22,
+          height: 22,
+          borderRadius: t.radius.pill,
+          borderWidth: t.borderWidth.default,
+          borderColor: completed ? t.accent.primary : t.border.default,
+          backgroundColor: completed ? t.accent.primary : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          {completed && <MaterialIcons name="check" size={14} color={t.accent.onPrimary} />}
+        </View>
+
+        <View style={{ flex: 1, gap: 3 }}>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: t.text.primary,
+              fontSize: t.typography.scale.bodyMain.fontSize,
+              lineHeight: t.typography.scale.bodyMain.lineHeight,
+              fontFamily: 'Lexend_500Medium',
+              textDecorationLine: completed ? 'line-through' : 'none',
+            }}
+          >
+            {habit.name}
           </Text>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: t.text.secondary,
+              fontSize: t.typography.scale.microBold.fontSize,
+              lineHeight: t.typography.scale.microBold.lineHeight,
+              fontFamily: 'Lexend_400Regular',
+            }}
+          >
+            {habit.description || label}
+          </Text>
+        </View>
+
+        <View style={{ alignItems: 'flex-end', gap: 4 }}>
+          <Text style={{ color: t.text.primary, fontSize: 12, fontFamily: 'Lexend_600SemiBold' }}>
+            🔥 {Math.round(score)}
+          </Text>
+          <MaterialIcons name="chevron-right" size={20} color={t.text.tertiary} />
         </View>
       </View>
 
-      <ProgressBar value={score} style={{ marginBottom: 6 }} />
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ color: t.text.tertiary, fontSize: 12 }}>
-          Score
-        </Text>
-        <Text
-          style={{
-            color:
-              score >= 71
-                ? t.score.excellent
-                : score >= 46
-                  ? t.score.good
-                  : score >= 21
-                    ? t.score.warning
-                    : t.score.critical,
-            fontSize: 12,
-            fontWeight: '700',
+      <View style={{ gap: t.spacing.stackSm }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <CategoryBadge habit={habit} size="sm" showLabel />
+          <Text style={{
+            color: t.text.secondary,
+            fontSize: t.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_500Medium',
             fontVariant: ['tabular-nums'],
-          }}
-        >
-          {score.toFixed(1)}
-        </Text>
+          }}>
+            {score.toFixed(1)} / 100
+          </Text>
+        </View>
+        <ProgressBar value={score} />
       </View>
+
+      {completed && (
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(17, 17, 17, 0.04)',
+          pointerEvents: 'none',
+        }} />
+      )}
     </TouchableOpacity>
   );
 };

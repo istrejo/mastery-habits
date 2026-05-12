@@ -1,4 +1,5 @@
 import type { ThemeTokens } from '../types';
+import { SPACING, TYPE_SCALE } from '../tokens';
 
 export const brutalistEditorialTheme: ThemeTokens = {
   bg: {
@@ -37,13 +38,49 @@ export const brutalistEditorialTheme: ThemeTokens = {
     ancient: { fg: '#fff', bg: '#000', border: '#000' },
   },
   status: {
-    success: '#ff5722',
-    skip: '#fbbf24',
-    danger: '#dc2626',
-    info: '#0066cc',
+    success: '#000',
+    skip: '#666',
+    danger: '#d00',
+    info: '#666',
+  },
+  activity: {
+    none: '#f5f5f5',
+    low: '#d4d4d4',
+    medium: '#a3a3a3',
+    high: '#525252',
+    veryHigh: '#000',
   },
   radius: { sm: 0, md: 0, lg: 0, pill: 0 },
   borderWidth: { hairline: 1.5, default: 1.5, bold: 2 },
-  typography: { displayFontFamily: 'Georgia', numericFeatures: 'tnum' },
-  meta: { id: 'brutalist-editorial', name: 'Brutalist Editorial', mode: 'light', tier: 'premium' },
+  spacing: SPACING,
+  typography: {
+    displayFontFamily: 'Georgia',
+    numericFeatures: 'tnum',
+    scale: {
+      displayXl: TYPE_SCALE.displayXl,
+      displaySm: TYPE_SCALE.displaySm,
+      titleLg: TYPE_SCALE.titleLg,
+      titleSm: TYPE_SCALE.titleSm,
+      labelCaps: TYPE_SCALE.labelCaps,
+      bodyMain: TYPE_SCALE.bodyMain,
+      microBold: TYPE_SCALE.microBold,
+    },
+  },
+  categoryColors: {
+    green: { fg: '#000', bg: '#86efac', border: '#000' },
+    violet: { fg: '#000', bg: '#d8b4fe', border: '#000' },
+    blue: { fg: '#000', bg: '#93c5fd', border: '#000' },
+    yellow: { fg: '#000', bg: '#fde047', border: '#000' },
+    orange: { fg: '#000', bg: '#fb923c', border: '#000' },
+    pink: { fg: '#000', bg: '#f9a8d4', border: '#000' },
+    cyan: { fg: '#000', bg: '#67e8f9', border: '#000' },
+    emerald: { fg: '#000', bg: '#6ee7b7', border: '#000' },
+    neutral: { fg: '#000', bg: '#ebe6da', border: '#000' },
+  },
+  meta: {
+    id: 'brutalist-editorial',
+    name: 'Brutalist Editorial',
+    mode: 'light',
+    tier: 'premium',
+  },
 };
