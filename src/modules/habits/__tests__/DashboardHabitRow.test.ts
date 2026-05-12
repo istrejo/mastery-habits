@@ -129,7 +129,7 @@ describe('DashboardHabitRow', () => {
     expect(textNodes.some((node: any) => readChildren(node.props.children) === '30%')).toBe(false);
   });
 
-  it('renders active state with start CTA and inline progress', () => {
+  it('renders active state with inline progress and chevron navigation', () => {
     let tree: any;
 
     act(() => {
@@ -137,7 +137,6 @@ describe('DashboardHabitRow', () => {
         React.createElement(DashboardHabitRow, {
           habit: createHabit(),
           status: 'active',
-          showStartAction: true,
           inlineProgressPercent: 30,
         }),
       );
@@ -145,9 +144,14 @@ describe('DashboardHabitRow', () => {
 
     const textNodes = tree.root.findAll((node: any) => node.type === 'Text');
 
-    expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Start')).toBe(true);
+    expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Start')).toBe(false);
     expect(textNodes.some((node: any) => readChildren(node.props.children) === '30%')).toBe(true);
     expect(tree.root.findAll((node: any) => node.type === 'ProgressBar')).toHaveLength(1);
+    expect(
+      tree.root.findAll(
+        (node: any) => node.type === 'TouchableOpacity' && node.props?.testID === 'dashboard-habit-row-chevron-habit-1',
+      ),
+    ).toHaveLength(1);
   });
 
   it('renders pending state with fallback category label and no inline progress', () => {

@@ -178,7 +178,8 @@ describe('DashboardScreen', () => {
     expect(dashboardHabitRowMock).toHaveBeenCalledTimes(3);
     expect(calls[0]![0].status).toBe('completed');
     expect(calls[1]![0].status).toBe('active');
-    expect(calls[1]![0].showStartAction).toBe(true);
+    expect(calls[1]![0].onPressRow).toBeDefined();
+    expect(calls[1]![0].onPressCheck).toBeDefined();
     expect(calls[2]![0].status).toBe('pending');
   });
 

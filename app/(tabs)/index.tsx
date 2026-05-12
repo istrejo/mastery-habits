@@ -189,15 +189,15 @@ export default function DashboardScreen() {
                 </Text>
               </View>
 
-              {habits.map((habit) => (
+              {pendingToday.map((habit) => (
                 <DashboardHabitRow
                   key={habit.id}
                   habit={habit}
                   status={getHabitStatus(habit.id)}
                   score={habit.mastery_scores?.score ?? 0}
-                  showStartAction={activeHabitId === habit.id}
                   inlineProgressPercent={activeHabitId === habit.id ? 30 : undefined}
-                  onPress={() => router.push(`/habit/${habit.id}`)}
+                  onPressRow={() => router.push(`/habit/${habit.id}`)}
+                  onPressCheck={() => {}}
                 />
               ))}
             </View>

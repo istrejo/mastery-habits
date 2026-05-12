@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ProgressBar } from '@core/components';
 import { useTheme } from '@core/theming';
@@ -12,8 +12,10 @@ interface DashboardHabitRowProps {
   habit: HabitWithScore;
   status: DashboardHabitStatus;
   score?: number;
-  onPress?: () => void;
-  showStartAction?: boolean;
+  onPressRow?: () => void;
+  onPressCheck?: () => void;
+  checkDisabled?: boolean;
+  submitting?: boolean;
   inlineProgressPercent?: number;
 }
 
@@ -21,8 +23,10 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
   habit,
   status,
   score = habit.mastery_scores?.score ?? 0,
-  onPress,
-  showStartAction = false,
+  onPressRow,
+  onPressCheck,
+  checkDisabled = false,
+  submitting = false,
   inlineProgressPercent,
 }) => {
   const theme = useTheme();
@@ -34,9 +38,7 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
   const displayProgress = inlineProgressPercent ?? 30;
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.82}
+    <View
       style={{
         position: 'relative',
         overflow: 'hidden',
@@ -63,7 +65,10 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
       ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View
+        <TouchableOpacity
+          onPress={onPressCheck}
+          disabled={checkDisabled || isCompleted || submitting}
+          activeOpacity={0.82}
           style={{
             width: 28,
             height: 28,
@@ -75,60 +80,70 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
             justifyContent: 'center',
             marginRight: theme.spacing.stackSm,
           }}
+          testID={`dashboard-habit-row-check-${habit.id}`}
         >
-          {isCompleted ? (
+          {submitting ? (
+            <ActivityIndicator size="small" color={theme.text.primary} />
+          ) : isCompleted ? (
             <MaterialIcons name="check" size={16} color={theme.text.inverse} />
           ) : null}
-        </View>
+        </TouchableOpacity>
 
-        <View style={{ flex: 1, paddingRight: theme.spacing.stackSm }}>
-          <Text
-            numberOfLines={1}
-            style={{
-              color: theme.text.primary,
-              fontSize: theme.typography.scale.bodyMain.fontSize,
-              lineHeight: theme.typography.scale.bodyMain.lineHeight,
-              fontFamily: isActive ? 'Lexend_600SemiBold' : 'Lexend_500Medium',
-              textDecorationLine: isCompleted ? 'line-through' : 'none',
-            }}
-          >
-            {habit.name}
-          </Text>
+        <TouchableOpacity
+          onPress={onPressRow}
+          activeOpacity={0.82}
+          style={{ flex: 1, paddingRight: theme.spacing.stackSm }}
+          testID={`dashboard-habit-row-body-${habit.id}`}
+        >
+          <View>
+            <Text
+              numberOfLines={1}
+              style={{
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.bodyMain.fontSize,
+                lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                fontFamily: isActive ? 'Lexend_600SemiBold' : 'Lexend_500Medium',
+                textDecorationLine: isCompleted ? 'line-through' : 'none',
+              }}
+            >
+              {habit.name}
+            </Text>
 
-          <Text
-            numberOfLines={1}
-            style={{
-              color: theme.text.secondary,
-              fontSize: theme.typography.scale.microBold.fontSize,
-              lineHeight: theme.typography.scale.microBold.lineHeight,
-              fontFamily: 'Lexend_400Regular',
-              marginTop: 2,
-            }}
-          >
-            {metaText}
-          </Text>
+            <Text
+              numberOfLines={1}
+              style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.microBold.fontSize,
+                lineHeight: theme.typography.scale.microBold.lineHeight,
+                fontFamily: 'Lexend_400Regular',
+                marginTop: 2,
+              }}
+            >
+              {metaText}
+            </Text>
 
-          {isActive ? (
-            <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 8, maxWidth: 170 }}>
-              <ProgressBar
-                value={displayProgress}
-                max={100}
-                height={8}
-                style={{ flex: 1, backgroundColor: theme.accent.muted }}
-              />
-              <Text
-                style={{
-                  color: theme.text.primary,
-                  fontSize: theme.typography.scale.microBold.fontSize,
-                  lineHeight: theme.typography.scale.microBold.lineHeight,
-                  fontFamily: 'Lexend_500Medium',
-                }}
-              >
-                {displayProgress}%
-              </Text>
-            </View>
-          ) : null}
-        </View>
+            {isActive ? (
+              <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 8, maxWidth: 170 }}>
+                <ProgressBar
+                  value={displayProgress}
+                  max={100}
+                  height={8}
+                  style={{ flex: 1, backgroundColor: theme.accent.muted }}
+                />
+                <Text
+                  style={{
+                    color: theme.text.primary,
+                    fontSize: theme.typography.scale.microBold.fontSize,
+                    lineHeight: theme.typography.scale.microBold.lineHeight,
+                    fontFamily: 'Lexend_500Medium',
+                  }}
+                >
+                  {displayProgress}%
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        </TouchableOpacity>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text
@@ -142,33 +157,15 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
             🔥 {Math.round(score)}
           </Text>
 
-          {showStartAction && isActive ? (
-            <View
-              style={{
-                backgroundColor: theme.text.primary,
-                borderRadius: theme.radius.sm,
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-              }}
-            >
-              <Text
-                style={{
-                  color: theme.text.inverse,
-                  fontSize: theme.typography.scale.microBold.fontSize,
-                  lineHeight: theme.typography.scale.microBold.lineHeight,
-                  fontFamily: 'Lexend_600SemiBold',
-                  letterSpacing: 0.6,
-                  textTransform: 'uppercase',
-                }}
-              >
-                Start
-              </Text>
-            </View>
-          ) : (
+          <TouchableOpacity
+            onPress={onPressRow}
+            activeOpacity={0.82}
+            testID={`dashboard-habit-row-chevron-${habit.id}`}
+          >
             <MaterialIcons name="chevron-right" size={20} color={theme.text.tertiary} />
-          )}
+          </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
