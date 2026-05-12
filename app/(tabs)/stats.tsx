@@ -1,99 +1,131 @@
 /* stitch: stats-dashboard */
+import { Fragment } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { subDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Screen, ProgressBar, Card } from '@core/components';
 import { useTheme } from '@core/theming';
-import { useHabits, resolveCategory } from '@habits/index';
-import { isPlannedDay } from '@checkin/index';
-import { useGlobalStreak } from '@commitment/index';
+import { resolveCategory } from '@habits/index';
+import { useStatsMetrics, type ActivityGridCell } from '@commitment/index';
 
-function ActivityGrid() {
+const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'] as const;
+
+function chunkCells(cells: ActivityGridCell[]) {
+  const rows = Math.ceil(cells.length / 7);
+  return Array.from({ length: rows }, (_, rowIndex) =>
+    cells.slice(rowIndex * 7, rowIndex * 7 + 7),
+  );
+}
+
+function getCellColor(cell: ActivityGridCell, theme: ReturnType<typeof useTheme>) {
+  switch (cell.intensity) {
+    case 'low':
+      return theme.activity.low;
+    case 'medium':
+      return theme.activity.medium;
+    case 'high':
+      return theme.activity.high;
+    case 'veryHigh':
+      return theme.activity.veryHigh;
+    case 'none':
+    default:
+      return theme.activity.none;
+  }
+}
+
+function ActivityGrid({ cells }: { cells: ActivityGridCell[] }) {
   const theme = useTheme();
-  const { habits } = useHabits();
-  const today = new Date();
-  const WEEKS = 10;
-  const DAYS = 7;
-  const TOTAL = WEEKS * DAYS;
-
-  const cells = Array.from({ length: TOTAL }, (_, i) => {
-    const date = subDays(today, TOTAL - 1 - i);
-    const planned = habits.filter((h) => isPlannedDay(h, date)).length;
-    const intensity = habits.length > 0 ? planned / habits.length : 0;
-    return { intensity, isToday: i === TOTAL - 1 };
-  });
-
-  const cellColor = (intensity: number) => {
-    if (intensity === 0) return theme.activity.none;
-    if (intensity < 0.3) return theme.activity.low;
-    if (intensity < 0.6) return theme.activity.medium;
-    if (intensity < 0.9) return theme.activity.high;
-    return theme.activity.veryHigh;
-  };
+  const rows = chunkCells(cells);
 
   return (
     <View style={{ gap: theme.spacing.stackSm }}>
-      <View style={{ flexDirection: 'row', gap: 5, justifyContent: 'center' }}>
-        {Array.from({ length: WEEKS }, (_, weekIdx) => (
-          <View key={weekIdx} style={{ flexDirection: 'column', gap: 5 }}>
-            {Array.from({ length: DAYS }, (_, dayIdx) => {
-              const { intensity, isToday } = cells[weekIdx * DAYS + dayIdx]!;
-              return (
-                <View
-                  key={dayIdx}
-                  style={{
-                    width: 14,
-                    height: 14,
-                    borderRadius: 2,
-                    backgroundColor: cellColor(intensity),
-                    borderWidth: isToday ? 1.5 : 0,
-                    borderColor: theme.accent.primary,
-                  }}
-                />
-              );
-            })}
-          </View>
+      <View style={{ flexDirection: 'row', gap: theme.spacing.unit * 2 }}>
+        {DAY_LABELS.map((label, index) => (
+          <Text
+            key={`${label}-${index}`}
+            style={{
+              flex: 1,
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              fontFamily: 'Lexend_500Medium',
+              textAlign: 'center',
+            }}
+          >
+            {label}
+          </Text>
         ))}
       </View>
+
+      <View style={{ gap: theme.spacing.unit * 2 }}>
+        {rows.map((row, rowIndex) => {
+          const placeholders = Math.max(0, 7 - row.length);
+
+          return (
+            <View key={`row-${rowIndex}`} style={{ flexDirection: 'row', gap: theme.spacing.unit * 2 }}>
+              {row.map((cell) => (
+                <View
+                  key={cell.dateKey}
+                  style={{
+                    flex: 1,
+                    aspectRatio: 1,
+                    borderRadius: theme.radius.sm,
+                    backgroundColor: getCellColor(cell, theme),
+                    borderWidth: cell.isToday ? theme.borderWidth.default : 0,
+                    borderColor: cell.isToday ? theme.border.strong : 'transparent',
+                  }}
+                />
+              ))}
+              {Array.from({ length: placeholders }, (_, placeholderIndex) => (
+                <View key={`placeholder-${rowIndex}-${placeholderIndex}`} style={{ flex: 1, aspectRatio: 1 }} />
+              ))}
+            </View>
+          );
+        })}
+      </View>
+
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-end',
           alignItems: 'center',
-          gap: 4,
+          gap: theme.spacing.unit * 2,
         }}
       >
         <Text
           style={{
             color: theme.text.secondary,
-            fontSize: 10,
+            fontSize: theme.typography.scale.microBold.fontSize,
             fontFamily: 'Lexend_400Regular',
           }}
         >
           Less
         </Text>
-        {[
-          theme.activity.none,
-          theme.activity.low,
-          theme.activity.medium,
-          theme.activity.veryHigh,
-        ].map((c) => (
+        {['none', 'low', 'high', 'veryHigh'].map((token) => (
           <View
-            key={c}
+            key={token}
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: 1,
-              backgroundColor: c,
+              width: 10,
+              height: 10,
+              borderRadius: 2,
+              backgroundColor: getCellColor(
+                {
+                  dateKey: token,
+                  plannedCount: 0,
+                  successCount: 0,
+                  ratio: 0,
+                  intensity: token as ActivityGridCell['intensity'],
+                  isToday: false,
+                },
+                theme,
+              ),
             }}
           />
         ))}
         <Text
           style={{
             color: theme.text.secondary,
-            fontSize: 10,
+            fontSize: theme.typography.scale.microBold.fontSize,
             fontFamily: 'Lexend_400Regular',
           }}
         >
@@ -104,34 +136,45 @@ function ActivityGrid() {
   );
 }
 
+function formatCompletionDelta(delta: number | null) {
+  if (delta === null) return null;
+  if (delta === 0) return 'On par with the previous 7 days';
+  return `${delta > 0 ? '+' : ''}${delta} pts vs prev 7d`;
+}
+
 export default function StatsScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
-  const { habits } = useHabits();
   const {
-    current: currentStreak,
-    best: bestStreak,
-    loading: streakLoading,
-  } = useGlobalStreak();
-  const sorted = [...habits].sort(
-    (a, b) => (b.mastery_scores?.score ?? 0) - (a.mastery_scores?.score ?? 0)
-  );
-  const top3 = sorted.slice(0, 3);
-  const avgScore =
-    habits.length > 0
-      ? habits.reduce((sum, h) => sum + (h.mastery_scores?.score ?? 0), 0) /
-        habits.length
-      : 0;
+    globalCurrentStreak,
+    globalBestStreak,
+    completion30d,
+    completionDeltaVsPrevWeek,
+    activity30dCells,
+    topHabitsByCurrentStreak,
+    loading,
+  } = useStatsMetrics();
+
+  const completionDeltaLabel = formatCompletionDelta(completionDeltaVsPrevWeek);
+  const completionFallbackLabel =
+    completion30d.planned === 0
+      ? 'No planned days in the last 30 days.'
+      : `${completion30d.completed}/${completion30d.planned} successful check-ins`;
 
   return (
     <Screen scrollable>
       <View
         style={{
+          marginHorizontal: -theme.spacing.marginMobile,
+          paddingHorizontal: theme.spacing.marginMobile,
+          paddingBottom: theme.spacing.stackSm,
+          marginBottom: theme.spacing.stackMd,
+          borderBottomWidth: theme.borderWidth.default,
+          borderBottomColor: theme.border.subtle,
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: theme.spacing.stackMd,
         }}
       >
         <Text
@@ -139,7 +182,7 @@ export default function StatsScreen() {
             color: theme.text.primary,
             fontSize: theme.typography.scale.microBold.fontSize,
             fontFamily: 'Lexend_600SemiBold',
-            letterSpacing: theme.typography.scale.microBold.letterSpacing,
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
             textTransform: 'uppercase',
           }}
         >
@@ -160,14 +203,14 @@ export default function StatsScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={{ marginBottom: theme.spacing.stackMd }}>
+      <View style={{ marginBottom: theme.spacing.stackMd, gap: theme.spacing.unit * 2 }}>
         <Text
           style={{
             color: theme.text.primary,
-            fontSize: theme.typography.scale.titleLg.fontSize,
-            lineHeight: theme.typography.scale.titleLg.lineHeight,
+            fontSize: theme.typography.scale.displayXl.fontSize,
+            lineHeight: theme.typography.scale.displayXl.lineHeight,
             fontFamily: 'Anton_400Regular',
-            letterSpacing: theme.typography.scale.titleLg.letterSpacing,
+            letterSpacing: theme.typography.scale.displayXl.letterSpacing,
             textTransform: 'uppercase',
           }}
         >
@@ -177,6 +220,7 @@ export default function StatsScreen() {
           style={{
             color: theme.text.secondary,
             fontSize: theme.typography.scale.bodyMain.fontSize,
+            lineHeight: theme.typography.scale.bodyMain.lineHeight,
             fontFamily: 'Lexend_400Regular',
           }}
         >
@@ -191,15 +235,15 @@ export default function StatsScreen() {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'flex-start',
-              marginBottom: theme.spacing.stackMd,
+              marginBottom: theme.spacing.stackLg,
             }}
           >
             <Text
               style={{
                 color: theme.text.secondary,
-                fontSize: theme.typography.scale.microBold.fontSize,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
                 fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: 1,
+                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
                 textTransform: 'uppercase',
               }}
             >
@@ -211,29 +255,31 @@ export default function StatsScreen() {
               color={theme.text.primary}
             />
           </View>
+
           <Text
             style={{
               color: theme.text.primary,
-              fontSize: theme.typography.scale.displaySm.fontSize,
-              lineHeight: theme.typography.scale.displaySm.lineHeight,
+              fontSize: theme.typography.scale.displayXl.fontSize,
+              lineHeight: theme.typography.scale.displayXl.lineHeight,
               fontFamily: 'Anton_400Regular',
-              letterSpacing: theme.typography.scale.displaySm.letterSpacing,
+              letterSpacing: theme.typography.scale.displayXl.letterSpacing,
               textTransform: 'uppercase',
               fontVariant: ['tabular-nums'],
             }}
           >
-            {streakLoading ? '--' : currentStreak} {t('stats.days')}
+            {loading ? '--' : `${globalCurrentStreak} ${t('stats.days')}`}
           </Text>
+
           <Text
             style={{
               color: theme.text.secondary,
               fontSize: theme.typography.scale.bodyMain.fontSize,
               lineHeight: theme.typography.scale.bodyMain.lineHeight,
               fontFamily: 'Lexend_400Regular',
-              marginTop: theme.spacing.stackSm,
+              marginTop: theme.spacing.unit * 2,
             }}
           >
-            {t('stats.best_streak', { count: bestStreak })}
+            {t('stats.best_streak', { count: globalBestStreak })}
           </Text>
         </Card>
 
@@ -249,144 +295,205 @@ export default function StatsScreen() {
             <Text
               style={{
                 color: theme.text.secondary,
-                fontSize: theme.typography.scale.microBold.fontSize,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
                 fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: 1,
+                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
                 textTransform: 'uppercase',
               }}
             >
               Completion
             </Text>
-            <MaterialIcons
-              name='check-circle-outline'
-              size={18}
-              color={theme.text.primary}
-            />
+            <MaterialIcons name='check-circle' size={18} color={theme.text.primary} />
           </View>
-          <Text
-            style={{
-              color: theme.text.primary,
-              fontSize: theme.typography.scale.titleLg.fontSize,
-              fontFamily: 'Anton_400Regular',
-              fontVariant: ['tabular-nums'],
-            }}
-          >
-            {Math.round(avgScore)}%
-          </Text>
-          <ProgressBar
-            value={avgScore}
-            style={{ marginTop: theme.spacing.stackSm }}
-          />
+
+          <View style={{ gap: theme.spacing.stackSm }}>
+            <Text
+              style={{
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.titleLg.fontSize,
+                lineHeight: theme.typography.scale.titleLg.lineHeight,
+                fontFamily: 'Anton_400Regular',
+                fontVariant: ['tabular-nums'],
+              }}
+            >
+              {loading ? '--%' : `${completion30d.percent}%`}
+            </Text>
+            <ProgressBar value={loading ? 0 : completion30d.percent} />
+            <Text
+              style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.microBold.fontSize,
+                lineHeight: theme.typography.scale.microBold.lineHeight,
+                fontFamily: 'Lexend_400Regular',
+              }}
+            >
+              {loading ? 'Loading completion trend...' : completionDeltaLabel ?? completionFallbackLabel}
+            </Text>
+          </View>
         </Card>
 
-        <Card style={{ gap: theme.spacing.stackMd }}>
+        <Card>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
+              paddingBottom: theme.spacing.stackSm,
+              marginBottom: theme.spacing.stackSm,
+              borderBottomWidth: theme.borderWidth.default,
+              borderBottomColor: theme.border.subtle,
             }}
           >
             <Text
               style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.microBold.fontSize,
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
                 fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: 1,
+                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
                 textTransform: 'uppercase',
               }}
             >
               Activity Grid
             </Text>
-            <Text
+            <View
               style={{
-                color: theme.text.secondary,
-                fontSize: 10,
-                fontFamily: 'Lexend_500Medium',
+                backgroundColor: theme.bg.surfaceAlt,
+                paddingHorizontal: theme.spacing.stackSm,
+                paddingVertical: theme.spacing.unit,
+                borderRadius: theme.radius.sm,
               }}
             >
-              Last 30 Days
-            </Text>
+              <Text
+                style={{
+                  color: theme.text.secondary,
+                  fontSize: theme.typography.scale.microBold.fontSize,
+                  fontFamily: 'Lexend_500Medium',
+                }}
+              >
+                Last 30 Days
+              </Text>
+            </View>
           </View>
-          <ActivityGrid />
+
+          <ActivityGrid cells={activity30dCells} />
         </Card>
 
-        {top3.length > 0 && (
+        {topHabitsByCurrentStreak.length > 0 && (
           <View style={{ gap: theme.spacing.stackSm }}>
             <Text
               style={{
                 color: theme.text.primary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
+                fontSize: theme.typography.scale.titleSm.fontSize,
+                lineHeight: theme.typography.scale.titleSm.lineHeight,
                 fontFamily: 'Anton_400Regular',
+                letterSpacing: theme.typography.scale.titleSm.letterSpacing,
                 textTransform: 'uppercase',
               }}
             >
               {t('stats.top_habits')}
             </Text>
-            {top3.map((habit, i) => {
-              const score = habit.mastery_scores?.score ?? 0;
-              const category = resolveCategory(habit);
-              return (
-                <TouchableOpacity
-                  key={habit.id}
-                  onPress={() => router.push(`/habit/${habit.id}`)}
-                  activeOpacity={0.82}
-                  style={{
-                    backgroundColor: theme.bg.surface,
-                    borderColor: theme.border.default,
-                    borderWidth: theme.borderWidth.default,
-                    borderRadius: theme.radius.lg,
-                    padding: theme.spacing.stackMd,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: theme.spacing.stackMd,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: theme.text.primary,
-                      fontSize: theme.typography.scale.titleSm.fontSize,
-                      fontFamily: 'Anton_400Regular',
-                      width: 34,
-                    }}
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </Text>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      numberOfLines={1}
+
+            <View
+              style={{
+                backgroundColor: theme.bg.surface,
+                borderColor: theme.border.default,
+                borderWidth: theme.borderWidth.default,
+                borderRadius: theme.radius.lg,
+                overflow: 'hidden',
+              }}
+            >
+              {topHabitsByCurrentStreak.map((entry, index) => {
+                const { habit, currentStreak } = entry;
+                const category = resolveCategory(habit);
+                const isLast = index === topHabitsByCurrentStreak.length - 1;
+
+                return (
+                  <Fragment key={habit.id}>
+                    <TouchableOpacity
+                      onPress={() => router.push(`/habit/${habit.id}`)}
+                      activeOpacity={0.82}
                       style={{
-                        color: theme.text.primary,
-                        fontSize: 14,
-                        fontFamily: 'Lexend_600SemiBold',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingHorizontal: theme.spacing.stackMd,
+                        paddingVertical: theme.spacing.stackSm + theme.spacing.unit,
                       }}
                     >
-                      {habit.name}
-                    </Text>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        color: theme.text.secondary,
-                        fontSize: 11,
-                        fontFamily: 'Lexend_400Regular',
-                        marginTop: 2,
-                      }}
-                    >
-                      {category.label}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{
-                      color: theme.text.primary,
-                      fontSize: 12,
-                      fontFamily: 'Lexend_600SemiBold',
-                    }}
-                  >
-                    ↻ {Math.round(score)} Days
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.stackMd, flex: 1 }}>
+                        <Text
+                          style={{
+                            width: 28,
+                            color: theme.text.secondary,
+                            fontSize: theme.typography.scale.titleSm.fontSize,
+                            lineHeight: theme.typography.scale.titleSm.lineHeight,
+                            fontFamily: 'Anton_400Regular',
+                          }}
+                        >
+                          {String(index + 1).padStart(2, '0')}
+                        </Text>
+                        <View style={{ flex: 1 }}>
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              color: theme.text.primary,
+                              fontSize: theme.typography.scale.labelCaps.fontSize,
+                              lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                              fontFamily: 'Lexend_600SemiBold',
+                            }}
+                          >
+                            {habit.name}
+                          </Text>
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              color: theme.text.secondary,
+                              fontSize: theme.typography.scale.microBold.fontSize,
+                              lineHeight: theme.typography.scale.microBold.lineHeight,
+                              fontFamily: 'Lexend_400Regular',
+                            }}
+                          >
+                            {category.label}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: theme.spacing.unit,
+                          backgroundColor: theme.bg.surfaceAlt,
+                          paddingHorizontal: theme.spacing.stackSm,
+                          paddingVertical: theme.spacing.unit,
+                          borderRadius: theme.radius.pill,
+                        }}
+                      >
+                        <MaterialIcons name='repeat' size={16} color={theme.text.primary} />
+                        <Text
+                          style={{
+                            color: theme.text.primary,
+                            fontSize: theme.typography.scale.microBold.fontSize,
+                            lineHeight: theme.typography.scale.microBold.lineHeight,
+                            fontFamily: 'Lexend_600SemiBold',
+                          }}
+                        >
+                          {`${currentStreak} ${t('stats.days')}`}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                    {!isLast && (
+                      <View
+                        style={{
+                          height: theme.borderWidth.default,
+                          backgroundColor: theme.border.subtle,
+                        }}
+                      />
+                    )}
+                  </Fragment>
+                );
+              })}
+            </View>
           </View>
         )}
       </View>
