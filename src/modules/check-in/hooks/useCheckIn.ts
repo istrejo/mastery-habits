@@ -10,6 +10,7 @@ type CheckInStatus = Database['public']['Enums']['checkin_status'];
 interface UseCheckInResult {
   todayCheckIn: CheckInRecord | null;
   last30Days: CheckInRecord[];
+  allCheckIns: CheckInRecord[];
   canCheckInToday: boolean;
   alreadyCheckedIn: boolean;
   skipAvailable: boolean;
@@ -23,6 +24,7 @@ interface UseCheckInResult {
 export function useCheckIn(habit: Habit | null): UseCheckInResult {
   const [todayCheckIn, setTodayCheckIn] = useState<CheckInRecord | null>(null);
   const [last30Days, setLast30Days] = useState<CheckInRecord[]>([]);
+  const [allCheckIns, setAllCheckIns] = useState<CheckInRecord[]>([]);
   const [skipAvailable, setSkipAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,13 +36,15 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
     setLoading(true);
     setError(null);
     try {
-      const [checkIn, history, usedSkip] = await Promise.all([
+      const [checkIn, history, fullHistory, usedSkip] = await Promise.all([
         checkinService.getCheckIn(habit.id, today),
         checkinService.getLast30Days(habit.id),
+        checkinService.getAllForHabit(habit.id),
         hasUsedSkipThisWeek(habit.id, today),
       ]);
       setTodayCheckIn(checkIn);
       setLast30Days(history);
+      setAllCheckIns(fullHistory);
       setSkipAvailable(!usedSkip);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'unknown_error');
@@ -73,6 +77,7 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
   return {
     todayCheckIn,
     last30Days,
+    allCheckIns,
     canCheckInToday,
     alreadyCheckedIn,
     skipAvailable,
