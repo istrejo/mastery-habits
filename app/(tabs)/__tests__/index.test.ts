@@ -172,6 +172,7 @@ describe('DashboardScreen', () => {
       completedToday: new Set(['habit-1']),
       submittingHabitIds: new Set(),
       completeHabit: jest.fn(),
+      undoHabit: jest.fn(),
     });
 
     act(() => {
@@ -199,6 +200,7 @@ describe('DashboardScreen', () => {
       completedToday: new Set(['habit-1', 'habit-2']),
       submittingHabitIds: new Set(),
       completeHabit: jest.fn(),
+      undoHabit: jest.fn(),
     });
 
     let tree: any;
@@ -210,5 +212,65 @@ describe('DashboardScreen', () => {
 
     expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Recovery')).toBe(true);
     expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Optimal alignment detected.')).toBe(true);
+  });
+
+  it('calls completeHabit when checking a pending habit', async () => {
+    const habits = [
+      createHabit('habit-1', { name: 'Morning Hydration' }),
+      createHabit('habit-2', { name: 'Deep Work' }),
+    ];
+    const completeHabitMock = jest.fn().mockResolvedValue(undefined);
+    const undoHabitMock = jest.fn().mockResolvedValue(undefined);
+
+    useHabitsMock.mockReturnValue({ habits, loading: false });
+    useTodayCheckInsMock.mockReturnValue({
+      completedToday: new Set(),
+      submittingHabitIds: new Set(),
+      completeHabit: completeHabitMock,
+      undoHabit: undoHabitMock,
+    });
+
+    act(() => {
+      create(React.createElement(DashboardScreen));
+    });
+
+    const calls = dashboardHabitRowMock.mock.calls as Array<[any]>;
+    await act(async () => {
+      await calls[0]![0].onPressCheck();
+    });
+
+    expect(completeHabitMock).toHaveBeenCalledWith('habit-1');
+    expect(undoHabitMock).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it('calls undoHabit when unchecking a completed habit', async () => {
+    const habits = [
+      createHabit('habit-1', { name: 'Morning Hydration' }),
+      createHabit('habit-2', { name: 'Deep Work' }),
+    ];
+    const completeHabitMock = jest.fn().mockResolvedValue(undefined);
+    const undoHabitMock = jest.fn().mockResolvedValue(undefined);
+
+    useHabitsMock.mockReturnValue({ habits, loading: false });
+    useTodayCheckInsMock.mockReturnValue({
+      completedToday: new Set(['habit-1']),
+      submittingHabitIds: new Set(),
+      completeHabit: completeHabitMock,
+      undoHabit: undoHabitMock,
+    });
+
+    act(() => {
+      create(React.createElement(DashboardScreen));
+    });
+
+    const calls = dashboardHabitRowMock.mock.calls as Array<[any]>;
+    await act(async () => {
+      await calls[0]![0].onPressCheck();
+    });
+
+    expect(undoHabitMock).toHaveBeenCalledWith('habit-1');
+    expect(completeHabitMock).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
   });
 });

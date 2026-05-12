@@ -7,6 +7,7 @@ interface UseTodayCheckInsResult {
   submittingHabitIds: Set<string>;
   loading: boolean;
   completeHabit: (habitId: string) => Promise<void>;
+  undoHabit: (habitId: string) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -66,5 +67,27 @@ export function useTodayCheckIns(): UseTodayCheckInsResult {
     }
   }, [fetchHabits, load]);
 
-  return { completedToday, submittingHabitIds, loading, completeHabit, refresh: load };
+  const undoHabit = useCallback(async (habitId: string) => {
+    const habit = habits.find((item) => item.id === habitId);
+    if (!habit) throw new Error('habit_not_found');
+
+    setSubmittingHabitIds((current) => {
+      const next = new Set(current);
+      next.add(habitId);
+      return next;
+    });
+
+    try {
+      await checkinService.undo(habit, new Date());
+      await Promise.all([load(), fetchHabits()]);
+    } finally {
+      setSubmittingHabitIds((current) => {
+        const next = new Set(current);
+        next.delete(habitId);
+        return next;
+      });
+    }
+  }, [fetchHabits, habits, load]);
+
+  return { completedToday, submittingHabitIds, loading, completeHabit, undoHabit, refresh: load };
 }

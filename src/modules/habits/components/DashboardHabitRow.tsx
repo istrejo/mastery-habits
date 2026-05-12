@@ -67,7 +67,7 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
           onPress={onPressCheck}
-          disabled={checkDisabled || isCompleted || submitting}
+          disabled={checkDisabled || submitting}
           activeOpacity={0.82}
           style={{
             width: 28,
