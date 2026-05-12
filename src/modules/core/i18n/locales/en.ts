@@ -82,6 +82,21 @@ export const en: TranslationKeys = {
     create_button: 'Create habit',
   },
 
+  create_habit: {
+    sections: {
+      identity: 'Identity',
+      category: 'Category',
+      frequency: 'Frequency',
+    },
+    frequency_presets: {
+      daily: 'Daily',
+      mon_fri: 'Mon-Fri',
+      custom: 'Custom',
+    },
+    select_days: 'Select days',
+    custom_category_error: 'Custom requires name and icon',
+  },
+
   login: {
     app_title: 'Mastery Habits',
     tagline: 'Build the discipline. Own the result.',
@@ -137,7 +152,7 @@ export const en: TranslationKeys = {
   },
 
   custom_category: {
-    emoji_label: 'Emoji',
+    emoji_label: 'Icon',
     name_label: 'Name',
     name_placeholder: 'My category',
     uncategorized_banner: 'This habit has no category. Edit it to classify it.',
