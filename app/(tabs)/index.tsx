@@ -1,5 +1,5 @@
 /* stitch: today-dashboard */
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { Alert, View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -73,7 +73,7 @@ export default function DashboardScreen() {
   const dateLocale = useDateLocale();
   const router = useRouter();
   const { habits, loading } = useHabits();
-  const { completedToday } = useTodayCheckIns();
+  const { completedToday, completeHabit, submittingHabitIds } = useTodayCheckIns();
   const today = new Date();
 
   const formatStr = i18n.language === "en" ? "EEEE, MMMM d" : "EEEE d 'de' MMMM";
@@ -89,6 +89,17 @@ export default function DashboardScreen() {
     if (completedToday.has(habitId)) return "completed";
     if (activeHabitId === habitId) return "active";
     return "pending";
+  };
+
+  const handleInlineComplete = async (habitId: string) => {
+    if (completedToday.has(habitId) || submittingHabitIds.has(habitId)) return;
+
+    try {
+      await completeHabit(habitId);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown_error";
+      Alert.alert("Could not complete habit", message);
+    }
   };
 
   return (
@@ -196,8 +207,12 @@ export default function DashboardScreen() {
                   status={getHabitStatus(habit.id)}
                   score={habit.mastery_scores?.score ?? 0}
                   inlineProgressPercent={activeHabitId === habit.id ? 30 : undefined}
+                  checkDisabled={completedToday.has(habit.id) || submittingHabitIds.has(habit.id)}
+                  submitting={submittingHabitIds.has(habit.id)}
                   onPressRow={() => router.push(`/habit/${habit.id}`)}
-                  onPressCheck={() => {}}
+                  onPressCheck={() => {
+                    void handleInlineComplete(habit.id);
+                  }}
                 />
               ))}
             </View>

@@ -58,6 +58,7 @@ jest.mock('react-native', () => {
   };
 
   return {
+    Alert: { alert: jest.fn() },
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
@@ -167,7 +168,11 @@ describe('DashboardScreen', () => {
     ];
 
     useHabitsMock.mockReturnValue({ habits, loading: false });
-    useTodayCheckInsMock.mockReturnValue({ completedToday: new Set(['habit-1']) });
+    useTodayCheckInsMock.mockReturnValue({
+      completedToday: new Set(['habit-1']),
+      submittingHabitIds: new Set(),
+      completeHabit: jest.fn(),
+    });
 
     act(() => {
       create(React.createElement(DashboardScreen));
@@ -190,7 +195,11 @@ describe('DashboardScreen', () => {
     ];
 
     useHabitsMock.mockReturnValue({ habits, loading: false });
-    useTodayCheckInsMock.mockReturnValue({ completedToday: new Set(['habit-1', 'habit-2']) });
+    useTodayCheckInsMock.mockReturnValue({
+      completedToday: new Set(['habit-1', 'habit-2']),
+      submittingHabitIds: new Set(),
+      completeHabit: jest.fn(),
+    });
 
     let tree: any;
     act(() => {
