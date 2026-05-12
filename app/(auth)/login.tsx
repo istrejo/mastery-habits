@@ -1,5 +1,6 @@
+/* stitch: login */
 import { useMemo } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,96 +15,47 @@ export default function LoginScreen() {
   const { t } = useTranslation();
   const { signIn, loading, error } = useAuth();
 
-  const schema = useMemo(
-    () =>
-      z.object({
-        email: z.string().email(t("login.error_email")),
-        password: z.string().min(6, t("login.error_password_min")),
-      }),
-    [t]
-  );
-
+  const schema = useMemo(() => z.object({ email: z.string().email(t("login.error_email")), password: z.string().min(6, t("login.error_password_min")) }), [t]);
   type FormData = z.infer<typeof schema>;
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
-
-  const onSubmit = (data: FormData) => {
-    signIn(data.email, data.password);
-  };
+  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const onSubmit = (data: FormData) => signIn(data.email, data.password);
 
   return (
-    <Screen scrollable>
-      <View style={{ flex: 1, justifyContent: "center", paddingVertical: 40 }}>
-        <Text
-          style={{
-            color: theme.text.primary,
-            fontSize: 32,
-            fontWeight: "800",
-            marginBottom: 6,
-            fontFamily: theme.typography.displayFontFamily,
-          }}
-        >
-          {t("login.app_title")}
-        </Text>
-        <Text style={{ color: theme.text.secondary, fontSize: 15, marginBottom: 40 }}>
-          {t("login.tagline")}
-        </Text>
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("login.email_label")}
-              onChangeText={onChange}
-              value={value}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              error={errors.email?.message}
-              containerStyle={{ marginBottom: 16 }}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label={t("login.password_label")}
-              onChangeText={onChange}
-              value={value}
-              secureTextEntry
-              autoComplete="current-password"
-              error={errors.password?.message}
-              containerStyle={{ marginBottom: 24 }}
-            />
-          )}
-        />
-
-        {error ? (
-          <Text style={{ color: theme.status.danger, marginBottom: 16, fontSize: 14 }}>
-            {error}
+    <Screen scrollable={false} contentStyle={{ justifyContent: "center", alignItems: "center" }}>
+      <View style={{ width: "100%", maxWidth: 420, alignItems: "center" }}>
+        <View style={{ alignItems: "center", marginBottom: theme.spacing.stackLg }}>
+          <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.displaySm.fontSize, lineHeight: theme.typography.scale.displaySm.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.displaySm.letterSpacing, textTransform: "uppercase", textAlign: "center" }}>
+            {t("login.app_title")}
           </Text>
-        ) : null}
-
-        <Button
-          label={t("login.submit")}
-          onPress={handleSubmit(onSubmit)}
-          loading={loading}
-          style={{ marginBottom: 16 }}
-        />
-
-        <Link href="/(auth)/signup" asChild>
-          <Text style={{ color: theme.accent.primary, textAlign: "center", fontSize: 14 }}>
-            {t("login.go_signup")}
+          <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: 1.2, textTransform: "uppercase", textAlign: "center", borderTopWidth: theme.borderWidth.default, borderTopColor: theme.border.default, paddingTop: theme.spacing.stackSm, marginTop: theme.spacing.stackSm }}>
+            {t("login.tagline")}
           </Text>
-        </Link>
+        </View>
+
+        <View style={{ width: "100%", gap: theme.spacing.stackMd, marginBottom: theme.spacing.stackLg }}>
+          <Controller control={control} name="email" render={({ field: { onChange, value } }) => (
+            <Input variant="underline" label={t("login.email_label")} onChangeText={onChange} value={value} keyboardType="email-address" autoCapitalize="none" autoComplete="email" error={errors.email?.message} />
+          )} />
+          <View style={{ gap: theme.spacing.stackSm }}>
+            <Controller control={control} name="password" render={({ field: { onChange, value } }) => (
+              <Input variant="underline" label={t("login.password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="current-password" error={errors.password?.message} />
+            )} />
+            <Pressable style={{ alignSelf: "flex-end" }}>
+              <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{t("login.forgot")}</Text>
+            </Pressable>
+          </View>
+          {error ? <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{error}</Text> : null}
+          <Button label={t("login.submit")} onPress={handleSubmit(onSubmit)} loading={loading} iconRight="arrow-forward" style={{ marginTop: theme.spacing.stackSm }} />
+        </View>
+
+        <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.unit }}>
+          <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_400Regular" }}>{t("login.no_account")}</Text>
+          <Link href="/(auth)/signup" asChild>
+            <Pressable>
+              <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", borderBottomWidth: 1, borderBottomColor: theme.text.primary }}>{t("login.go_signup")}</Text>
+            </Pressable>
+          </Link>
+        </View>
       </View>
     </Screen>
   );

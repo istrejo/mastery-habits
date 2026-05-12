@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Screen } from "@core/components";
 import { useTheme } from "@core/theming";
 import { useHabits, HabitForm } from "@habits/index";
@@ -23,23 +24,23 @@ export default function NewHabitScreen() {
 
   return (
     <Screen scrollable>
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24, gap: 12 }}>
-        <Text
-          onPress={() => router.back()}
-          style={{ color: theme.accent.primary, fontSize: 15 }}
-        >
+      <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.unit, marginBottom: theme.spacing.stackLg }}>
+        <MaterialIcons name="arrow-back" size={18} color={theme.text.primary} />
+        <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: "uppercase" }}>
           {t("common.back")}
         </Text>
-        <Text style={{ color: theme.text.primary, fontSize: 20, fontWeight: "700" }}>
+      </TouchableOpacity>
+
+      <View style={{ marginBottom: theme.spacing.stackMd }}>
+        <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleLg.fontSize, lineHeight: theme.typography.scale.titleLg.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.titleLg.letterSpacing, textTransform: "uppercase", marginBottom: theme.spacing.stackSm }}>
           {t("new_habit.title")}
+        </Text>
+        <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: "Lexend_400Regular" }}>
+          {t("new_habit.subtitle")}
         </Text>
       </View>
 
-      <HabitForm
-        onSubmit={handleSubmit}
-        submitLabel={t("new_habit.create_button")}
-        loading={loading}
-      />
+      <HabitForm onSubmit={handleSubmit} submitLabel={t("new_habit.create_button")} loading={loading} />
     </Screen>
   );
 }

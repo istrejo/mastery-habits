@@ -36,9 +36,9 @@ export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
               key={e}
               onPress={() => onChange({ label, emoji: e })}
               style={{
-                backgroundColor: emoji === e ? theme.accent.muted : theme.bg.surfaceAlt,
-                borderColor: emoji === e ? theme.accent.primary : theme.border.default,
-                borderWidth: theme.borderWidth.default,
+                backgroundColor: theme.bg.surface,
+                borderColor: emoji === e ? theme.border.strong : theme.border.default,
+                borderWidth: emoji === e ? theme.borderWidth.bold : theme.borderWidth.default,
                 borderRadius: theme.radius.md,
                 paddingHorizontal: 10,
                 paddingVertical: 6,
@@ -58,7 +58,7 @@ export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
           placeholder={t('custom_category.name_placeholder')}
           maxLength={30}
         />
-        <Text style={{ color: theme.text.tertiary, fontSize: 11, textAlign: 'right' }}>
+        <Text style={{ color: theme.text.tertiary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: 'Lexend_400Regular', textAlign: 'right' }}>
           {label.length}/30
         </Text>
       </View>

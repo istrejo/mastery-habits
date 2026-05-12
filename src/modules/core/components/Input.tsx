@@ -1,3 +1,4 @@
+/* stitch: input */
 import React, { useState } from 'react';
 import {
   TextInput,
@@ -12,6 +13,7 @@ interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   containerStyle?: ViewStyle;
+  variant?: 'boxed' | 'underline';
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -19,6 +21,7 @@ export const Input: React.FC<InputProps> = ({
   error,
   containerStyle,
   style,
+  variant = 'boxed',
   ...rest
 }) => {
   const t = useTheme();
@@ -27,30 +30,50 @@ export const Input: React.FC<InputProps> = ({
   const borderColor = error
     ? t.status.danger
     : focused
-      ? t.accent.primary
+      ? t.border.strong
       : t.border.default;
+
+  const inputBase = variant === 'underline'
+    ? {
+        backgroundColor: 'transparent',
+        borderBottomWidth: t.borderWidth.default,
+        borderBottomColor: borderColor,
+        borderRadius: 0,
+        paddingVertical: t.spacing.stackSm + 2,
+        paddingHorizontal: 0,
+      }
+    : {
+        backgroundColor: t.bg.surface,
+        borderWidth: t.borderWidth.default,
+        borderColor,
+        borderRadius: t.radius.md,
+        paddingVertical: 13,
+        paddingHorizontal: t.spacing.stackMd - 8,
+      };
 
   return (
     <View style={containerStyle}>
       {label ? (
-        <Text
-          style={{ color: t.text.secondary, fontSize: 13, marginBottom: 6, fontWeight: '500' }}
-        >
+        <Text style={{
+          color: t.text.secondary,
+          fontSize: t.typography.scale.microBold.fontSize,
+          fontWeight: '500',
+          fontFamily: 'Lexend_500Medium',
+          letterSpacing: t.typography.scale.microBold.letterSpacing,
+          marginBottom: t.spacing.stackSm,
+        }}>
           {label}
         </Text>
       ) : null}
       <TextInput
         style={[
           {
-            backgroundColor: t.bg.surfaceAlt,
-            borderColor,
-            borderWidth: t.borderWidth.default,
-            borderRadius: t.radius.md,
             color: t.text.primary,
-            paddingVertical: 12,
-            paddingHorizontal: 14,
-            fontSize: 15,
+            fontFamily: 'Lexend_400Regular',
+            fontSize: t.typography.scale.bodyMain.fontSize,
+            lineHeight: t.typography.scale.bodyMain.lineHeight,
           },
+          inputBase,
           style,
         ]}
         placeholderTextColor={t.text.tertiary}
@@ -59,7 +82,12 @@ export const Input: React.FC<InputProps> = ({
         {...rest}
       />
       {error ? (
-        <Text style={{ color: t.status.danger, fontSize: 12, marginTop: 4 }}>
+        <Text style={{
+          color: t.status.danger,
+          fontSize: t.typography.scale.microBold.fontSize,
+          fontFamily: 'Lexend_500Medium',
+          marginTop: 6,
+        }}>
           {error}
         </Text>
       ) : null}

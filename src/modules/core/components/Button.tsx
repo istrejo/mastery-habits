@@ -1,10 +1,13 @@
+/* stitch: button */
 import React from 'react';
 import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
+  View,
   type ViewStyle,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -18,6 +21,8 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
+  iconRight?: keyof typeof MaterialIcons.glyphMap;
+  iconLeft?: keyof typeof MaterialIcons.glyphMap;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -28,21 +33,24 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   style,
+  iconRight,
+  iconLeft,
 }) => {
   const t = useTheme();
 
+  const iconSizeMap: Record<ButtonSize, number> = { sm: 16, md: 18, lg: 20 };
   const paddingMap: Record<ButtonSize, { v: number; h: number }> = {
-    sm: { v: 8, h: 14 },
-    md: { v: 12, h: 20 },
-    lg: { v: 16, h: 28 },
+    sm: { v: 9,  h: 14 },
+    md: { v: 13, h: 20 },
+    lg: { v: 16, h: 24 },
   };
-  const fontSizeMap: Record<ButtonSize, number> = { sm: 13, md: 15, lg: 17 };
+  const fontSizeMap: Record<ButtonSize, number> = { sm: 12, md: 14, lg: 16 };
 
   const pad = paddingMap[size];
 
   const bgColor = {
     primary: t.accent.primary,
-    secondary: t.bg.surfaceAlt,
+    secondary: 'transparent',
     ghost: 'transparent',
     danger: t.status.danger,
   }[variant];
@@ -50,19 +58,22 @@ export const Button: React.FC<ButtonProps> = ({
   const textColor = {
     primary: t.accent.onPrimary,
     secondary: t.text.primary,
-    ghost: t.text.primary,
+    ghost: t.text.secondary,
     danger: t.text.inverse,
   }[variant];
 
   const borderProps: ViewStyle =
     variant === 'secondary'
-      ? { borderWidth: t.borderWidth.default, borderColor: t.border.default }
-      : {};
+      ? { borderWidth: t.borderWidth.default, borderColor: t.border.strong }
+      : variant === 'ghost'
+        ? { borderWidth: t.borderWidth.default, borderColor: 'transparent' }
+        : {};
 
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
+      activeOpacity={0.78}
       style={[
         {
           backgroundColor: bgColor,
@@ -71,7 +82,7 @@ export const Button: React.FC<ButtonProps> = ({
           paddingHorizontal: pad.h,
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: disabled ? 0.4 : 1,
+          opacity: disabled ? 0.45 : 1,
         },
         borderProps,
         style,
@@ -80,9 +91,20 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <Text style={{ color: textColor, fontWeight: '600', fontSize: fontSizeMap[size] }}>
-          {label}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: t.spacing.unit * 2 }}>
+          {iconLeft && <MaterialIcons name={iconLeft} size={iconSizeMap[size]} color={textColor} />}
+          <Text style={{
+            color: textColor,
+            fontWeight: '600',
+            fontSize: fontSizeMap[size],
+            fontFamily: 'Lexend_600SemiBold',
+            letterSpacing: 0.7,
+            textTransform: 'uppercase',
+          }}>
+            {label}
+          </Text>
+          {iconRight && <MaterialIcons name={iconRight} size={iconSizeMap[size]} color={textColor} />}
+        </View>
       )}
     </TouchableOpacity>
   );

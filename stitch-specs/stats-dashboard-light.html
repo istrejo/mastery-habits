@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mastery Habits - Stats</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e5e2e1",
+                        "surface": "#fdf8f8",
+                        "surface-variant": "#e5e2e1",
+                        "surface-container-high": "#ebe7e6",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "on-secondary-fixed-variant": "#464747",
+                        "tertiary": "#000000",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1d1b1a",
+                        "background": "#fdf8f8",
+                        "tertiary-container": "#1d1b1a",
+                        "on-tertiary-container": "#868381",
+                        "on-secondary-container": "#626262",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#484645",
+                        "outline": "#747878",
+                        "on-primary-fixed-variant": "#474646",
+                        "tertiary-fixed": "#e6e1df",
+                        "surface-container-low": "#f7f3f2",
+                        "secondary-container": "#e1dfdf",
+                        "secondary": "#5e5e5e",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#444748",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#e4e2e2",
+                        "on-primary-container": "#858383",
+                        "inverse-primary": "#c8c6c5",
+                        "tertiary-fixed-dim": "#cac6c3",
+                        "surface-tint": "#5f5e5e",
+                        "inverse-surface": "#313030",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "surface-bright": "#fdf8f8",
+                        "on-surface": "#1c1b1b",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#f4f0ef",
+                        "primary-container": "#1c1b1b",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#f1edec",
+                        "on-primary-fixed": "#1c1b1b",
+                        "surface-dim": "#ddd9d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "40px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "container-max": "1200px",
+                        "md": "16px",
+                        "margin-mobile": "24px",
+                        "stack-sm": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Anton"],
+                        "headline-md": ["Anton"],
+                        "display": ["Anton"],
+                        "label-bold": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-sm": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "headline-lg": ["Anton"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "display": ["64px", { "lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "label-bold": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24 font-body-md">
+<!-- TopAppBar -->
+<header class="bg-background flex justify-between items-center w-full px-margin-mobile py-unit max-w-7xl mx-auto border-b border-outline-variant docked full-width top-0 sticky z-40">
+<div class="font-label-bold text-label-bold text-on-background uppercase tracking-[0.05em]">MASTERY HABITS</div>
+<button class="text-primary-container hover:bg-surface-container transition-colors p-2 rounded-full active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile pt-lg flex flex-col gap-xl">
+<!-- Header Title -->
+<section class="flex flex-col gap-sm">
+<h1 class="font-display text-display text-primary uppercase">Stats</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your discipline quantified.</p>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Streak Card -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between">
+<div class="flex justify-between items-start mb-xl">
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase">Current Streak</span>
+<span class="material-symbols-outlined text-primary" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<div>
+<div class="font-display text-display text-primary uppercase tracking-tight">14 DAYS</div>
+<p class="font-body-md text-body-md text-secondary mt-2">You are in the top 5% of consistent users this month.</p>
+</div>
+</div>
+<!-- Completion Rate Card -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between">
+<div class="flex justify-between items-start mb-md">
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase">Completion</span>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex flex-col gap-md">
+<div class="font-headline-lg text-headline-lg text-primary">87%</div>
+<div class="w-full h-[8px] bg-secondary-fixed rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[87%]"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary">+12% from last week</p>
+</div>
+</div>
+<!-- Activity Grid -->
+<div class="md:col-span-12 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex justify-between items-center border-b border-outline-variant pb-md mb-md">
+<h2 class="font-label-bold text-label-bold text-on-background uppercase">Activity Grid</h2>
+<span class="font-label-sm text-label-sm text-secondary bg-surface-container px-2 py-1 rounded">Last 30 Days</span>
+</div>
+<div class="grid grid-cols-7 gap-2 pt-2">
+<!-- Day Labels -->
+<div class="font-label-sm text-label-sm text-secondary text-center">M</div>
+<div class="font-label-sm text-label-sm text-secondary text-center">T</div>
+<div class="font-label-sm text-label-sm text-secondary text-center">W</div>
+<div class="font-label-sm text-label-sm text-secondary text-center">T</div>
+<div class="font-label-sm text-label-sm text-secondary text-center">F</div>
+<div class="font-label-sm text-label-sm text-secondary text-center">S</div>
+<div class="font-label-sm text-label-sm text-secondary text-center">S</div>
+<!-- Grid Cells (Simulated data) -->
+<!-- Week 1 -->
+<div class="aspect-square bg-primary/20 rounded-sm"></div>
+<div class="aspect-square bg-primary/40 rounded-sm"></div>
+<div class="aspect-square bg-primary/10 rounded-sm"></div>
+<div class="aspect-square bg-primary/80 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/60 rounded-sm"></div>
+<div class="aspect-square bg-primary/20 rounded-sm"></div>
+<!-- Week 2 -->
+<div class="aspect-square bg-primary/80 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/60 rounded-sm"></div>
+<div class="aspect-square bg-surface-container-high rounded-sm"></div>
+<div class="aspect-square bg-primary/40 rounded-sm"></div>
+<div class="aspect-square bg-primary/80 rounded-sm"></div>
+<!-- Week 3 -->
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/80 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/40 rounded-sm"></div>
+<div class="aspect-square bg-primary/20 rounded-sm"></div>
+<!-- Week 4 -->
+<div class="aspect-square bg-primary/60 rounded-sm"></div>
+<div class="aspect-square bg-primary/80 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm"></div>
+<div class="aspect-square bg-primary/100 rounded-sm border border-primary"></div>
+<div class="aspect-square bg-transparent"></div>
+</div>
+<div class="flex items-center justify-end gap-2 mt-md">
+<span class="font-label-sm text-label-sm text-secondary">Less</span>
+<div class="w-3 h-3 bg-surface-container-high rounded-sm"></div>
+<div class="w-3 h-3 bg-primary/40 rounded-sm"></div>
+<div class="w-3 h-3 bg-primary/80 rounded-sm"></div>
+<div class="w-3 h-3 bg-primary/100 rounded-sm"></div>
+<span class="font-label-sm text-label-sm text-secondary">More</span>
+</div>
+</div>
+<!-- Top Habits -->
+<div class="md:col-span-12">
+<h2 class="font-headline-md text-headline-md text-primary uppercase mb-lg">Top Habits</h2>
+<div class="flex flex-col gap-0 border border-outline-variant rounded-xl bg-surface-container-lowest overflow-hidden">
+<!-- Habit 1 -->
+<div class="flex items-center justify-between p-md border-b border-outline-variant last:border-0 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<div class="font-headline-md text-headline-md text-on-surface-variant w-8">01</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-background">Morning Run</span>
+<span class="font-label-sm text-label-sm text-secondary">Physical</span>
+</div>
+</div>
+<div class="flex items-center gap-sm bg-surface-container px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="repeat" style="font-variation-settings: 'FILL' 0;">repeat</span>
+<span class="font-label-bold text-label-bold text-primary">28 Days</span>
+</div>
+</div>
+<!-- Habit 2 -->
+<div class="flex items-center justify-between p-md border-b border-outline-variant last:border-0 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<div class="font-headline-md text-headline-md text-on-surface-variant w-8">02</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-background">Deep Work</span>
+<span class="font-label-sm text-label-sm text-secondary">Focus</span>
+</div>
+</div>
+<div class="flex items-center gap-sm bg-surface-container px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="repeat" style="font-variation-settings: 'FILL' 0;">repeat</span>
+<span class="font-label-bold text-label-bold text-primary">14 Days</span>
+</div>
+</div>
+<!-- Habit 3 -->
+<div class="flex items-center justify-between p-md border-b border-outline-variant last:border-0 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<div class="font-headline-md text-headline-md text-on-surface-variant w-8">03</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-background">Read 20 Pages</span>
+<span class="font-label-sm text-label-sm text-secondary">Mental</span>
+</div>
+</div>
+<div class="flex items-center gap-sm bg-surface-container px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="repeat" style="font-variation-settings: 'FILL' 0;">repeat</span>
+<span class="font-label-bold text-label-bold text-primary">8 Days</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-background fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-stack-sm border-t border-outline-variant md:hidden">
+<!-- Inactive: bolt -->
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-fixed transition-colors active:scale-110 transition-transform duration-200">
+<span class="material-symbols-outlined text-[28px]" data-icon="bolt" style="font-variation-settings: 'FILL' 0;">bolt</span>
+</button>
+<!-- Inactive: grid_view -->
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-fixed transition-colors active:scale-110 transition-transform duration-200">
+<span class="material-symbols-outlined text-[28px]" data-icon="grid_view" style="font-variation-settings: 'FILL' 0;">grid_view</span>
+</button>
+<!-- Active: leaderboard (Stats Screen) -->
+<button class="flex flex-col items-center justify-center text-primary-container active:scale-110 transition-transform duration-200">
+<span class="material-symbols-outlined text-[28px]" data-icon="leaderboard" style="font-variation-settings: 'FILL' 1;">leaderboard</span>
+</button>
+<!-- Inactive: person -->
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-fixed transition-colors active:scale-110 transition-transform duration-200">
+<span class="material-symbols-outlined text-[28px]" data-icon="person" style="font-variation-settings: 'FILL' 0;">person</span>
+</button>
+</nav>
+</body></html>

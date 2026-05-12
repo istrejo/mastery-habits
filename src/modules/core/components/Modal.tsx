@@ -55,8 +55,11 @@ export const Modal: React.FC<ModalProps> = ({
             <Text
               style={{
                 color: t.text.primary,
-                fontSize: 18,
-                fontWeight: '700',
+                fontSize: t.typography.scale.titleSm.fontSize,
+                lineHeight: t.typography.scale.titleSm.lineHeight,
+                fontFamily: 'Anton_400Regular',
+                letterSpacing: t.typography.scale.titleSm.letterSpacing,
+                textTransform: 'uppercase',
                 marginBottom: 16,
               }}
             >

@@ -25,6 +25,13 @@ export interface CategoryColorPair {
   border: string;
 }
 
+export interface TypeScaleEntry {
+  fontSize: number;
+  fontWeight: string;
+  lineHeight: number;
+  letterSpacing: number;
+}
+
 export interface ThemeTokens {
   bg: {
     base: string;
@@ -68,6 +75,13 @@ export interface ThemeTokens {
     danger: string;
     info: string;
   };
+  activity: {
+    none: string;
+    low: string;
+    medium: string;
+    high: string;
+    veryHigh: string;
+  };
   radius: {
     sm: number;
     md: number;
@@ -79,10 +93,27 @@ export interface ThemeTokens {
     default: number;
     bold: number;
   };
+  spacing: {
+    unit: number;
+    gutter: number;
+    marginMobile: number;
+    stackSm: number;
+    stackMd: number;
+    stackLg: number;
+  };
   typography: {
     displayFontFamily?: string;
     bodyFontFamily?: string;
     numericFeatures: string;
+    scale: {
+      displayXl: TypeScaleEntry;
+      displaySm: TypeScaleEntry;
+      titleLg: TypeScaleEntry;
+      titleSm: TypeScaleEntry;
+      labelCaps: TypeScaleEntry;
+      bodyMain: TypeScaleEntry;
+      microBold: TypeScaleEntry;
+    };
   };
   categoryColors: Record<CategoryColorToken, CategoryColorPair>;
   meta: {

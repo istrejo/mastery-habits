@@ -3,7 +3,7 @@ export const es = {
     cancel: 'Cancelar',
     confirm: 'Confirmar',
     save: 'Guardar',
-    back: '← Volver',
+    back: 'Volver',
     score_suffix: '/ 100',
   },
 
@@ -20,6 +20,7 @@ export const es = {
 
   profile: {
     title: 'PERFIL',
+    edit: 'Editar perfil',
     score_global: 'SCORE GLOBAL',
     habits_count_one: '{{count}} hábito',
     habits_count_other: '{{count}} hábitos',
@@ -36,18 +37,34 @@ export const es = {
   habit_detail: {
     not_found: 'Hábito no encontrado',
     edit_title: 'Editar hábito',
+    actions_title: 'Acciones del hábito',
+    actions_edit: 'Editar hábito',
+    actions_archive: 'Archivar hábito',
     commitment_score: 'COMMITMENT SCORE',
+    current_momentum: 'MOMENTUM ACTUAL',
+    monthly_completion: 'MENSUAL',
+    weekly_rhythm: 'RITMO SEMANAL',
+    stats_section: 'MÉTRICAS',
+    best_streak: 'MEJOR RACHA',
+    completion_rate: 'CUMPLIMIENTO',
+    avg_per_week: 'PROM / SEMANA',
+    planned_days: 'DÍAS / SEMANA',
     today_section: 'HOY',
     history_section: 'ÚLTIMOS 30 DÍAS',
     legend_completed: 'Completado',
     legend_skip: 'Skip',
     legend_missed: 'Fallado',
+    legend_pending: 'Pendiente',
+    legend_rest: 'Libre',
     frequency_section: 'FRECUENCIA',
     edit_button: 'Editar',
     archive_button: 'Archivar',
     save_changes: 'Guardar cambios',
     archive_title: 'Archivar hábito',
     archive_body: '¿Confirmás? El hábito dejará de aparecer en tu lista.',
+    open_actions: 'Abrir acciones',
+    this_week: 'Esta semana',
+    checkin_error: 'No pudimos actualizar este hábito. Probá de nuevo.',
     day_mon: 'Lun',
     day_tue: 'Mar',
     day_wed: 'Mié',
@@ -59,29 +76,33 @@ export const es = {
 
   new_habit: {
     title: 'Nuevo hábito',
+    subtitle: 'Construí un hábito que dure.',
     create_button: 'Crear hábito',
   },
 
   login: {
     app_title: 'Mastery Habits',
-    tagline: 'Cultivá disciplina real.',
+    tagline: 'Forjá la disciplina. Adueñate del resultado.',
     email_label: 'Email',
     password_label: 'Contraseña',
-    submit: 'Iniciar sesión',
-    go_signup: '¿No tenés cuenta? Registrate',
+    forgot: '¿Olvidaste?',
+    no_account: '¿No tenés cuenta?',
+    submit: 'Ingresar',
+    go_signup: 'Registrate',
     error_email: 'Email inválido',
     error_password_min: 'Mínimo 6 caracteres',
   },
 
   signup: {
     title: 'Crear cuenta',
-    tagline: 'Empezá tu camino hacia la maestría.',
+    tagline: 'Unite a la élite. Empezá tu maestría.',
     name_label: 'Nombre',
     email_label: 'Email',
     password_label: 'Contraseña',
     confirm_password_label: 'Confirmar contraseña',
+    have_account: '¿Ya tenés cuenta?',
     submit: 'Crear cuenta',
-    go_login: '¿Ya tenés cuenta? Iniciá sesión',
+    go_login: 'Iniciá sesión',
     error_name_min: 'Mínimo 2 caracteres',
     error_email: 'Email inválido',
     error_password_min: 'Mínimo 6 caracteres',
@@ -149,6 +170,8 @@ export const es = {
     coming_soon_title: 'Próximamente',
     coming_soon_body: 'Los temas premium estarán disponibles en la versión completa de Mastery Habits.',
     understood: 'Entendido',
+    light_active: 'Light activo',
+    theming_soon_body: 'El tema light queda fijo en esta versión. El theming completo vuelve más adelante.',
   },
 
   language_picker: {
@@ -181,7 +204,32 @@ export const es = {
 
   tabs: {
     habits: 'Hábitos',
+    power_grid: 'Grid',
+    stats: 'Stats',
     profile: 'Perfil',
+  },
+
+  stats: {
+    current_streak: 'Racha Actual',
+    days: 'Días',
+    best_streak_one: 'Mejor: {{count}} día',
+    best_streak_other: 'Mejor: {{count}} días',
+    best_streak: 'Mejor: {{count}} días',
+    top_habits: 'Top Hábitos',
+    activity: 'Actividad',
+  },
+
+  power_grid: {
+    title: 'Power Grid',
+    description:
+      'Tu disciplina diaria, mapeada. Las celdas sólidas representan hábitos de alto impacto completados. Las grises muestran oportunidades perdidas. Mantené la cadena intacta.',
+    empty: 'Aún no hay hábitos. Agregá uno para cargar energía.',
+    legend_active: 'Activo',
+    legend_empty: 'Vacío',
+    completion_rate: 'Completion Rate',
+    total_power: 'Total Power',
+    low_energy: 'Baja Energía',
+    full_power: 'Máxima Energía',
   },
 };
 

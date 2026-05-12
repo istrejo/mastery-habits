@@ -1,3 +1,4 @@
+/* stitch: progress-bar */
 import React from 'react';
 import { View, type ViewStyle } from 'react-native';
 import { useTheme } from '@core/theming';
@@ -15,27 +16,18 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   max = 100,
   scoreColor,
   style,
-  height = 6,
+  height = 8,
 }) => {
   const t = useTheme();
   const pct = Math.min(Math.max(value / max, 0), 1);
-
-  const fillColor =
-    scoreColor ??
-    (value >= 71
-      ? t.score.excellent
-      : value >= 46
-        ? t.score.good
-        : value >= 21
-          ? t.score.warning
-          : t.score.critical);
+  const fillColor = scoreColor ?? t.accent.primary;
 
   return (
     <View
       style={[
         {
           height,
-          backgroundColor: t.bg.surfaceAlt,
+          backgroundColor: t.accent.muted,
           borderRadius: t.radius.pill,
           overflow: 'hidden',
         },

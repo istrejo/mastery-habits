@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@core/theming';
-import { Input, Button } from '@core/components';
+import { Input, Button, Card } from '@core/components';
 import { FrequencySelector } from './FrequencySelector';
 import { CategoryPicker } from './CategoryPicker';
 import type { HabitInsert } from '../types';
@@ -29,43 +29,28 @@ interface HabitFormProps {
 
 const CATEGORY_IDS = ['health', 'mind', 'learning', 'productivity', 'nutrition', 'creativity', 'social', 'finance', 'custom'] as const;
 
-export const HabitForm: React.FC<HabitFormProps> = ({
-  defaultValues,
-  onSubmit,
-  submitLabel,
-  loading = false,
-}) => {
+export const HabitForm: React.FC<HabitFormProps> = ({ defaultValues, onSubmit, submitLabel, loading = false }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
   const schema = useMemo(
-    () =>
-      z
-        .object({
-          name: z.string().min(1, t('habit_form.error_required')).max(80, t('habit_form.error_name_max')),
-          description: z.string().max(300).optional(),
-          category: z.enum(CATEGORY_IDS),
-          custom_label: z.string().max(30).optional(),
-          custom_emoji: z.string().max(8).optional(),
-          frequency_days: z
-            .array(z.number().int().min(1).max(7))
-            .min(1, t('habit_form.error_days_min')),
-        })
-        .refine(
-          (data) =>
-            data.category !== 'custom' || (!!data.custom_label && !!data.custom_emoji),
-          { message: 'Custom requiere label y emoji', path: ['custom_label'] }
-        ),
+    () => z
+      .object({
+        name: z.string().min(1, t('habit_form.error_required')).max(80, t('habit_form.error_name_max')),
+        description: z.string().max(300).optional(),
+        category: z.enum(CATEGORY_IDS),
+        custom_label: z.string().max(30).optional(),
+        custom_emoji: z.string().max(8).optional(),
+        frequency_days: z.array(z.number().int().min(1).max(7)).min(1, t('habit_form.error_days_min')),
+      })
+      .refine((data) => data.category !== 'custom' || (!!data.custom_label && !!data.custom_emoji), {
+        message: 'Custom requiere label y emoji',
+        path: ['custom_label'],
+      }),
     [t]
   );
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<HabitFormData>({
+  const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<HabitFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
@@ -83,30 +68,23 @@ export const HabitForm: React.FC<HabitFormProps> = ({
 
   const handleFormSubmit = (data: HabitFormData) => {
     const isCustom = data.category === 'custom';
-    const payload: HabitInsert = {
+    onSubmit({
       name: data.name,
       frequency_days: data.frequency_days,
       category: data.category,
       description: data.description || undefined,
       custom_label: isCustom ? (data.custom_label ?? null) : null,
       custom_emoji: isCustom ? (data.custom_emoji ?? null) : null,
-    };
-    onSubmit(payload);
+    });
   };
 
   return (
-    <View style={{ gap: 16 }}>
+    <Card style={{ gap: theme.spacing.stackMd }}>
       <Controller
         control={control}
         name="name"
         render={({ field: { onChange, value } }) => (
-          <Input
-            label={t('habit_form.name_label')}
-            onChangeText={onChange}
-            value={value}
-            placeholder={t('habit_form.name_placeholder')}
-            error={errors.name?.message}
-          />
+          <Input label={t('habit_form.name_label')} onChangeText={onChange} value={value} placeholder={t('habit_form.name_placeholder')} error={errors.name?.message} />
         )}
       />
 
@@ -114,19 +92,12 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         control={control}
         name="description"
         render={({ field: { onChange, value } }) => (
-          <Input
-            label={t('habit_form.description_label')}
-            onChangeText={onChange}
-            value={value ?? ''}
-            placeholder={t('habit_form.description_placeholder')}
-            multiline
-            numberOfLines={3}
-          />
+          <Input label={t('habit_form.description_label')} onChangeText={onChange} value={value ?? ''} placeholder={t('habit_form.description_placeholder')} multiline numberOfLines={3} />
         )}
       />
 
-      <View style={{ gap: 6 }}>
-        <Text style={{ color: theme.text.secondary, fontSize: 13, fontWeight: '600' }}>
+      <View style={{ gap: theme.spacing.stackSm }}>
+        <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: 'Lexend_500Medium' }}>
           {t('habit_form.category_label')}
         </Text>
         <Controller
@@ -145,31 +116,16 @@ export const HabitForm: React.FC<HabitFormProps> = ({
             />
           )}
         />
-        {errors.custom_label && (
-          <Text style={{ color: theme.status.danger, fontSize: 12 }}>
-            {errors.custom_label.message}
-          </Text>
-        )}
+        {errors.custom_label && <Text style={{ color: theme.status.danger, fontSize: 12, fontFamily: 'Lexend_500Medium' }}>{errors.custom_label.message}</Text>}
       </View>
 
       <Controller
         control={control}
         name="frequency_days"
-        render={({ field: { onChange, value } }) => (
-          <FrequencySelector
-            value={value}
-            onChange={onChange}
-            error={errors.frequency_days?.message}
-          />
-        )}
+        render={({ field: { onChange, value } }) => <FrequencySelector value={value} onChange={onChange} error={errors.frequency_days?.message} />}
       />
 
-      <Button
-        label={submitLabel ?? t('habit_form.save_default')}
-        onPress={handleSubmit(handleFormSubmit)}
-        loading={loading}
-        style={{ marginTop: 8 }}
-      />
-    </View>
+      <Button label={submitLabel ?? t('habit_form.save_default')} onPress={handleSubmit(handleFormSubmit)} loading={loading} style={{ marginTop: theme.spacing.stackSm }} />
+    </Card>
   );
 };
