@@ -223,10 +223,13 @@ export const en: TranslationKeys = {
 
   power_grid: {
     title: 'Power Grid',
-    subtitle_one: 'Your habit energy — {{count}} active habit',
-    subtitle_other: 'Your habit energy — {{count}} active habits',
-    subtitle: 'Your habit energy — {{count}} active habits',
+    description:
+      'Your daily discipline mapped. Solid cells represent completed high-impact habits. Grey cells indicate missed opportunities. Maintain the unbroken chain.',
     empty: 'No habits yet. Add one to power up.',
+    legend_active: 'Active',
+    legend_empty: 'Empty',
+    completion_rate: 'Completion Rate',
+    total_power: 'Total Power',
     low_energy: 'Low Energy',
     full_power: 'Full Power',
   },

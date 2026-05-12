@@ -66,6 +66,27 @@ export const checkinService = {
     return (data ?? []) as CheckInRecord[];
   },
 
+  getRangeForHabits: async (
+    habitIds: string[],
+    startDate: Date,
+    endDate: Date,
+  ): Promise<CheckInRecord[]> => {
+    if (habitIds.length === 0) return [];
+
+    const startStr = format(startDate, 'yyyy-MM-dd');
+    const endStr = format(endDate, 'yyyy-MM-dd');
+    const { data, error } = await supabase
+      .from('check_ins')
+      .select('id, habit_id, check_date, status')
+      .in('habit_id', habitIds)
+      .gte('check_date', startStr)
+      .lte('check_date', endStr)
+      .order('check_date', { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return (data ?? []) as CheckInRecord[];
+  },
+
   register: async (
     habitId: string,
     date: Date,

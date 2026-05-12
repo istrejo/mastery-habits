@@ -221,10 +221,13 @@ export const es = {
 
   power_grid: {
     title: 'Power Grid',
-    subtitle_one: 'Energía de tus hábitos — {{count}} activo',
-    subtitle_other: 'Energía de tus hábitos — {{count}} activos',
-    subtitle: 'Energía de tus hábitos — {{count}} activos',
+    description:
+      'Tu disciplina diaria, mapeada. Las celdas sólidas representan hábitos de alto impacto completados. Las grises muestran oportunidades perdidas. Mantené la cadena intacta.',
     empty: 'Aún no hay hábitos. Agregá uno para cargar energía.',
+    legend_active: 'Activo',
+    legend_empty: 'Vacío',
+    completion_rate: 'Completion Rate',
+    total_power: 'Total Power',
     low_energy: 'Baja Energía',
     full_power: 'Máxima Energía',
   },
