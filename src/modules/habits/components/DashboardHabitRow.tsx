@@ -146,16 +146,23 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
         </TouchableOpacity>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text
-            style={{
-              color: isCompleted ? theme.text.primary : isActive ? theme.text.primary : theme.text.secondary,
-              fontSize: theme.typography.scale.labelCaps.fontSize,
-              lineHeight: theme.typography.scale.labelCaps.lineHeight,
-              fontFamily: 'Lexend_600SemiBold',
-            }}
-          >
-            🔥 {Math.round(score)}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <MaterialIcons
+              name='local-fire-department'
+              size={16}
+              color={isCompleted ? theme.text.primary : isActive ? theme.text.primary : theme.text.secondary}
+            />
+            <Text
+              style={{
+                color: isCompleted ? theme.text.primary : isActive ? theme.text.primary : theme.text.secondary,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
+                lineHeight: theme.typography.scale.labelCaps.lineHeight,
+                fontFamily: 'Lexend_600SemiBold',
+              }}
+            >
+              {Math.round(score)}
+            </Text>
+          </View>
 
           <TouchableOpacity
             onPress={onPressRow}
