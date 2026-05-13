@@ -14,7 +14,7 @@ interface CustomCategoryInputProps {
 
 export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
   label,
-  emoji,
+  emoji = '✦',
   onChange,
 }) => {
   const theme = useTheme();

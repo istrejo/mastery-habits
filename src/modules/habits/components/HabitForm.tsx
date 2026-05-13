@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
@@ -86,6 +86,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   const initialCategory = defaultValues?.category ?? (stitchMode ? DEFAULT_CREATE_HABIT_CATEGORY : 'health');
   const initialFrequencyDays = defaultValues?.frequency_days ?? (stitchMode ? [...DEFAULT_CREATE_HABIT_DAYS] : [1, 2, 3, 4, 5]);
   const initialFrequencyPreset = inferFrequencyPreset(initialFrequencyDays);
+  const [stitchCategory, setStitchCategory] = useState<HabitCategoryId>(initialCategory);
+  const [stitchFrequencyPreset, setStitchFrequencyPreset] = useState<CreateHabitFrequencyPreset>(initialFrequencyPreset);
   const [lastCustomDays, setLastCustomDays] = useState<number[]>(
     initialFrequencyPreset === 'custom' ? [...initialFrequencyDays].sort((a, b) => a - b) : [1, 2, 3, 4, 5],
   );
@@ -107,28 +109,30 @@ export const HabitForm: React.FC<HabitFormProps> = ({
     [t]
   );
 
-  const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<HabitFormData>({
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<HabitFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
       description: '',
       category: initialCategory,
       custom_label: '',
-      custom_emoji: '✨',
+      custom_emoji: '✦',
       frequency_days: [...initialFrequencyDays],
       ...defaultValues,
     },
   });
 
-  const watchedCategory = watch('category');
-  const watchedCustomLabel = watch('custom_label');
-  const watchedCustomEmoji = watch('custom_emoji');
-  const watchedFrequencyDays = watch('frequency_days');
+  const watchedCategory = useWatch({ control, name: 'category' }) ?? initialCategory;
+  const watchedCustomLabel = useWatch({ control, name: 'custom_label' }) ?? '';
+  const watchedCustomEmoji = useWatch({ control, name: 'custom_emoji' }) ?? '✦';
+  const watchedFrequencyDays = useWatch({ control, name: 'frequency_days' }) ?? [...initialFrequencyDays];
   const categoryOptions = useMemo(() => getCreateHabitCategoryOptions(), []);
-  const selectedCategoryOption = findCreateHabitCategoryOption(watchedCategory);
-  const frequencyPreset = inferFrequencyPreset(watchedFrequencyDays);
+  const selectedCategoryId = stitchMode ? stitchCategory : watchedCategory;
+  const selectedCategoryOption = findCreateHabitCategoryOption(selectedCategoryId);
+  const frequencyPreset = stitchMode ? stitchFrequencyPreset : inferFrequencyPreset(watchedFrequencyDays);
 
   const applyCategory = (option: CreateHabitCategoryOption) => {
+    setStitchCategory(option.categoryId);
     setValue('category', option.categoryId, { shouldValidate: true });
 
     if (option.usesCustomFields) {
@@ -136,7 +140,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
         setValue('custom_label', '', { shouldValidate: true });
       }
       if (!watchedCustomEmoji?.trim()) {
-        setValue('custom_emoji', '✨', { shouldValidate: true });
+        setValue('custom_emoji', '✦', { shouldValidate: true });
       }
       return;
     }
@@ -146,6 +150,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   };
 
   const applyFrequencyPreset = (preset: CreateHabitFrequencyPreset) => {
+    setStitchFrequencyPreset(preset);
     const nextDays = getDaysForFrequencyPreset(preset, lastCustomDays);
     setValue('frequency_days', nextDays, { shouldValidate: true });
 
@@ -155,6 +160,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   };
 
   const toggleCustomDay = (iso: number) => {
+    setStitchFrequencyPreset('custom');
     const sourceDays = frequencyPreset === 'custom' ? watchedFrequencyDays : lastCustomDays;
     const nextDays = sourceDays.includes(iso)
       ? sourceDays.length === 1
@@ -167,12 +173,13 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   };
 
   const handleFormSubmit = (data: HabitFormData) => {
-    const isCustom = data.category === 'custom';
+    const selectedCategory = stitchMode ? stitchCategory : data.category;
+    const isCustom = selectedCategory === 'custom';
 
     return onSubmit({
       name: data.name,
       frequency_days: data.frequency_days,
-      category: data.category,
+      category: selectedCategory,
       description: data.description || undefined,
       custom_label: isCustom ? (data.custom_label ?? null) : null,
       custom_emoji: isCustom ? (data.custom_emoji ?? null) : null,
@@ -316,11 +323,11 @@ export const HabitForm: React.FC<HabitFormProps> = ({
           })}
         </View>
 
-        {watchedCategory === 'custom' ? (
+        {selectedCategoryId === 'custom' ? (
           <View style={{ marginTop: theme.spacing.stackMd }}>
             <CustomCategoryInput
               label={watchedCustomLabel ?? ''}
-              emoji={watchedCustomEmoji ?? '✨'}
+              emoji={watchedCustomEmoji ?? '✦'}
               onChange={({ label, emoji }) => {
                 setValue('custom_label', label, { shouldValidate: true });
                 setValue('custom_emoji', emoji, { shouldValidate: true });

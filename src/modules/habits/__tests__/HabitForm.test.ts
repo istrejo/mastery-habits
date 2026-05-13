@@ -72,7 +72,7 @@ const translations: Record<string, string> = {
   'categories.social.label': 'SOCIAL',
   'categories.finance.label': 'FINANCE',
   'categories.custom.label': 'CUSTOM',
-  'custom_category.emoji_label': 'Emoji',
+  'custom_category.emoji_label': 'Icon',
   'custom_category.name_label': 'Name',
   'custom_category.name_placeholder': 'My category',
 };
@@ -162,6 +162,61 @@ describe('HabitForm', () => {
       'CUSTOM',
     ]));
     expect(labels).not.toContain('ICONOGRAPHY');
+  });
+
+  it('allows selecting the custom category and reveals the custom controls', () => {
+    let tree: any;
+
+    act(() => {
+      tree = create(
+        React.createElement(HabitForm, {
+          onSubmit: jest.fn(async () => undefined),
+          submitLabel: 'Create habit',
+          mode: 'stitch',
+        }),
+      );
+    });
+
+    const touchables = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    const customTrigger = touchables[8];
+
+    act(() => {
+      customTrigger.props.onPress();
+    });
+
+    const labels = tree.root.findAll((node: any) => node.type === 'Text').map((node: any) => String(node.props.children));
+    expect(labels).toEqual(expect.arrayContaining(['Icon']));
+    expect(tree.root.findAll((node: any) => node.type === 'Input' && node.props.label === 'Name')).toHaveLength(1);
+  });
+
+  it('allows selecting custom frequency and then toggling custom days', () => {
+    let tree: any;
+
+    act(() => {
+      tree = create(
+        React.createElement(HabitForm, {
+          onSubmit: jest.fn(async () => undefined),
+          submitLabel: 'Create habit',
+          mode: 'stitch',
+        }),
+      );
+    });
+
+    let touchables = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    const customFrequencyTrigger = touchables[11];
+
+    act(() => {
+      customFrequencyTrigger.props.onPress();
+    });
+
+    touchables = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    const mondayChip = touchables[12];
+
+    act(() => {
+      mondayChip.props.onPress();
+    });
+
+    expect(mondayChip.props.activeOpacity).toBe(0.82);
   });
 
   it('submits a HabitInsert payload without changing the existing API shape', async () => {
