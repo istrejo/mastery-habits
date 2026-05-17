@@ -3,19 +3,12 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { Screen, Skeleton, Card } from "@core/components";
-import { useTheme } from "@core/theming";
+import { useTheme, type MasteryLevel } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
 import { useHabits } from "@habits/index";
-import { getLevel } from "@progression/index";
+import { getLevel, MasteryLevelIcon } from "@progression/index";
 
 const LEVEL_SCORE: Record<string, number> = { ancient: 100, forest: 80, tree: 58, sprout: 33, seed: 10 };
-const LEVEL_EMOJIS: Record<string, string> = {
-  seed: "🌱",
-  sprout: "🌿",
-  tree: "🌳",
-  forest: "🌲",
-  ancient: "🗿",
-};
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -170,7 +163,7 @@ export default function ProfileScreen() {
                     }}
                   >
                     <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.stackMd }}>
-                      <Text style={{ fontSize: 18 }}>{LEVEL_EMOJIS[key]}</Text>
+                      <MasteryLevelIcon level={key as MasteryLevel} size={20} />
                       <Text style={{ color: theme.text.primary, fontSize: 18, lineHeight: 28, fontFamily: isActive ? "Lexend_500Medium" : "Lexend_400Regular" }}>{level.label}</Text>
                     </View>
                     <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.labelCaps.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.labelCaps.letterSpacing }}>
