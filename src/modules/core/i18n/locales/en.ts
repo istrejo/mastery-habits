@@ -182,15 +182,11 @@ export const en: TranslationKeys = {
   },
 
   theme_picker: {
-    free_tier: 'FREE',
-    premium_tier: 'PREMIUM',
-    badge_free: 'FREE',
-    badge_premium: 'PREMIUM',
-    coming_soon_title: 'Coming soon',
-    coming_soon_body: 'Premium themes will be available in the full version of Mastery Habits.',
-    understood: 'Got it',
-    light_active: 'Light active',
-    theming_soon_body: 'Light theme is locked for this version. Full theming will return in a future release.',
+    active_badge: 'Active',
+    light_name: 'Mastery Habits Light',
+    light_description: 'Clean, bright editorial palette with high contrast.',
+    dark_name: 'Mastery Habits Dark',
+    dark_description: 'Monochromatic dark inversion sourced from Stitch.',
   },
 
   language_picker: {

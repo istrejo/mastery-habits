@@ -180,15 +180,11 @@ export const es = {
   },
 
   theme_picker: {
-    free_tier: 'GRATIS',
-    premium_tier: 'PREMIUM',
-    badge_free: 'FREE',
-    badge_premium: 'PREMIUM',
-    coming_soon_title: 'Próximamente',
-    coming_soon_body: 'Los temas premium estarán disponibles en la versión completa de Mastery Habits.',
-    understood: 'Entendido',
-    light_active: 'Light activo',
-    theming_soon_body: 'El tema light queda fijo en esta versión. El theming completo vuelve más adelante.',
+    active_badge: 'Activo',
+    light_name: 'Mastery Habits Light',
+    light_description: 'Paleta editorial clara, limpia y de alto contraste.',
+    dark_name: 'Mastery Habits Dark',
+    dark_description: 'Inversión monocromática oscura basada en Stitch.',
   },
 
   language_picker: {
