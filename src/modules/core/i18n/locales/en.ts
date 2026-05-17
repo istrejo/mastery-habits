@@ -26,6 +26,7 @@ export const en: TranslationKeys = {
     score_global: 'GLOBAL SCORE',
     habits_count_one: '{{count}} habit',
     habits_count_other: '{{count}} habits',
+    levels_section: 'Habit Levels',
     distribution: 'DISTRIBUTION',
     theme_section: 'THEME',
     language_section: 'LANGUAGE',

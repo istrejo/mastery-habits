@@ -1,12 +1,12 @@
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Screen, Skeleton, Card } from "@core/components";
-import { useTheme } from "@core/theming";
+import { useTheme, type MasteryLevel } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
 import { useHabits } from "@habits/index";
-import { getLevel } from "@progression/index";
+import { getLevel, MasteryLevelIcon } from "@progression/index";
 
 const LEVEL_SCORE: Record<string, number> = { ancient: 100, forest: 80, tree: 58, sprout: 33, seed: 10 };
 
@@ -22,21 +22,79 @@ export default function ProfileScreen() {
   const displayName = user?.user_metadata?.["display_name"] as string | undefined;
   const email = user?.email ?? "";
   const initials = displayName ? displayName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase() : email.slice(0, 2).toUpperCase();
+  const levelRows = (["seed", "sprout", "tree", "forest", "ancient"] as const)
+    .map((key) => {
+      const count = habits.filter((h) => (h.mastery_scores?.level ?? "seed") === key).length;
+      const level = getLevel(LEVEL_SCORE[key]!);
+      return { key, count, level };
+    })
+    .filter(({ count }) => count > 0);
 
   return (
-    <Screen scrollable>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: theme.spacing.stackLg }}>
-        <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: "uppercase" }}>
+    <Screen
+      scrollable
+      contentStyle={{
+        paddingTop: 0,
+        paddingHorizontal: 0,
+        paddingBottom: theme.spacing.stackLg,
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: theme.spacing.marginMobile,
+          paddingVertical: theme.spacing.stackSm,
+          borderBottomWidth: theme.borderWidth.default,
+          borderBottomColor: theme.border.default,
+        }}
+      >
+        <Text
+          style={{
+            color: theme.text.primary,
+            fontSize: 12,
+            fontFamily: "Lexend_600SemiBold",
+            letterSpacing: 0.7,
+            textTransform: "uppercase",
+          }}
+        >
           {t("dashboard.app_name")}
         </Text>
-        <TouchableOpacity onPress={() => router.push("/settings")} hitSlop={12} style={{ width: 40, height: 40, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center" }}>
+        <Pressable
+          onPress={() => router.push("/settings")}
+          hitSlop={12}
+          style={({ pressed }) => ({
+            width: 32,
+            height: 32,
+            borderRadius: theme.radius.pill,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: pressed ? theme.bg.surfaceAlt : "transparent",
+          })}
+        >
           <Ionicons name="settings-outline" size={20} color={theme.text.primary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
-      <View style={{ gap: theme.spacing.stackLg }}>
-        <Card style={{ alignItems: "center", gap: theme.spacing.stackMd }}>
-          <View style={{ width: 96, height: 96, borderRadius: theme.radius.pill, backgroundColor: theme.bg.surfaceAlt, alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={{
+          paddingHorizontal: theme.spacing.marginMobile,
+          paddingTop: theme.spacing.stackLg,
+          gap: theme.spacing.stackLg,
+        }}
+      >
+        <View style={{ alignItems: "center", gap: theme.spacing.stackMd }}>
+          <View
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: theme.radius.pill,
+              backgroundColor: theme.bg.surfaceAlt,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleLg.fontSize, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.titleLg.letterSpacing }}>
               {initials}
             </Text>
@@ -49,60 +107,72 @@ export default function ProfileScreen() {
               {email}
             </Text>
           </View>
-          <Pressable onPress={() => router.push("/settings")} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: theme.spacing.unit, borderWidth: theme.borderWidth.default, borderColor: pressed ? theme.border.strong : theme.border.default, borderRadius: theme.radius.md, paddingHorizontal: theme.spacing.stackMd, paddingVertical: theme.spacing.stackSm })}>
-            <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: "uppercase" }}>
-              {t("profile.edit")}
-            </Text>
-            <MaterialIcons name="edit" size={14} color={theme.text.primary} />
-          </Pressable>
-        </Card>
+        </View>
 
-        <Card style={{ alignItems: "center" }}>
+        <Card style={{ alignItems: "center", paddingVertical: theme.spacing.stackLg }}>
           {loading ? (
-            <View style={{ gap: theme.spacing.stackSm, width: "100%" }}>
-              <Skeleton width="40%" height={theme.typography.scale.displaySm.fontSize} />
-              <Skeleton width="60%" height={theme.typography.scale.bodyMain.fontSize} />
+            <View style={{ gap: theme.spacing.stackSm, width: "100%", alignItems: "center" }}>
+              <Skeleton width="50%" height={theme.typography.scale.displaySm.fontSize} />
+              <Skeleton width="36%" height={28} />
             </View>
           ) : (
             <>
-              <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.displayXl.fontSize, lineHeight: theme.typography.scale.displayXl.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.displayXl.letterSpacing, fontVariant: ["tabular-nums"] }}>
+              <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.displaySm.fontSize, lineHeight: theme.typography.scale.displaySm.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.displaySm.letterSpacing, fontVariant: ["tabular-nums"] }}>
                 {avgScore.toFixed(1)}
               </Text>
-              <View style={{ borderWidth: theme.borderWidth.default, borderColor: theme.border.strong, borderRadius: theme.radius.pill, paddingHorizontal: theme.spacing.stackMd, paddingVertical: theme.spacing.stackSm, marginTop: theme.spacing.stackSm }}>
-                <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium", letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: "uppercase" }}>
+              <View style={{ borderWidth: theme.borderWidth.default, borderColor: theme.border.strong, borderRadius: theme.radius.pill, paddingHorizontal: 12, paddingVertical: 4 }}>
+                <Text style={{ color: theme.text.primary, fontSize: 12, fontFamily: "Lexend_500Medium", letterSpacing: 0.6, textTransform: "uppercase" }}>
                   {globalLevel.label} Level
                 </Text>
               </View>
-              <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: "Lexend_400Regular", marginTop: theme.spacing.stackSm }}>
-                {t("profile.habits_count", { count: habits.length })}
-              </Text>
             </>
           )}
         </Card>
 
-        {!loading && habits.length > 0 && (
+        {!loading && levelRows.length > 0 && (
           <View style={{ gap: theme.spacing.stackMd }}>
-            <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.labelCaps.fontSize, fontFamily: "Anton_400Regular", textTransform: "uppercase" }}>
-              Habit Levels
+            <Text
+              style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
+                fontFamily: "Lexend_600SemiBold",
+                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                textTransform: "uppercase",
+                paddingBottom: theme.spacing.stackSm,
+                borderBottomWidth: theme.borderWidth.default,
+                borderBottomColor: theme.border.default,
+              }}
+            >
+              {t("profile.levels_section")}
             </Text>
-            <Card style={{ padding: 0, overflow: "hidden" }}>
-              {(["seed", "sprout", "tree", "forest", "ancient"] as const).map((key) => {
-                const count = habits.filter((h) => (h.mastery_scores?.level ?? "seed") === key).length;
-                const level = getLevel(LEVEL_SCORE[key]!);
+            <View>
+              {levelRows.map(({ key, count, level }, index) => {
                 const isActive = globalLevel.key === level.key;
                 return (
-                  <View key={key} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: theme.spacing.stackMd, borderBottomWidth: key === "ancient" ? 0 : theme.borderWidth.default, borderBottomColor: theme.border.default, borderLeftWidth: isActive ? 4 : 0, borderLeftColor: theme.accent.primary }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.stackSm }}>
-                      <Text style={{ fontSize: 18 }}>{level.emoji}</Text>
-                      <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: isActive ? "Lexend_600SemiBold" : "Lexend_400Regular" }}>{level.label}</Text>
+                  <View
+                    key={key}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingVertical: theme.spacing.stackMd,
+                      paddingHorizontal: theme.spacing.stackSm,
+                      marginHorizontal: -theme.spacing.stackSm,
+                      borderBottomWidth: index === levelRows.length - 1 ? 0 : theme.borderWidth.default,
+                      borderBottomColor: theme.border.default,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.stackMd }}>
+                      <MasteryLevelIcon level={key as MasteryLevel} size={20} />
+                      <Text style={{ color: theme.text.primary, fontSize: 18, lineHeight: 28, fontFamily: isActive ? "Lexend_500Medium" : "Lexend_400Regular" }}>{level.label}</Text>
                     </View>
-                    <Text style={{ color: isActive ? theme.text.primary : theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, fontFamily: "Lexend_600SemiBold" }}>
-                      {count} {count === 1 ? "Habit" : "Habits"}
+                    <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.labelCaps.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.labelCaps.letterSpacing }}>
+                      {t("profile.habits_count", { count })}
                     </Text>
                   </View>
                 );
               })}
-            </Card>
+            </View>
           </View>
         )}
       </View>
