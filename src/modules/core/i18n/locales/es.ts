@@ -24,6 +24,7 @@ export const es = {
     score_global: 'SCORE GLOBAL',
     habits_count_one: '{{count}} hábito',
     habits_count_other: '{{count}} hábitos',
+    levels_section: 'NIVELES DE HÁBITO',
     distribution: 'DISTRIBUCIÓN',
     theme_section: 'TEMA',
     language_section: 'IDIOMA',
