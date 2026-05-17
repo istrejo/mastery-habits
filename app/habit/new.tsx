@@ -23,24 +23,45 @@ export default function NewHabitScreen() {
   };
 
   return (
-    <Screen scrollable>
-      <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.unit, marginBottom: theme.spacing.stackLg }}>
-        <MaterialIcons name="arrow-back" size={18} color={theme.text.primary} />
-        <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: "uppercase" }}>
-          {t("common.back")}
-        </Text>
-      </TouchableOpacity>
+    <Screen
+      scrollable
+      contentStyle={{
+        paddingTop: theme.spacing.stackSm,
+        paddingBottom: theme.spacing.stackLg,
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: theme.spacing.stackMd,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{ width: 40, height: 40, alignItems: "center", justifyContent: "center" }}
+        >
+          <MaterialIcons name="arrow-back" size={18} color={theme.text.primary} />
+        </TouchableOpacity>
 
-      <View style={{ marginBottom: theme.spacing.stackMd }}>
-        <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleLg.fontSize, lineHeight: theme.typography.scale.titleLg.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.titleLg.letterSpacing, textTransform: "uppercase", marginBottom: theme.spacing.stackSm }}>
+        <Text
+          style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.titleSm.fontSize,
+            lineHeight: theme.typography.scale.titleSm.lineHeight,
+            fontFamily: "Anton_400Regular",
+            letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+            textTransform: "uppercase",
+          }}
+        >
           {t("new_habit.title")}
         </Text>
-        <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: "Lexend_400Regular" }}>
-          {t("new_habit.subtitle")}
-        </Text>
+
+        <View style={{ width: 40 }} />
       </View>
 
-      <HabitForm onSubmit={handleSubmit} submitLabel={t("new_habit.create_button")} loading={loading} />
+      <HabitForm onSubmit={handleSubmit} submitLabel={t("new_habit.create_button")} loading={loading} mode="stitch" />
     </Screen>
   );
 }

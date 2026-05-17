@@ -80,6 +80,21 @@ export const es = {
     create_button: 'Crear hábito',
   },
 
+  create_habit: {
+    sections: {
+      identity: 'Identidad',
+      category: 'Categoría',
+      frequency: 'Frecuencia',
+    },
+    frequency_presets: {
+      daily: 'Diario',
+      mon_fri: 'Lun-Vie',
+      custom: 'Personalizado',
+    },
+    select_days: 'Seleccionar días',
+    custom_category_error: 'Personalizado requiere nombre e ícono',
+  },
+
   login: {
     app_title: 'Mastery Habits',
     tagline: 'Forjá la disciplina. Adueñate del resultado.',
@@ -135,7 +150,7 @@ export const es = {
   },
 
   custom_category: {
-    emoji_label: 'Emoji',
+    emoji_label: 'Ícono',
     name_label: 'Nombre',
     name_placeholder: 'Mi categoría',
     uncategorized_banner: 'Este hábito no tiene categoría asignada. Editalo para clasificarlo.',
