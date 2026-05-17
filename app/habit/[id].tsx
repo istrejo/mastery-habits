@@ -30,7 +30,7 @@ import {
 } from '@habits/utils/habitDetailMetrics';
 import { CheckInButton, useCheckIn } from '@checkin/index';
 import { calculateStreak } from '@commitment/index';
-import { getLevel, LevelProgress, MasteryBadge } from '@progression/index';
+import { getLevel, getLocalizedLevelLabel, LevelProgress, MasteryBadge, type LevelKey } from '@progression/index';
 
 function HistoryGrid({
   checkIns,
@@ -256,21 +256,6 @@ function getRhythmColors(status: WeeklyRhythmStatus, isToday: boolean, theme: Re
     icon: undefined,
     iconColor: theme.text.tertiary,
   };
-}
-
-function getLevelLabel(
-  levelKey: 'seed' | 'sprout' | 'tree' | 'forest' | 'ancient',
-  t: ReturnType<typeof useTranslation>['t'],
-) {
-  const levelMap = {
-    seed: t('levels.seed'),
-    sprout: t('levels.sprout'),
-    tree: t('levels.tree'),
-    forest: t('levels.forest'),
-    ancient: t('levels.ancient'),
-  } as const;
-
-  return levelMap[levelKey];
 }
 
 export default function HabitDetailScreen() {
@@ -760,7 +745,7 @@ export default function HabitDetailScreen() {
               <MetricCard
                 label={t('habit_detail.commitment_score')}
                 value={score.toFixed(1)}
-                helper={getLevelLabel(level.key as 'seed' | 'sprout' | 'tree' | 'forest' | 'ancient', t)}
+                helper={getLocalizedLevelLabel(level.key as LevelKey, t)}
               />
               <MetricCard
                 label={t('habit_detail.best_streak')}

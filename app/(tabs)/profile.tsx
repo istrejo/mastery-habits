@@ -3,12 +3,12 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { Screen, Skeleton, Card } from "@core/components";
-import { useTheme, type MasteryLevel } from "@core/theming";
+import { useTheme } from "@core/theming";
 import { useSessionStore } from "@core/states/session.store";
 import { useHabits } from "@habits/index";
-import { getLevel, MasteryLevelIcon } from "@progression/index";
+import { getLevel, getLocalizedLevelLabel, MasteryLevelIcon, type LevelKey } from "@progression/index";
 
-const LEVEL_SCORE: Record<string, number> = { ancient: 100, forest: 80, tree: 58, sprout: 33, seed: 10 };
+const LEVEL_SCORE: Record<LevelKey, number> = { ancient: 100, forest: 80, tree: 58, sprout: 33, seed: 10 };
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -19,14 +19,15 @@ export default function ProfileScreen() {
 
   const avgScore = habits.length > 0 ? habits.reduce((sum, h) => sum + (h.mastery_scores?.score ?? 0), 0) / habits.length : 0;
   const globalLevel = getLevel(avgScore);
+  const globalLevelLabel = getLocalizedLevelLabel(globalLevel.key, t);
   const displayName = user?.user_metadata?.["display_name"] as string | undefined;
   const email = user?.email ?? "";
   const initials = displayName ? displayName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase() : email.slice(0, 2).toUpperCase();
-  const levelRows = (["seed", "sprout", "tree", "forest", "ancient"] as const)
+  const levelRows = (["seed", "sprout", "tree", "forest", "ancient"] as const satisfies readonly LevelKey[])
     .map((key) => {
       const count = habits.filter((h) => (h.mastery_scores?.level ?? "seed") === key).length;
       const level = getLevel(LEVEL_SCORE[key]!);
-      return { key, count, level };
+      return { key, count, label: getLocalizedLevelLabel(key, t), level };
     })
     .filter(({ count }) => count > 0);
 
@@ -122,7 +123,7 @@ export default function ProfileScreen() {
               </Text>
               <View style={{ borderWidth: theme.borderWidth.default, borderColor: theme.border.strong, borderRadius: theme.radius.pill, paddingHorizontal: 12, paddingVertical: 4 }}>
                 <Text style={{ color: theme.text.primary, fontSize: 12, fontFamily: "Lexend_500Medium", letterSpacing: 0.6, textTransform: "uppercase" }}>
-                  {globalLevel.label} Level
+                  {t("profile.level_chip", { level: globalLevelLabel })}
                 </Text>
               </View>
             </>
@@ -146,7 +147,7 @@ export default function ProfileScreen() {
               {t("profile.levels_section")}
             </Text>
             <View>
-              {levelRows.map(({ key, count, level }, index) => {
+              {levelRows.map(({ key, count, label, level }, index) => {
                 const isActive = globalLevel.key === level.key;
                 return (
                   <View
@@ -163,8 +164,8 @@ export default function ProfileScreen() {
                     }}
                   >
                     <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.stackMd }}>
-                      <MasteryLevelIcon level={key as MasteryLevel} size={20} />
-                      <Text style={{ color: theme.text.primary, fontSize: 18, lineHeight: 28, fontFamily: isActive ? "Lexend_500Medium" : "Lexend_400Regular" }}>{level.label}</Text>
+                      <MasteryLevelIcon level={key} size={20} />
+                      <Text style={{ color: theme.text.primary, fontSize: 18, lineHeight: 28, fontFamily: isActive ? "Lexend_500Medium" : "Lexend_400Regular" }}>{label}</Text>
                     </View>
                     <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.labelCaps.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.labelCaps.letterSpacing }}>
                       {t("profile.habits_count", { count })}

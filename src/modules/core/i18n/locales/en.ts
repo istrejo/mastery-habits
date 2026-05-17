@@ -24,6 +24,7 @@ export const en: TranslationKeys = {
     title: 'PROFILE',
     edit: 'Edit profile',
     score_global: 'GLOBAL SCORE',
+    level_chip: '{{level}} Level',
     habits_count_one: '{{count}} habit',
     habits_count_other: '{{count}} habits',
     levels_section: 'Habit Levels',
