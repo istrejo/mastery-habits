@@ -13,6 +13,7 @@ export type ThemeId =
   | 'tech-neon'
   | 'organic-growth'
   | 'minimal-light'
+  | 'minimal-dark'
   | 'brutalist-editorial'
   | 'cyberpunk'
   | 'terminal-phosphor';
