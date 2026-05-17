@@ -22,6 +22,7 @@ export const es = {
     title: 'PERFIL',
     edit: 'Editar perfil',
     score_global: 'SCORE GLOBAL',
+    level_chip: 'Nivel {{level}}',
     habits_count_one: '{{count}} hábito',
     habits_count_other: '{{count}} hábitos',
     levels_section: 'NIVELES DE HÁBITO',
@@ -211,11 +212,11 @@ export const es = {
   },
 
   levels: {
-    seed: 'Seed',
-    sprout: 'Sprout',
-    tree: 'Tree',
-    forest: 'Forest',
-    ancient: 'Ancient',
+    seed: 'Semilla',
+    sprout: 'Brote',
+    tree: 'Árbol',
+    forest: 'Bosque',
+    ancient: 'Ancestral',
   },
 
   tabs: {

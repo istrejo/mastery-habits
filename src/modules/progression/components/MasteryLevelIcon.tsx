@@ -1,5 +1,5 @@
-import type { MasteryLevel } from "@core/theming";
 import { useCurrentMode } from "@core/theming";
+import type { LevelKey } from "../types";
 import SeedDarkIcon from "../../../../assets/icons/dark/seed.svg";
 import SproutDarkIcon from "../../../../assets/icons/dark/sprout.svg";
 import TreeDarkIcon from "../../../../assets/icons/dark/tree.svg";
@@ -12,7 +12,7 @@ import ForestLightIcon from "../../../../assets/icons/light/forest.svg";
 import AncientLightIcon from "../../../../assets/icons/light/ancient.svg";
 
 interface MasteryLevelIconProps {
-  level: MasteryLevel;
+  level: LevelKey;
   size?: number;
 }
 

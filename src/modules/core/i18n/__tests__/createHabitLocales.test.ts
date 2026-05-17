@@ -11,6 +11,12 @@ describe('create habit locales', () => {
     expect(es.create_habit.frequency_presets.daily).toBe('Diario');
     expect(es.create_habit.frequency_presets.mon_fri).toBe('Lun-Vie');
     expect(es.create_habit.frequency_presets.custom).toBe('Personalizado');
+    expect(es.levels.seed).toBe('Semilla');
+    expect(es.levels.sprout).toBe('Brote');
+    expect(es.levels.tree).toBe('Árbol');
+    expect(es.levels.forest).toBe('Bosque');
+    expect(es.levels.ancient).toBe('Ancestral');
+    expect(es.profile.level_chip).toBe('Nivel {{level}}');
   });
 
   it('keeps the English locale aligned with the Stitch-style wording', () => {
@@ -19,5 +25,6 @@ describe('create habit locales', () => {
     expect(en.create_habit.sections.category).toBe('Category');
     expect(en.create_habit.sections.frequency).toBe('Frequency');
     expect(en.create_habit.select_days).toBe('Select days');
+    expect(en.profile.level_chip).toBe('{{level}} Level');
   });
 });
