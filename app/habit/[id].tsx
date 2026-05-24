@@ -31,6 +31,8 @@ import {
 import { CheckInButton, useCheckIn } from '@checkin/index';
 import { calculateStreak } from '@commitment/index';
 import { getLevel, getLocalizedLevelLabel, LevelProgress, MasteryBadge, type LevelKey } from '@progression/index';
+import { useHabitTasks, useTaskActions, TaskComposer, TaskList } from '@tasks/index';
+import type { Task } from '@tasks/index';
 
 function HistoryGrid({
   checkIns,
@@ -279,9 +281,26 @@ export default function HabitDetailScreen() {
     markSkipped,
   } = useCheckIn(habit ?? null);
 
+  const { tasks: habitTasks, refresh: refreshTasks } = useHabitTasks(id ?? '');
+  const { completeTask, uncompleteTask, deleteTask } = useTaskActions();
+
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
+
+  const handleToggleTask = async (task: Task) => {
+    if (task.status === 'completed') {
+      await uncompleteTask(task.id);
+    } else {
+      await completeTask(task.id);
+    }
+    await refreshTasks();
+  };
+
+  const handleDeleteTask = async (task: Task) => {
+    await deleteTask(task.id);
+    await refreshTasks();
+  };
 
   const DAY_LABELS: Record<number, string> = {
     1: t('habit_detail.day_mon'),
@@ -793,6 +812,29 @@ export default function HabitDetailScreen() {
             </View>
 
             <HistoryGrid checkIns={last30Days} />
+          </Card>
+
+          <Card style={{ marginTop: theme.spacing.stackMd }}>
+            <Text
+              style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
+                fontFamily: 'Lexend_600SemiBold',
+                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                textTransform: 'uppercase',
+                marginBottom: theme.spacing.stackMd,
+              }}
+            >
+              {t('tasks.title')}
+            </Text>
+            <TaskComposer habitId={id} onCreated={refreshTasks} />
+            <View style={{ marginTop: theme.spacing.stackSm }}>
+              <TaskList
+                tasks={habitTasks}
+                onToggle={handleToggleTask}
+                onDelete={handleDeleteTask}
+              />
+            </View>
           </Card>
         </ScrollView>
 
