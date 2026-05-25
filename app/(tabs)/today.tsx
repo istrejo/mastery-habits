@@ -10,18 +10,52 @@ import { useTheme } from '@core/theming';
 import { useDateLocale } from '@core/i18n';
 import { useHabits } from '@habits/index';
 import { useTodayCheckIns } from '@checkin/index';
-import { DashboardTaskRow, TaskCreateSheet, useTaskActions, useTodayTasks, type DashboardTaskStatus, type TaskCreateSheetValues, type TaskWithHabit } from '@tasks/index';
+import {
+  DashboardTaskRow,
+  TaskCreateSheet,
+  useTaskActions,
+  useTodayTasks,
+  type DashboardTaskStatus,
+  type TaskCreateSheetValues,
+  type TaskWithHabit,
+} from '@tasks/index';
 
 function Header({ onAdd }: { onAdd: () => void }) {
   const theme = useTheme();
   const { t } = useTranslation();
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.stackMd }}>
-      <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: 'Lexend_600SemiBold', letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: theme.spacing.stackMd,
+      }}
+    >
+      <Text
+        style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.microBold.fontSize,
+          fontFamily: 'Lexend_600SemiBold',
+          letterSpacing: theme.typography.scale.microBold.letterSpacing,
+          textTransform: 'uppercase',
+        }}
+      >
         {t('dashboard.app_name')}
       </Text>
-      <TouchableOpacity testID="today-add-task" onPress={onAdd} hitSlop={12} style={{ width: 40, height: 40, borderRadius: theme.radius.pill, alignItems: 'center', justifyContent: 'center' }}>
-        <MaterialIcons name="add" size={22} color={theme.text.primary} />
+      <TouchableOpacity
+        testID='today-add-task'
+        onPress={onAdd}
+        hitSlop={12}
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: theme.radius.pill,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <MaterialIcons name='add' size={22} color={theme.text.primary} />
       </TouchableOpacity>
     </View>
   );
@@ -32,10 +66,20 @@ function TodaySkeleton() {
   return (
     <View style={{ gap: theme.spacing.stackMd }}>
       <Card style={{ minHeight: 132 }}>
-        <Skeleton width="55%" height={14} style={{ marginBottom: theme.spacing.stackSm }} />
-        <Skeleton width="44%" height={theme.typography.scale.displaySm.fontSize} style={{ marginTop: theme.spacing.stackMd }} />
+        <Skeleton
+          width='55%'
+          height={14}
+          style={{ marginBottom: theme.spacing.stackSm }}
+        />
+        <Skeleton
+          width='44%'
+          height={theme.typography.scale.displaySm.fontSize}
+          style={{ marginTop: theme.spacing.stackMd }}
+        />
       </Card>
-      {[1, 2, 3].map((i) => <Skeleton key={i} height={94} borderRadius={theme.radius.lg} />)}
+      {[1, 2, 3].map((i) => (
+        <Skeleton key={i} height={94} borderRadius={theme.radius.lg} />
+      ))}
     </View>
   );
 }
@@ -45,7 +89,7 @@ function FloatingAddButton({ onPress }: { onPress: () => void }) {
 
   return (
     <TouchableOpacity
-      testID="today-add-task"
+      testID='today-add-task'
       onPress={onPress}
       activeOpacity={0.9}
       style={{
@@ -65,7 +109,7 @@ function FloatingAddButton({ onPress }: { onPress: () => void }) {
         elevation: 6,
       }}
     >
-      <MaterialIcons name="add" size={26} color={theme.text.inverse} />
+      <MaterialIcons name='add' size={26} color={theme.text.inverse} />
     </TouchableOpacity>
   );
 }
@@ -77,20 +121,39 @@ export default function TodayScreen() {
   const router = useRouter();
   const { habits, loading: habitsLoading } = useHabits();
   const { tasks, loading: tasksLoading, refresh } = useTodayTasks();
-  const { completeTask, createTaskWithSubtasks, toggleSubtask, uncompleteTask } = useTaskActions();
-  const { completedToday, completeHabit, undoHabit, submittingHabitIds } = useTodayCheckIns();
-  const [submittingTaskIds, setSubmittingTaskIds] = useState<Set<string>>(new Set());
-  const [createSheetVisible, setCreateSheetVisible] = useState(false);
-  const [creatingTask, setCreatingTask] = useState(false);
+  const {
+    completeTask,
+    createTaskWithSubtasks,
+    updateTaskWithSubtasks,
+    toggleSubtask,
+    uncompleteTask,
+  } = useTaskActions();
+  const { completedToday, completeHabit, undoHabit, submittingHabitIds } =
+    useTodayCheckIns();
+  const [submittingTaskIds, setSubmittingTaskIds] = useState<Set<string>>(
+    new Set()
+  );
+  const [sheetVisible, setSheetVisible] = useState(false);
+  const [sheetTask, setSheetTask] = useState<TaskWithHabit | null>(null);
+  const [submittingSheet, setSubmittingSheet] = useState(false);
   const today = new Date();
 
-  const formatStr = i18n.language === 'en' ? 'EEEE, MMMM d' : "EEEE d 'de' MMMM";
+  const formatStr =
+    i18n.language === 'en' ? 'EEEE, MMMM d' : "EEEE d 'de' MMMM";
   const todayLabel = format(today, formatStr, { locale: dateLocale });
-  const completedCount = tasks.filter((task) => task.status === 'completed').length;
+  const completedCount = tasks.filter(
+    (task) => task.status === 'completed'
+  ).length;
   const pendingTasks = tasks.filter((task) => task.status !== 'completed');
   const activeTaskId = pendingTasks[0]?.id;
   const completedAllToday = completedCount === tasks.length && tasks.length > 0;
-  const avgScore = habits.length > 0 ? habits.reduce((sum, habit) => sum + (habit.mastery_scores?.score ?? 0), 0) / habits.length : 0;
+  const avgScore =
+    habits.length > 0
+      ? habits.reduce(
+          (sum, habit) => sum + (habit.mastery_scores?.score ?? 0),
+          0
+        ) / habits.length
+      : 0;
   const loading = tasksLoading || habitsLoading;
 
   const getTaskStatus = (task: TaskWithHabit): DashboardTaskStatus => {
@@ -110,10 +173,18 @@ export default function TodayScreen() {
 
   const hasOtherCompletedTaskForHabit = (task: TaskWithHabit) => {
     if (!task.habit_id) return false;
-    return tasks.some((item) => item.id !== task.id && item.habit_id === task.habit_id && item.status === 'completed');
+    return tasks.some(
+      (item) =>
+        item.id !== task.id &&
+        item.habit_id === task.habit_id &&
+        item.status === 'completed'
+    );
   };
 
-  const syncHabitAfterTaskStatusChange = async (before: TaskWithHabit, after: TaskWithHabit | null) => {
+  const syncHabitAfterTaskStatusChange = async (
+    before: TaskWithHabit,
+    after: TaskWithHabit | null
+  ) => {
     if (!after || !before.habit_id) return;
 
     const wasCompleted = before.status === 'completed';
@@ -124,7 +195,12 @@ export default function TodayScreen() {
       return;
     }
 
-    if (wasCompleted && !isCompleted && completedToday.has(before.habit_id) && !hasOtherCompletedTaskForHabit(before)) {
+    if (
+      wasCompleted &&
+      !isCompleted &&
+      completedToday.has(before.habit_id) &&
+      !hasOtherCompletedTaskForHabit(before)
+    ) {
       await undoHabit(before.habit_id);
     }
   };
@@ -152,7 +228,10 @@ export default function TodayScreen() {
     }
   };
 
-  const handleSubtaskToggle = async (task: TaskWithHabit, subtaskId: string) => {
+  const handleSubtaskToggle = async (
+    task: TaskWithHabit,
+    subtaskId: string
+  ) => {
     if (submittingTaskIds.has(task.id)) return;
 
     setTaskSubmitting(task.id, true);
@@ -168,29 +247,53 @@ export default function TodayScreen() {
     }
   };
 
-  const handleCreateTask = async (values: TaskCreateSheetValues) => {
-    setCreatingTask(true);
+  const handleSheetSubmit = async (values: TaskCreateSheetValues) => {
+    setSubmittingSheet(true);
     try {
-      const created = await createTaskWithSubtasks({
-        title: values.title,
-        notes: values.notes ?? null,
-        subtasks: values.subtasks,
-      });
-      if (!created) throw new Error('task_not_created');
+      if (sheetTask) {
+        const before = sheetTask;
+        const updated = await updateTaskWithSubtasks(sheetTask.id, {
+          title: values.title,
+          notes: values.notes ?? null,
+          subtasks: values.subtasks,
+        });
+        if (!updated) throw new Error('task_not_updated');
+        await syncHabitAfterTaskStatusChange(before, updated);
+      } else {
+        const created = await createTaskWithSubtasks({
+          title: values.title,
+          notes: values.notes ?? null,
+          subtasks: values.subtasks,
+        });
+        if (!created) throw new Error('task_not_created');
+      }
       await refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown_error';
-      Alert.alert('Could not create task', message);
+      Alert.alert(
+        sheetTask ? 'Could not update task' : 'Could not create task',
+        message
+      );
       throw error;
     } finally {
-      setCreatingTask(false);
+      setSubmittingSheet(false);
     }
   };
 
-  const goToNewTask = () => setCreateSheetVisible(true);
+  const openCreateSheet = () => {
+    setSheetTask(null);
+    setSheetVisible(true);
+  };
+
+  const openEditSheet = (task: TaskWithHabit) => {
+    setSheetTask(task);
+    setSheetVisible(true);
+  };
 
   return (
-    <Screen contentStyle={{ paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }}>
+    <Screen
+      contentStyle={{ paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }}
+    >
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: theme.spacing.marginMobile,
@@ -199,65 +302,222 @@ export default function TodayScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <Header onAdd={goToNewTask} />
+        <Header onAdd={openCreateSheet} />
 
-        {loading ? <TodaySkeleton /> : tasks.length === 0 ? (
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: theme.spacing.stackLg * 2 }}>
-            <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleLg.fontSize, lineHeight: theme.typography.scale.titleLg.lineHeight, fontFamily: 'Anton_400Regular', textAlign: 'center', textTransform: 'uppercase', marginBottom: theme.spacing.stackSm }}>
+        {loading ? (
+          <TodaySkeleton />
+        ) : tasks.length === 0 ? (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: theme.spacing.stackLg * 2,
+            }}
+          >
+            <Text
+              style={{
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.titleLg.fontSize,
+                lineHeight: theme.typography.scale.titleLg.lineHeight,
+                fontFamily: 'Anton_400Regular',
+                textAlign: 'center',
+                textTransform: 'uppercase',
+                marginBottom: theme.spacing.stackSm,
+              }}
+            >
               {t('dashboard.empty_tasks_title')}
             </Text>
-            <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: 'Lexend_400Regular', textAlign: 'center', marginBottom: theme.spacing.stackLg }}>
+            <Text
+              style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.bodyMain.fontSize,
+                lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                fontFamily: 'Lexend_400Regular',
+                textAlign: 'center',
+                marginBottom: theme.spacing.stackLg,
+              }}
+            >
               {t('dashboard.empty_tasks_body')}
             </Text>
-            <Button label={t('dashboard.create_task')} onPress={goToNewTask} iconRight="arrow-forward" />
+            <Button
+              label={t('dashboard.create_task')}
+              onPress={openCreateSheet}
+              iconRight='arrow-forward'
+            />
           </View>
         ) : (
           <View style={{ gap: theme.spacing.stackMd }}>
-            <Card style={{ minHeight: 150, justifyContent: 'space-between', padding: 18 }}>
+            <Card
+              style={{
+                minHeight: 150,
+                justifyContent: 'space-between',
+                padding: 18,
+              }}
+            >
               <View>
-                <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.labelCaps.fontSize, lineHeight: theme.typography.scale.labelCaps.lineHeight, fontFamily: 'Lexend_600SemiBold', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 6 }}>
+                <Text
+                  style={{
+                    color: theme.text.secondary,
+                    fontSize: theme.typography.scale.labelCaps.fontSize,
+                    lineHeight: theme.typography.scale.labelCaps.lineHeight,
+                    fontFamily: 'Lexend_600SemiBold',
+                    letterSpacing: 1.4,
+                    textTransform: 'uppercase',
+                    marginBottom: 6,
+                  }}
+                >
                   {t('dashboard.today_protocol')}
                 </Text>
-                <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: 'Lexend_400Regular' }}>
-                  {completedAllToday ? t('dashboard.tasks_all_done') : t('dashboard.tasks_today', { count: tasks.length })}
+                <Text
+                  style={{
+                    color: theme.text.secondary,
+                    fontSize: theme.typography.scale.bodyMain.fontSize,
+                    lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                    fontFamily: 'Lexend_400Regular',
+                  }}
+                >
+                  {completedAllToday
+                    ? t('dashboard.tasks_all_done')
+                    : t('dashboard.tasks_today', { count: tasks.length })}
                 </Text>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: theme.spacing.stackMd }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  justifyContent: 'space-between',
+                  marginTop: theme.spacing.stackMd,
+                }}
+              >
                 <View>
-                  <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.displaySm.fontSize, lineHeight: theme.typography.scale.displaySm.lineHeight, fontFamily: 'Anton_400Regular', letterSpacing: theme.typography.scale.displaySm.letterSpacing, fontVariant: ['tabular-nums'] }}>
+                  <Text
+                    style={{
+                      color: theme.text.primary,
+                      fontSize: theme.typography.scale.displaySm.fontSize,
+                      lineHeight: theme.typography.scale.displaySm.lineHeight,
+                      fontFamily: 'Anton_400Regular',
+                      letterSpacing:
+                        theme.typography.scale.displaySm.letterSpacing,
+                      fontVariant: ['tabular-nums'],
+                    }}
+                  >
                     {avgScore.toFixed(1)}
                   </Text>
-                  <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, lineHeight: theme.typography.scale.microBold.lineHeight, fontFamily: 'Lexend_600SemiBold', letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
+                  <Text
+                    style={{
+                      color: theme.text.secondary,
+                      fontSize: theme.typography.scale.microBold.fontSize,
+                      lineHeight: theme.typography.scale.microBold.lineHeight,
+                      fontFamily: 'Lexend_600SemiBold',
+                      letterSpacing:
+                        theme.typography.scale.microBold.letterSpacing,
+                      textTransform: 'uppercase',
+                    }}
+                  >
                     / 100 Mastery Index
                   </Text>
                 </View>
-                <View style={{ width: 48, height: 48, borderRadius: theme.radius.pill, borderWidth: 2, borderColor: theme.text.primary, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  <MaterialIcons name="task-alt" size={24} color={theme.text.primary} />
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: theme.radius.pill,
+                    borderWidth: 2,
+                    borderColor: theme.text.primary,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                  }}
+                >
+                  <MaterialIcons
+                    name='task-alt'
+                    size={24}
+                    color={theme.text.primary}
+                  />
                 </View>
               </View>
             </Card>
 
             <Card style={{ padding: 14 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <View style={{ flex: 1, paddingRight: theme.spacing.stackSm }}>
-                  <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, lineHeight: theme.typography.scale.microBold.lineHeight, fontFamily: 'Lexend_600SemiBold', letterSpacing: 1.1, textTransform: 'uppercase', marginBottom: 4 }}>
+                  <Text
+                    style={{
+                      color: theme.text.secondary,
+                      fontSize: theme.typography.scale.microBold.fontSize,
+                      lineHeight: theme.typography.scale.microBold.lineHeight,
+                      fontFamily: 'Lexend_600SemiBold',
+                      letterSpacing: 1.1,
+                      textTransform: 'uppercase',
+                      marginBottom: 4,
+                    }}
+                  >
                     {t('dashboard.environment')}
                   </Text>
-                  <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.bodyMain.fontSize, lineHeight: theme.typography.scale.bodyMain.lineHeight, fontFamily: 'Lexend_600SemiBold' }}>
+                  <Text
+                    style={{
+                      color: theme.text.primary,
+                      fontSize: theme.typography.scale.bodyMain.fontSize,
+                      lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                      fontFamily: 'Lexend_600SemiBold',
+                    }}
+                  >
                     {todayLabel}
                   </Text>
                 </View>
-                <MaterialIcons name="wb-sunny" size={22} color={theme.text.primary} />
+                <MaterialIcons
+                  name='wb-sunny'
+                  size={22}
+                  color={theme.text.primary}
+                />
               </View>
             </Card>
 
             <View style={{ marginTop: theme.spacing.stackSm }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.stackMd, paddingBottom: theme.spacing.stackSm, borderBottomWidth: theme.borderWidth.default, borderBottomColor: theme.border.default }}>
-                <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.titleSm.fontSize, lineHeight: theme.typography.scale.titleSm.lineHeight, fontFamily: 'Anton_400Regular', textTransform: 'uppercase' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: theme.spacing.stackMd,
+                  paddingBottom: theme.spacing.stackSm,
+                  borderBottomWidth: theme.borderWidth.default,
+                  borderBottomColor: theme.border.default,
+                }}
+              >
+                <Text
+                  style={{
+                    color: theme.text.primary,
+                    fontSize: theme.typography.scale.titleSm.fontSize,
+                    lineHeight: theme.typography.scale.titleSm.lineHeight,
+                    fontFamily: 'Anton_400Regular',
+                    textTransform: 'uppercase',
+                  }}
+                >
                   {t('dashboard.tasks_section')}
                 </Text>
-                <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.labelCaps.fontSize, lineHeight: theme.typography.scale.labelCaps.lineHeight, fontFamily: 'Lexend_600SemiBold', letterSpacing: theme.typography.scale.labelCaps.letterSpacing, textTransform: 'uppercase' }}>
-                  {t('dashboard.tasks_completed', { completed: completedCount, count: tasks.length })}
+                <Text
+                  style={{
+                    color: theme.text.secondary,
+                    fontSize: theme.typography.scale.labelCaps.fontSize,
+                    lineHeight: theme.typography.scale.labelCaps.lineHeight,
+                    fontFamily: 'Lexend_600SemiBold',
+                    letterSpacing:
+                      theme.typography.scale.labelCaps.letterSpacing,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {t('dashboard.tasks_completed', {
+                    completed: completedCount,
+                    count: tasks.length,
+                  })}
                 </Text>
               </View>
 
@@ -266,10 +526,17 @@ export default function TodayScreen() {
                   key={task.id}
                   task={task}
                   status={getTaskStatus(task)}
-                  inlineProgressPercent={activeTaskId === task.id ? 30 : undefined}
-                  checkDisabled={submittingTaskIds.has(task.id) || (task.habit_id ? submittingHabitIds.has(task.habit_id) : false)}
+                  inlineProgressPercent={
+                    activeTaskId === task.id ? 30 : undefined
+                  }
+                  checkDisabled={
+                    submittingTaskIds.has(task.id) ||
+                    (task.habit_id
+                      ? submittingHabitIds.has(task.habit_id)
+                      : false)
+                  }
                   submitting={submittingTaskIds.has(task.id)}
-                  onPressRow={() => router.push('/tasks')}
+                  onPressRow={() => openEditSheet(task)}
                   onPressCheck={() => {
                     void handleInlineToggle(task);
                   }}
@@ -283,12 +550,16 @@ export default function TodayScreen() {
         )}
       </ScrollView>
 
-      <FloatingAddButton onPress={goToNewTask} />
+      <FloatingAddButton onPress={openCreateSheet} />
       <TaskCreateSheet
-        visible={createSheetVisible}
-        submitting={creatingTask}
-        onClose={() => setCreateSheetVisible(false)}
-        onSubmit={handleCreateTask}
+        task={sheetTask}
+        visible={sheetVisible}
+        submitting={submittingSheet}
+        onClose={() => {
+          setSheetVisible(false);
+          setSheetTask(null);
+        }}
+        onSubmit={handleSheetSubmit}
       />
     </Screen>
   );

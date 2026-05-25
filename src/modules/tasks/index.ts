@@ -12,6 +12,15 @@ export { TaskCreateSheet } from './components/TaskCreateSheet';
 export { TaskComposer } from './components/TaskComposer';
 export { isOverdue } from './utils/isOverdue';
 export { groupTasksByHabit } from './utils/groupTasksByHabit';
-export type { Task, TaskInsert, TaskUpdate, TaskSubtask, TaskSubtaskInsert, TaskWithHabit, TaskStatus, CreateTaskWithSubtasksInput } from './types';
+export type {
+  Task,
+  TaskInsert,
+  TaskUpdate,
+  TaskSubtask,
+  TaskSubtaskInsert,
+  TaskWithHabit,
+  TaskStatus,
+  CreateTaskWithSubtasksInput,
+} from './types';
 export type { DashboardTaskStatus } from './components/DashboardTaskRow';
 export type { TaskCreateSheetValues } from './components/TaskCreateSheet';

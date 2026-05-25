@@ -261,6 +261,7 @@ export const es = {
       subtask_placeholder: 'Subtarea',
       add_subtask: 'Agregar subtarea',
       create: 'Crear tarea',
+      save: 'Guardar',
     },
     form: {
       title_label: 'Título',

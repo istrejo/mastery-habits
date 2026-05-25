@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   KeyboardAvoidingView,
@@ -14,6 +14,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
+import type { TaskWithHabit } from '../types';
 
 export interface TaskCreateSheetValues {
   title: string;
@@ -22,6 +23,7 @@ export interface TaskCreateSheetValues {
 }
 
 interface TaskCreateSheetProps {
+  task?: TaskWithHabit | null;
   visible: boolean;
   submitting?: boolean;
   onClose: () => void;
@@ -29,6 +31,7 @@ interface TaskCreateSheetProps {
 }
 
 export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
+  task,
   visible,
   submitting = false,
   onClose,
@@ -41,6 +44,21 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
   const [notes, setNotes] = useState('');
   const [subtasks, setSubtasks] = useState<string[]>([]);
   const [subtaskDraft, setSubtaskDraft] = useState('');
+  const isEditMode = !!task;
+
+  useEffect(() => {
+    if (task && visible) {
+      setTitle(task.title);
+      setNotes(task.description || '');
+      setSubtasks((task.task_subtasks ?? []).map((st) => st.title));
+      setSubtaskDraft('');
+    } else if (!visible) {
+      setTitle('');
+      setNotes('');
+      setSubtasks([]);
+      setSubtaskDraft('');
+    }
+  }, [task, visible]);
 
   const panResponder = useMemo(
     () =>
@@ -82,7 +100,9 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
         .map((item) => item.trim())
         .filter(Boolean),
     });
-    reset();
+    if (!isEditMode) {
+      reset();
+    }
     onClose();
   };
 
@@ -184,7 +204,11 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
 
                 <TouchableOpacity
                   testID='task-sheet-submit'
-                  accessibilityLabel='Add task from top bar'
+                  accessibilityLabel={
+                    isEditMode
+                      ? 'Save task from top bar'
+                      : 'Add task from top bar'
+                  }
                   onPress={handleSubmit}
                   disabled={!title.trim() || submitting}
                   activeOpacity={0.85}
@@ -203,7 +227,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                       fontSize: theme.typography.scale.bodyMain.fontSize,
                     }}
                   >
-                    {t('tasks.sheet.create')}
+                    {t(isEditMode ? 'tasks.sheet.save' : 'tasks.sheet.create')}
                   </Text>
                 </TouchableOpacity>
               </View>

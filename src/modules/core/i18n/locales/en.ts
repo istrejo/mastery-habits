@@ -259,6 +259,7 @@ export const en: TranslationKeys = {
       subtask_placeholder: 'Subtask',
       add_subtask: 'Add subtask',
       create: 'Add',
+      save: 'Save',
     },
     form: {
       title_label: 'Title',

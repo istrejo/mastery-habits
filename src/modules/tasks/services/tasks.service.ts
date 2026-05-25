@@ -1,13 +1,21 @@
 import { addDays, format } from 'date-fns';
 import { supabase } from '@core/lib/supabase';
 import { useSessionStore } from '@core/states/session.store';
-import type { CreateTaskWithSubtasksInput, TaskInsert, TaskSubtask, TaskUpdate, TaskWithHabit } from '../types';
+import type {
+  CreateTaskWithSubtasksInput,
+  TaskInsert,
+  TaskSubtask,
+  TaskUpdate,
+  TaskWithHabit,
+} from '../types';
 
 const TASK_SELECT = '*, habits(id, name), task_subtasks(*)';
 
 const sortTaskSubtasks = (task: TaskWithHabit): TaskWithHabit => ({
   ...task,
-  task_subtasks: [...(task.task_subtasks ?? [])].sort((a, b) => a.order_index - b.order_index),
+  task_subtasks: [...(task.task_subtasks ?? [])].sort(
+    (a, b) => a.order_index - b.order_index
+  ),
 });
 
 const getTodayRange = () => {
@@ -88,10 +96,14 @@ export const tasksService = {
     return sortTaskSubtasks(data as TaskWithHabit);
   },
 
-  async createWithSubtasks(input: CreateTaskWithSubtasksInput): Promise<TaskWithHabit> {
+  async createWithSubtasks(
+    input: CreateTaskWithSubtasksInput
+  ): Promise<TaskWithHabit> {
     const userId = requireUserId();
     const title = input.title.trim();
-    const subtasks = (input.subtasks ?? []).map((item) => item.trim()).filter(Boolean);
+    const subtasks = (input.subtasks ?? [])
+      .map((item) => item.trim())
+      .filter(Boolean);
     const today = format(new Date(), 'yyyy-MM-dd');
 
     const task = await tasksService.create({
@@ -174,7 +186,10 @@ export const tasksService = {
     });
   },
 
-  async toggleSubtask(taskId: string, subtaskId: string): Promise<TaskWithHabit> {
+  async toggleSubtask(
+    taskId: string,
+    subtaskId: string
+  ): Promise<TaskWithHabit> {
     const userId = requireUserId();
     const { data: subtask, error: readError } = await supabase
       .from('task_subtasks')
@@ -188,24 +203,76 @@ export const tasksService = {
     const isCompleting = subtask.status !== 'completed';
     const { error: updateError } = await supabase
       .from('task_subtasks')
-      .update({ status: isCompleting ? 'completed' : 'pending', completed_at: isCompleting ? new Date().toISOString() : null })
+      .update({
+        status: isCompleting ? 'completed' : 'pending',
+        completed_at: isCompleting ? new Date().toISOString() : null,
+      })
       .eq('id', subtaskId);
 
     if (updateError) throw new Error(updateError.message);
 
     const task = await tasksService.getById(taskId);
     const hasSubtasks = task.task_subtasks.length > 0;
-    const allCompleted = hasSubtasks && task.task_subtasks.every((item) => item.status === 'completed');
+    const allCompleted =
+      hasSubtasks &&
+      task.task_subtasks.every((item) => item.status === 'completed');
 
     if (allCompleted && task.status !== 'completed') {
-      return tasksService.update(taskId, { status: 'completed', completed_at: new Date().toISOString() });
+      return tasksService.update(taskId, {
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      });
     }
 
     if (!allCompleted && task.status === 'completed') {
-      return tasksService.update(taskId, { status: 'pending', completed_at: null });
+      return tasksService.update(taskId, {
+        status: 'pending',
+        completed_at: null,
+      });
     }
 
     return task;
+  },
+
+  async updateWithSubtasks(
+    id: string,
+    input: CreateTaskWithSubtasksInput
+  ): Promise<TaskWithHabit> {
+    const userId = requireUserId();
+    const title = input.title.trim();
+    const newSubtasks = (input.subtasks ?? [])
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const task = await tasksService.update(id, {
+      title,
+      description: input.notes?.trim() || null,
+    });
+
+    const { error: deleteError } = await supabase
+      .from('task_subtasks')
+      .delete()
+      .eq('task_id', id);
+
+    if (deleteError) throw new Error(deleteError.message);
+
+    if (newSubtasks.length === 0) return { ...task, task_subtasks: [] };
+
+    const rows = newSubtasks.map((subtask, index) => ({
+      task_id: id,
+      user_id: userId,
+      title: subtask,
+      order_index: index,
+    }));
+
+    const { data, error } = await supabase
+      .from('task_subtasks')
+      .insert(rows)
+      .select('*')
+      .order('order_index', { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return { ...task, task_subtasks: (data ?? []) as TaskSubtask[] };
   },
 
   async delete(id: string): Promise<void> {

@@ -20,7 +20,7 @@ export const useTaskActions = () => {
         return null;
       }
     },
-    [upsertTask],
+    [upsertTask]
   );
 
   const createTaskWithSubtasks = useCallback(
@@ -36,7 +36,7 @@ export const useTaskActions = () => {
         return null;
       }
     },
-    [upsertTask],
+    [upsertTask]
   );
 
   const completeTask = useCallback(
@@ -52,7 +52,7 @@ export const useTaskActions = () => {
         return null;
       }
     },
-    [upsertTask],
+    [upsertTask]
   );
 
   const uncompleteTask = useCallback(
@@ -68,7 +68,7 @@ export const useTaskActions = () => {
         return null;
       }
     },
-    [upsertTask],
+    [upsertTask]
   );
 
   const toggleSubtask = useCallback(
@@ -84,7 +84,23 @@ export const useTaskActions = () => {
         return null;
       }
     },
-    [upsertTask],
+    [upsertTask]
+  );
+
+  const updateTaskWithSubtasks = useCallback(
+    async (id: string, input: CreateTaskWithSubtasksInput) => {
+      setError(null);
+      try {
+        const task = await tasksService.updateWithSubtasks(id, input);
+        upsertTask(task);
+        return task;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'unknown_error';
+        setError(msg);
+        return null;
+      }
+    },
+    [upsertTask]
   );
 
   const deleteTask = useCallback(
@@ -100,8 +116,17 @@ export const useTaskActions = () => {
         return false;
       }
     },
-    [removeTask],
+    [removeTask]
   );
 
-  return { createTask, createTaskWithSubtasks, completeTask, uncompleteTask, toggleSubtask, deleteTask, error };
+  return {
+    createTask,
+    createTaskWithSubtasks,
+    updateTaskWithSubtasks,
+    completeTask,
+    uncompleteTask,
+    toggleSubtask,
+    deleteTask,
+    error,
+  };
 };
