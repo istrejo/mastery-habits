@@ -47,6 +47,7 @@ src/shared/
 **Module isolation rule:** modules never import directly from each other — only from `core/` or `shared/`. Each module's public API lives in its `index.ts` barrel.
 
 **Consistent module pattern:**
+
 ```
 <module>/
 ├── index.ts        ← public API (barrel)
@@ -60,6 +61,7 @@ src/shared/
 ```
 
 **Screens** live in `app/` (Expo Router file-based routing):
+
 ```
 app/
 ├── _layout.tsx          ← root layout + auth gate
@@ -73,22 +75,24 @@ app/
 
 ## Path Aliases (tsconfig + jest.config)
 
-| Alias | Maps to |
-|-------|---------|
-| `@core/*` | `src/modules/core/*` |
-| `@auth/*` | `src/modules/auth/*` |
-| `@habits/*` | `src/modules/habits/*` |
-| `@checkin/*` | `src/modules/check-in/*` |
-| `@commitment/*` | `src/modules/commitment/*` |
+| Alias            | Maps to                     |
+| ---------------- | --------------------------- |
+| `@core/*`        | `src/modules/core/*`        |
+| `@auth/*`        | `src/modules/auth/*`        |
+| `@habits/*`      | `src/modules/habits/*`      |
+| `@checkin/*`     | `src/modules/check-in/*`    |
+| `@commitment/*`  | `src/modules/commitment/*`  |
 | `@progression/*` | `src/modules/progression/*` |
-| `@shared/*` | `src/shared/*` |
+| `@shared/*`      | `src/shared/*`              |
 
 ## Core Business Logic
 
 **Commitment Score formula:**
+
 ```
 Score_today = (Score_yesterday × 0.8) + (Compliance × 20)
 ```
+
 - `Compliance = 1` → planned day completed (or weekly skip used)
 - `Compliance = 0` → planned day missed
 - Non-planned day → score unchanged
@@ -110,11 +114,19 @@ Score runs in two places: Supabase RPC `register_check_in` (production) and `src
 ## Database
 
 3 SQL migrations in `supabase/migrations/`:
+
 - `0001` → tables: `profiles`, `habits`, `check_ins`, `mastery_scores`
 - `0002` → RLS policies + auto-create profile on signup trigger
 - `0003` → RPCs: `register_check_in`, `calculate_mastery_level`, `has_used_weekly_skip`
 
 RLS enforces row-level user isolation — no cross-user data access.
+
+## Environment Variables
+
+Required in `.env`:
+
+- `EXPO_PUBLIC_SUPABASE_URL` — Supabase project URL (local or production)
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
 
 ## Key Tech
 

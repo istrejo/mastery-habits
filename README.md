@@ -8,17 +8,17 @@ Habit tracker de alta fidelidad basado en **Commitment Score** y niveles de maes
 
 ## Stack
 
-| Capa | Tecnología |
-|---|---|
-| Framework | React Native + Expo SDK 54 |
-| Navegación | Expo Router v6 (file-based) |
-| Estilos | NativeWind v4 (Tailwind para RN) |
-| Estado global | Zustand v5 |
-| Backend | Supabase (PostgreSQL + Auth + RLS + RPC) |
-| Forms | react-hook-form + zod |
-| Fechas | date-fns |
-| Testing | Jest + ts-jest |
-| Lenguaje | TypeScript strict |
+| Capa          | Tecnología                               |
+| ------------- | ---------------------------------------- |
+| Framework     | React Native + Expo SDK 54               |
+| Navegación    | Expo Router v6 (file-based)              |
+| Estilos       | NativeWind v4 (Tailwind para RN)         |
+| Estado global | Zustand v5                               |
+| Backend       | Supabase (PostgreSQL + Auth + RLS + RPC) |
+| Forms         | react-hook-form + zod                    |
+| Fechas        | date-fns                                 |
+| Testing       | Jest + ts-jest                           |
+| Lenguaje      | TypeScript strict                        |
 
 ---
 
@@ -62,10 +62,10 @@ npx expo start
 
 ## Variables de entorno
 
-| Variable | Descripción |
-|---|---|
-| `EXPO_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase (local o producción) |
-| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Anon key pública de Supabase |
+| Variable                        | Descripción                                    |
+| ------------------------------- | ---------------------------------------------- |
+| `EXPO_PUBLIC_SUPABASE_URL`      | URL del proyecto Supabase (local o producción) |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Anon key pública de Supabase                   |
 
 ---
 
@@ -128,11 +128,11 @@ app/
 Score_hoy = (Score_ayer × 0.8) + (Compliance_hoy × 20)
 ```
 
-| `Compliance` | Condición |
-|---|---|
-| `1` | Día planificado y completado (o skip semanal usado) |
-| `0` | Día planificado y NO completado |
-| — | Día no planificado → score se mantiene igual |
+| `Compliance` | Condición                                           |
+| ------------ | --------------------------------------------------- |
+| `1`          | Día planificado y completado (o skip semanal usado) |
+| `0`          | Día planificado y NO completado                     |
+| —            | Día no planificado → score se mantiene igual        |
 
 - **Rango:** 0–100
 - **Score inicial:** 0
@@ -140,13 +140,13 @@ Score_hoy = (Score_ayer × 0.8) + (Compliance_hoy × 20)
 
 ### Niveles de Maestría
 
-| Nivel | Rango | Emoji |
-|---|---|---|
-| Seed | 0–20 | 🌱 |
-| Sprout | 21–45 | 🌿 |
-| Tree | 46–70 | 🌳 |
-| Forest | 71–90 | 🌲 |
-| Ancient | 91–100 | 🗿 |
+| Nivel   | Rango  | Emoji |
+| ------- | ------ | ----- |
+| Seed    | 0–20   | 🌱    |
+| Sprout  | 21–45  | 🌿    |
+| Tree    | 46–70  | 🌳    |
+| Forest  | 71–90  | 🌲    |
+| Ancient | 91–100 | 🗿    |
 
 ### Grace Period
 
@@ -160,25 +160,27 @@ Score_hoy = (Score_ayer × 0.8) + (Compliance_hoy × 20)
 
 Cada hábito pertenece a una de 8 áreas de vida predefinidas o a una categoría personalizada.
 
-| ID | Emoji | Color | Descripción |
-|---|---|---|---|
-| `health` | 💪 | green | Ejercicio, sueño, movimiento |
-| `mind` | 🧘 | violet | Meditación, journaling, terapia |
-| `learning` | 📚 | blue | Lectura, cursos, idiomas |
-| `productivity` | ⚡ | yellow | Deep work, planificación, foco |
-| `nutrition` | 🥗 | orange | Hidratación, alimentación consciente |
-| `creativity` | 🎨 | pink | Escribir, crear, side projects |
-| `social` | 👥 | cyan | Familia, amigos, networking |
-| `finance` | 💰 | emerald | Ahorro, gastos, inversión |
-| `custom` | ✨ | neutral | El usuario define label + emoji |
+| ID             | Emoji | Color   | Descripción                          |
+| -------------- | ----- | ------- | ------------------------------------ |
+| `health`       | 💪    | green   | Ejercicio, sueño, movimiento         |
+| `mind`         | 🧘    | violet  | Meditación, journaling, terapia      |
+| `learning`     | 📚    | blue    | Lectura, cursos, idiomas             |
+| `productivity` | ⚡    | yellow  | Deep work, planificación, foco       |
+| `nutrition`    | 🥗    | orange  | Hidratación, alimentación consciente |
+| `creativity`   | 🎨    | pink    | Escribir, crear, side projects       |
+| `social`       | 👥    | cyan    | Familia, amigos, networking          |
+| `finance`      | 💰    | emerald | Ahorro, gastos, inversión            |
+| `custom`       | ✨    | neutral | El usuario define label + emoji      |
 
 **Comportamiento:**
+
 - Obligatoria al crear un hábito — no hay hábitos sin categoría
 - Editable sin perder histórico, score ni racha
 - `custom` requiere `custom_label` (máx 30 chars) y `custom_emoji`
 - Los hábitos migrados desde antes de esta feature aparecen como "Sin categorizar 📌" con un banner que invita a recategorizar
 
 **Implementación:**
+
 - Catálogo: `src/modules/habits/constants/categories.ts`
 - Resolver de display: `src/modules/habits/utils/resolveCategory.ts`
 - Componentes: `CategoryBadge`, `CategoryPicker`, `CustomCategoryInput` en `src/modules/habits/components/`
@@ -190,11 +192,11 @@ Cada hábito pertenece a una de 8 áreas de vida predefinidas o a una categoría
 
 4 migraciones en `supabase/migrations/`:
 
-| Migración | Qué hace |
-|---|---|
-| `0001_initial_schema.sql` | Tablas: `profiles`, `habits`, `check_ins`, `mastery_scores` |
-| `0002_rls_policies.sql` | RLS policies + trigger para crear perfil en signup |
-| `0003_rpc_functions.sql` | `register_check_in` RPC, `calculate_mastery_level`, `has_used_weekly_skip` |
+| Migración                   | Qué hace                                                                            |
+| --------------------------- | ----------------------------------------------------------------------------------- |
+| `0001_initial_schema.sql`   | Tablas: `profiles`, `habits`, `check_ins`, `mastery_scores`                         |
+| `0002_rls_policies.sql`     | RLS policies + trigger para crear perfil en signup                                  |
+| `0003_rpc_functions.sql`    | `register_check_in` RPC, `calculate_mastery_level`, `has_used_weekly_skip`          |
 | `0004_habit_categories.sql` | Enum `habit_category`, columnas `custom_label`/`custom_emoji`, constraints e índice |
 
 RLS garantiza aislamiento total por usuario — ningún usuario puede leer datos de otro.

@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   Screen,
   Card,
@@ -156,6 +157,14 @@ export default function TodayScreen() {
   const [sheetTask, setSheetTask] = useState<TaskWithHabit | null>(null);
   const [submittingSheet, setSubmittingSheet] = useState(false);
   const today = new Date();
+
+  // Detección simple de día/noche por hora local (6am-6pm = día)
+  const currentHour = today.getHours();
+  const isDaytime = currentHour >= 6 && currentHour < 18;
+
+  // Gradientes para día/noche
+  const dayGradient = ['#FFA726', '#FFEB3B'] as const;
+  const nightGradient = ['#1A237E', '#4A148C'] as const;
 
   const formatStr =
     i18n.language === 'en' ? 'EEEE, MMMM d' : "EEEE d 'de' MMMM";
@@ -442,132 +451,91 @@ export default function TodayScreen() {
               style={{
                 minHeight: 150,
                 justifyContent: 'space-between',
-                padding: 18,
+                padding: 0,
+                overflow: 'hidden',
               }}
             >
-              <View>
-                <Text
-                  style={{
-                    color: theme.text.secondary,
-                    fontSize: theme.typography.scale.labelCaps.fontSize,
-                    lineHeight: theme.typography.scale.labelCaps.lineHeight,
-                    fontFamily: 'Lexend_600SemiBold',
-                    letterSpacing: 1.4,
-                    textTransform: 'uppercase',
-                    marginBottom: 6,
-                  }}
-                >
-                  {t('dashboard.today_protocol')}
-                </Text>
-                <Text
-                  style={{
-                    color: theme.text.secondary,
-                    fontSize: theme.typography.scale.bodyMain.fontSize,
-                    lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                    fontFamily: 'Lexend_400Regular',
-                  }}
-                >
-                  {completedAllToday
-                    ? t('dashboard.tasks_all_done')
-                    : t('dashboard.tasks_today', { count: tasks.length })}
-                </Text>
-              </View>
-              <View
+              <LinearGradient
+                colors={isDaytime ? dayGradient : nightGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
+                  flex: 1,
+                  padding: 18,
                   justifyContent: 'space-between',
-                  marginTop: theme.spacing.stackMd,
                 }}
               >
                 <View>
                   <Text
                     style={{
-                      color: theme.text.primary,
-                      fontSize: theme.typography.scale.displaySm.fontSize,
-                      lineHeight: theme.typography.scale.displaySm.lineHeight,
-                      fontFamily: 'Anton_400Regular',
-                      letterSpacing:
-                        theme.typography.scale.displaySm.letterSpacing,
-                      fontVariant: ['tabular-nums'],
+                      color: '#FFFFFF',
+                      fontSize: theme.typography.scale.labelCaps.fontSize,
+                      lineHeight: theme.typography.scale.labelCaps.lineHeight,
+                      fontFamily: 'Lexend_600SemiBold',
+                      letterSpacing: 1.4,
+                      textTransform: 'uppercase',
+                      marginBottom: 6,
+                      opacity: 0.9,
                     }}
                   >
-                    {avgScore.toFixed(1)}
+                    {t('dashboard.today_protocol')}
                   </Text>
                   <Text
                     style={{
-                      color: theme.text.secondary,
-                      fontSize: theme.typography.scale.microBold.fontSize,
-                      lineHeight: theme.typography.scale.microBold.lineHeight,
-                      fontFamily: 'Lexend_600SemiBold',
-                      letterSpacing:
-                        theme.typography.scale.microBold.letterSpacing,
-                      textTransform: 'uppercase',
+                      color: '#FFFFFF',
+                      fontSize: theme.typography.scale.bodyMain.fontSize,
+                      lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                      fontFamily: 'Lexend_400Regular',
+                      opacity: 0.95,
                     }}
                   >
-                    / 100 Mastery Index
+                    {completedAllToday
+                      ? t('dashboard.tasks_all_done')
+                      : t('dashboard.tasks_today', { count: tasks.length })}
                   </Text>
                 </View>
                 <View
                   style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: theme.radius.pill,
-                    borderWidth: 2,
-                    borderColor: theme.text.primary,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                    marginTop: theme.spacing.stackMd,
                   }}
                 >
-                  <MaterialIcons
-                    name='task-alt'
-                    size={24}
-                    color={theme.text.primary}
-                  />
-                </View>
-              </View>
-            </Card>
-
-            <Card style={{ padding: 14 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <View style={{ flex: 1, paddingRight: theme.spacing.stackSm }}>
-                  <Text
+                  <View>
+                    <Text
+                      style={{
+                        color: '#FFFFFF',
+                        fontSize: theme.typography.scale.displaySm.fontSize,
+                        lineHeight: theme.typography.scale.displaySm.lineHeight,
+                        fontFamily: 'Anton_400Regular',
+                        letterSpacing:
+                          theme.typography.scale.displaySm.letterSpacing,
+                      }}
+                    >
+                      {todayLabel}
+                    </Text>
+                  </View>
+                  <View
                     style={{
-                      color: theme.text.secondary,
-                      fontSize: theme.typography.scale.microBold.fontSize,
-                      lineHeight: theme.typography.scale.microBold.lineHeight,
-                      fontFamily: 'Lexend_600SemiBold',
-                      letterSpacing: 1.1,
-                      textTransform: 'uppercase',
-                      marginBottom: 4,
+                      width: 48,
+                      height: 48,
+                      borderRadius: theme.radius.pill,
+                      borderWidth: 2,
+                      borderColor: '#FFFFFF',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     }}
                   >
-                    {t('dashboard.environment')}
-                  </Text>
-                  <Text
-                    style={{
-                      color: theme.text.primary,
-                      fontSize: theme.typography.scale.bodyMain.fontSize,
-                      lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                      fontFamily: 'Lexend_600SemiBold',
-                    }}
-                  >
-                    {todayLabel}
-                  </Text>
+                    <MaterialIcons
+                      name={isDaytime ? 'wb-sunny' : 'nightlight'}
+                      size={24}
+                      color='#FFFFFF'
+                    />
+                  </View>
                 </View>
-                <MaterialIcons
-                  name='wb-sunny'
-                  size={22}
-                  color={theme.text.primary}
-                />
-              </View>
+              </LinearGradient>
             </Card>
 
             <View style={{ marginTop: theme.spacing.stackSm }}>
