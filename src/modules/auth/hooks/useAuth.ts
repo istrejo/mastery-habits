@@ -1,6 +1,13 @@
 import { useState } from 'react';
+import { Platform } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
+import { supabase } from '@core/lib/supabase';
 import { authService } from '../services/auth.service';
 import { useSessionStore } from '@core/states/session.store';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
@@ -50,5 +57,61 @@ export const useAuth = () => {
     }
   };
 
-  return { session, user, loading, error, signIn, signUp, signOut, signInWithMagicLink };
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { url, error: err } = await authService.signInWithGoogle();
+      if (err) { setError(err.message); return; }
+      if (!url) { setError('No OAuth URL received'); return; }
+
+      const result = await WebBrowser.openAuthSessionAsync(url, 'masteryhabits://google-auth');
+      if (result.type !== 'success') return;
+
+      const hash = new URL(result.url).hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+
+      if (!access_token || !refresh_token) { setError('OAuth tokens missing'); return; }
+      const { error: sessionErr } = await supabase.auth.setSession({ access_token, refresh_token });
+      if (sessionErr) setError(sessionErr.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Google sign in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithApple = async () => {
+    if (Platform.OS !== 'ios') return;
+    setLoading(true);
+    setError(null);
+    try {
+      const rawNonce = Crypto.randomUUID();
+      const hashedNonce = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        rawNonce,
+      );
+
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+        nonce: hashedNonce,
+      });
+
+      if (!credential.identityToken) { setError('Apple identity token missing'); return; }
+      const { error: err } = await authService.signInWithApple(credential.identityToken, rawNonce);
+      if (err) setError(err.message);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes('ERR_CANCELED')) return;
+      setError(e instanceof Error ? e.message : 'Apple sign in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { session, user, loading, error, signIn, signUp, signOut, signInWithMagicLink, signInWithGoogle, signInWithApple };
 };

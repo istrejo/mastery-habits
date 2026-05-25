@@ -23,8 +23,13 @@ function AuthGate() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        supabase.auth.signOut();
+        setSession(null);
+      } else {
+        setSession(data.session);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
