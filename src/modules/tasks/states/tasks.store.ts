@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import type { Task } from '../types';
+import type { TaskWithHabit } from '../types';
 
 interface TasksState {
-  tasks: Task[];
-  setTasks: (tasks: Task[]) => void;
-  upsertTask: (task: Task) => void;
+  tasks: TaskWithHabit[];
+  setTasks: (tasks: TaskWithHabit[]) => void;
+  upsertTask: (task: TaskWithHabit) => void;
   removeTask: (id: string) => void;
 }
 

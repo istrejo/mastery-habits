@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { tasksService } from '../services/tasks.service';
 import { useTasksStore } from '../states/tasks.store';
-import type { TaskInsert } from '../types';
+import type { CreateTaskWithSubtasksInput, TaskInsert } from '../types';
 
 export const useTaskActions = () => {
   const { upsertTask, removeTask } = useTasksStore();
@@ -12,6 +12,22 @@ export const useTaskActions = () => {
       setError(null);
       try {
         const task = await tasksService.create(input);
+        upsertTask(task);
+        return task;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'unknown_error';
+        setError(msg);
+        return null;
+      }
+    },
+    [upsertTask],
+  );
+
+  const createTaskWithSubtasks = useCallback(
+    async (input: CreateTaskWithSubtasksInput) => {
+      setError(null);
+      try {
+        const task = await tasksService.createWithSubtasks(input);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -55,6 +71,22 @@ export const useTaskActions = () => {
     [upsertTask],
   );
 
+  const toggleSubtask = useCallback(
+    async (taskId: string, subtaskId: string) => {
+      setError(null);
+      try {
+        const task = await tasksService.toggleSubtask(taskId, subtaskId);
+        upsertTask(task);
+        return task;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'unknown_error';
+        setError(msg);
+        return null;
+      }
+    },
+    [upsertTask],
+  );
+
   const deleteTask = useCallback(
     async (id: string) => {
       setError(null);
@@ -71,5 +103,5 @@ export const useTaskActions = () => {
     [removeTask],
   );
 
-  return { createTask, completeTask, uncompleteTask, deleteTask, error };
+  return { createTask, createTaskWithSubtasks, completeTask, uncompleteTask, toggleSubtask, deleteTask, error };
 };

@@ -6,9 +6,15 @@ import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
 import { taskValidationSchema, type TaskFormValues } from '../utils/taskValidationSchema';
 
+interface HabitOption {
+  id: string;
+  name: string;
+}
+
 interface TaskFormProps {
   defaultValues?: Partial<TaskFormValues>;
   habitId?: string;
+  habitOptions?: HabitOption[];
   onSubmit: (values: TaskFormValues) => Promise<void>;
   submitting?: boolean;
 }
@@ -16,6 +22,7 @@ interface TaskFormProps {
 export const TaskForm: React.FC<TaskFormProps> = ({
   defaultValues,
   habitId,
+  habitOptions = [],
   onSubmit,
   submitting = false,
 }) => {
@@ -114,6 +121,57 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           )}
         />
       </View>
+
+      {habitOptions.length > 0 ? (
+        <View>
+          <Text style={labelStyle}>{i18n('tasks.form.habit_label')}</Text>
+          <Controller
+            control={control}
+            name="habit_id"
+            render={({ field: { value, onChange } }) => (
+              <View style={{ gap: t.spacing.stackSm }}>
+                <TouchableOpacity
+                  onPress={() => onChange(null)}
+                  activeOpacity={0.8}
+                  style={{
+                    borderColor: value ? t.border.default : t.text.primary,
+                    borderWidth: value ? t.borderWidth.default : t.borderWidth.bold,
+                    borderRadius: t.radius.md,
+                    padding: t.spacing.stackSm,
+                    backgroundColor: value ? 'transparent' : t.bg.surfaceAlt,
+                  }}
+                >
+                  <Text style={{ color: t.text.primary, fontFamily: 'Lexend_500Medium' }}>
+                    {i18n('tasks.form.habit_none')}
+                  </Text>
+                </TouchableOpacity>
+
+                {habitOptions.map((habit) => {
+                  const selected = value === habit.id;
+                  return (
+                    <TouchableOpacity
+                      key={habit.id}
+                      onPress={() => onChange(habit.id)}
+                      activeOpacity={0.8}
+                      style={{
+                        borderColor: selected ? t.text.primary : t.border.default,
+                        borderWidth: selected ? t.borderWidth.bold : t.borderWidth.default,
+                        borderRadius: t.radius.md,
+                        padding: t.spacing.stackSm,
+                        backgroundColor: selected ? t.bg.surfaceAlt : 'transparent',
+                      }}
+                    >
+                      <Text style={{ color: t.text.primary, fontFamily: 'Lexend_500Medium' }}>
+                        {habit.name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+          />
+        </View>
+      ) : null}
 
       <TouchableOpacity
         onPress={handleSubmit(onSubmit)}

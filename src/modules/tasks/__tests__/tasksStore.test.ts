@@ -1,7 +1,7 @@
 import { useTasksStore } from '../states/tasks.store';
-import type { Task } from '../types';
+import type { TaskWithHabit } from '../types';
 
-const task = (id: string): Task => ({
+const task = (id: string): TaskWithHabit => ({
   id,
   user_id: 'u1',
   habit_id: null,
@@ -11,6 +11,8 @@ const task = (id: string): Task => ({
   status: 'pending',
   completed_at: null,
   created_at: new Date().toISOString(),
+  habits: null,
+  task_subtasks: [],
 });
 
 beforeEach(() => {

@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@core/components';
 import { useTheme } from '@core/theming';
-import { useTasks, useTaskActions, TaskList, groupTasksByHabit } from '@tasks/index';
+import { useTasks, useTaskActions, TaskCreateSheet, TaskList } from '@tasks/index';
 import type { Task } from '@tasks/index';
 
 export default function TasksIndexScreen() {
@@ -12,7 +13,9 @@ export default function TasksIndexScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { tasks, loading, refresh } = useTasks();
-  const { completeTask, uncompleteTask, deleteTask } = useTaskActions();
+  const { completeTask, createTaskWithSubtasks, uncompleteTask, deleteTask } = useTaskActions();
+  const [createSheetVisible, setCreateSheetVisible] = useState(false);
+  const [creatingTask, setCreatingTask] = useState(false);
 
   const pending = tasks.filter((task) => task.status === 'pending');
   const completed = tasks.filter((task) => task.status === 'completed');
@@ -29,6 +32,16 @@ export default function TasksIndexScreen() {
   const handleDelete = async (task: Task) => {
     await deleteTask(task.id);
     await refresh();
+  };
+
+  const handleCreate = async (values: { title: string; notes?: string | null; subtasks: string[] }) => {
+    setCreatingTask(true);
+    try {
+      await createTaskWithSubtasks(values);
+      await refresh();
+    } finally {
+      setCreatingTask(false);
+    }
   };
 
   return (
@@ -68,7 +81,7 @@ export default function TasksIndexScreen() {
             {t('tasks.title')}
           </Text>
           <TouchableOpacity
-            onPress={() => router.push('/tasks/new')}
+            onPress={() => setCreateSheetVisible(true)}
             style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
           >
             <MaterialIcons name="add" size={22} color={theme.text.primary} />
@@ -124,6 +137,12 @@ export default function TasksIndexScreen() {
             </View>
           )}
         </ScrollView>
+        <TaskCreateSheet
+          visible={createSheetVisible}
+          submitting={creatingTask}
+          onClose={() => setCreateSheetVisible(false)}
+          onSubmit={handleCreate}
+        />
       </View>
     </Screen>
   );

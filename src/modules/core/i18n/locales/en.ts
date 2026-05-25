@@ -14,6 +14,16 @@ export const en: TranslationKeys = {
     empty_title: 'Start your first habit',
     empty_body: 'Build a Commitment Score.\nConsistency creates mastery.',
     create_habit: '+ Create habit',
+    create_task: '+ Create task',
+    empty_tasks_title: 'No tasks for today',
+    empty_tasks_body: 'Create a task with a due date to make it show here.',
+    today_protocol: "Today's Protocol",
+    tasks_all_done: 'Optimal alignment detected.',
+    tasks_today_one: '{{count}} task due today',
+    tasks_today_other: '{{count}} tasks due today',
+    tasks_section: 'Today Tasks',
+    tasks_completed: '{{completed}} / {{count}} Completed',
+    environment: 'Environment',
     score_avg: 'AVERAGE SCORE',
     habits_today_one: '{{count}} habit planned for today',
     habits_today_other: '{{count}} habits planned for today',
@@ -81,7 +91,7 @@ export const en: TranslationKeys = {
   new_habit: {
     title: 'New habit',
     subtitle: 'Build a habit that sticks.',
-    create_button: 'Create habit',
+    create_button: 'Add habit',
   },
 
   create_habit: {
@@ -142,15 +152,21 @@ export const en: TranslationKeys = {
   },
 
   categories: {
-    health:       { label: 'Health',        description: 'Exercise, sleep, movement' },
-    mind:         { label: 'Mind',          description: 'Meditation, journaling, therapy' },
-    learning:     { label: 'Learning',      description: 'Reading, courses, languages' },
-    productivity: { label: 'Productivity',  description: 'Deep work, planning, focus' },
-    nutrition:    { label: 'Nutrition',     description: 'Hydration, mindful eating' },
-    creativity:   { label: 'Creativity',    description: 'Writing, creating, side projects' },
-    social:       { label: 'Social',        description: 'Family, friends, networking' },
-    finance:      { label: 'Finance',       description: 'Savings, spending, investing' },
-    custom:       { label: 'Custom',        description: 'Define your own' },
+    health: { label: 'Health', description: 'Exercise, sleep, movement' },
+    mind: { label: 'Mind', description: 'Meditation, journaling, therapy' },
+    learning: { label: 'Learning', description: 'Reading, courses, languages' },
+    productivity: {
+      label: 'Productivity',
+      description: 'Deep work, planning, focus',
+    },
+    nutrition: { label: 'Nutrition', description: 'Hydration, mindful eating' },
+    creativity: {
+      label: 'Creativity',
+      description: 'Writing, creating, side projects',
+    },
+    social: { label: 'Social', description: 'Family, friends, networking' },
+    finance: { label: 'Finance', description: 'Savings, spending, investing' },
+    custom: { label: 'Custom', description: 'Define your own' },
   },
 
   custom_category: {
@@ -178,7 +194,8 @@ export const en: TranslationKeys = {
     complete_action: '✓ Complete today',
     use_skip: '⏭ Use weekly skip',
     skip_modal_title: 'Use weekly skip',
-    skip_modal_body: 'You have 1 skip per ISO week. Counts as completion — does not break your streak. Confirm?',
+    skip_modal_body:
+      'You have 1 skip per ISO week. Counts as completion — does not break your streak. Confirm?',
   },
 
   theme_picker: {
@@ -219,6 +236,7 @@ export const en: TranslationKeys = {
 
   tabs: {
     habits: 'Habits',
+    today: 'Today',
     power_grid: 'Grid',
     stats: 'Stats',
     pomodoro: 'Pomodoro',
@@ -231,6 +249,17 @@ export const en: TranslationKeys = {
     empty_body: 'Create your first task to start ticking things off.',
     new_task: '+ New task',
     composer_placeholder: 'Add a task…',
+    sheet: {
+      title: 'New task',
+      name_label: 'Task name',
+      name_placeholder: 'What needs to be done?',
+      notes_label: 'Notes',
+      notes_placeholder: 'Add context, constraints, or details…',
+      subtasks_label: 'Subtasks',
+      subtask_placeholder: 'Subtask',
+      add_subtask: 'Add subtask',
+      create: 'Add',
+    },
     form: {
       title_label: 'Title',
       title_placeholder: 'What needs to be done?',

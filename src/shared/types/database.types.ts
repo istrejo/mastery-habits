@@ -224,6 +224,47 @@ export type Database = {
         }
         Relationships: []
       }
+      task_subtasks: {
+        Row: {
+          id: string
+          task_id: string
+          user_id: string
+          title: string
+          status: Database["public"]["Enums"]["task_status"]
+          completed_at: string | null
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          task_id: string
+          user_id: string
+          title: string
+          status?: Database["public"]["Enums"]["task_status"]
+          completed_at?: string | null
+          order_index?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          task_id?: string
+          user_id?: string
+          title?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          completed_at?: string | null
+          order_index?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_subtasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           id: string

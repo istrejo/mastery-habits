@@ -1,6 +1,6 @@
 import React from 'react';
-import type { HabitWithScore } from '@habits/types';
-import DashboardScreen from '../index';
+import TodayScreen from '../today';
+import type { TaskWithHabit } from '@tasks/index';
 
 const renderer = require('react-test-renderer');
 const { act, create } = renderer;
@@ -9,9 +9,12 @@ const { act, create } = renderer;
 const readChildren = (children: unknown): string => Array.isArray(children) ? children.join('') : String(children);
 
 const pushMock = jest.fn();
+const useTodayTasksMock = jest.fn();
+const useTaskActionsMock = jest.fn();
 const useHabitsMock = jest.fn();
 const useTodayCheckInsMock = jest.fn();
-const isPlannedDayMock = jest.fn();
+const dashboardTaskRowMock = jest.fn((props: any) => React.createElement('DashboardTaskRow', props));
+const taskCreateSheetMock = jest.fn((props: any) => React.createElement('TaskCreateSheet', props));
 const dashboardHabitRowMock = jest.fn((props: any) => React.createElement('DashboardHabitRow', props));
 
 const mockTheme = {
@@ -50,19 +53,18 @@ const mockTheme = {
 
 jest.mock('react-native', () => {
   const ReactLocal = require('react');
-
   const mock = (name: string) => {
     const Component = (props: any) => ReactLocal.createElement(name, props, props.children);
     Component.displayName = name;
     return Component;
   };
-
   return {
     Alert: { alert: jest.fn() },
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
     ScrollView: mock('ScrollView'),
+    ActivityIndicator: mock('ActivityIndicator'),
   };
 });
 
@@ -73,12 +75,14 @@ jest.mock('expo-router', () => ({
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     i18n: { language: 'en' },
-    t: (key: string, params?: { count?: number }) => {
+    t: (key: string, params?: { count?: number; completed?: number }) => {
       if (key === 'dashboard.app_name') return 'Mastery Habits';
-      if (key === 'dashboard.empty_title') return 'No habits yet';
-      if (key === 'dashboard.empty_body') return 'Create your first habit';
-      if (key === 'dashboard.create_habit') return 'Create habit';
-      if (key === 'dashboard.habits_today') return `${params?.count ?? 0} habits planned for today`;
+      if (key === 'dashboard.empty_tasks_title') return 'No tasks for today';
+      if (key === 'dashboard.empty_tasks_body') return 'Create a task with a due date to make it show here.';
+      if (key === 'dashboard.create_task') return '+ Create task';
+      if (key === 'dashboard.tasks_today') return `${params?.count ?? 0} tasks due today`;
+      if (key === 'dashboard.tasks_section') return 'Today Tasks';
+      if (key === 'dashboard.tasks_completed') return `${params?.completed ?? 0} / ${params?.count ?? 0} Completed`;
       return key;
     },
   }),
@@ -91,14 +95,8 @@ jest.mock('@expo/vector-icons', () => {
   };
 });
 
-jest.mock('@core/theming', () => ({
-  useTheme: () => mockTheme,
-}));
-
-jest.mock('@core/i18n', () => ({
-  useDateLocale: () => undefined,
-}));
-
+jest.mock('@core/theming', () => ({ useTheme: () => mockTheme }));
+jest.mock('@core/i18n', () => ({ useDateLocale: () => undefined }));
 jest.mock('@core/components', () => {
   const ReactLocal = require('react');
   const mock = (name: string) => {
@@ -106,14 +104,21 @@ jest.mock('@core/components', () => {
     Component.displayName = name;
     return Component;
   };
-
   return {
     Screen: mock('Screen'),
     Card: mock('Card'),
     Skeleton: mock('Skeleton'),
     Button: (props: any) => ReactLocal.createElement('Button', props, props.label),
+    ProgressBar: mock('ProgressBar'),
   };
 });
+
+jest.mock('@tasks/index', () => ({
+  useTodayTasks: () => useTodayTasksMock(),
+  useTaskActions: () => useTaskActionsMock(),
+  DashboardTaskRow: (props: any) => dashboardTaskRowMock(props),
+  TaskCreateSheet: (props: any) => taskCreateSheetMock(props),
+}));
 
 jest.mock('@habits/index', () => ({
   useHabits: () => useHabitsMock(),
@@ -122,155 +127,229 @@ jest.mock('@habits/index', () => ({
 
 jest.mock('@checkin/index', () => ({
   useTodayCheckIns: () => useTodayCheckInsMock(),
-  isPlannedDay: (...args: any[]) => isPlannedDayMock(...args),
 }));
 
-const createHabit = (id: string, overrides: Partial<HabitWithScore> = {}): HabitWithScore => ({
+const createTask = (id: string, overrides: Partial<TaskWithHabit> = {}): TaskWithHabit => ({
   id,
   user_id: 'user-1',
-  name: `Habit ${id}`,
+  habit_id: null,
+  title: `Task ${id}`,
   description: `Description ${id}`,
-  category: 'productivity',
-  custom_label: null,
-  custom_emoji: null,
-  frequency_days: [1, 2, 3, 4, 5],
-  created_at: '2026-05-12T00:00:00.000Z',
-  archived_at: null,
-  mastery_scores: {
-    habit_id: id,
-    user_id: 'user-1',
-    score: 20,
-    level: 'Seed',
-    last_calculated_date: '2026-05-12',
-    updated_at: '2026-05-12T00:00:00.000Z',
-  },
+  due_date: '2026-05-24',
+  status: 'pending',
+  completed_at: null,
+  created_at: '2026-05-24T00:00:00.000Z',
+  habits: null,
+  task_subtasks: [],
   ...overrides,
 });
 
-describe('DashboardScreen', () => {
+const setup = (overrides: Partial<{
+  tasks: TaskWithHabit[];
+  completedToday: Set<string>;
+  completeTask: jest.Mock;
+  uncompleteTask: jest.Mock;
+  completeHabit: jest.Mock;
+  undoHabit: jest.Mock;
+  createTaskWithSubtasks: jest.Mock;
+  toggleSubtask: jest.Mock;
+}> = {}) => {
+  useHabitsMock.mockReturnValue({ habits: [], loading: false });
+  useTodayTasksMock.mockReturnValue({ tasks: overrides.tasks ?? [], loading: false, refresh: jest.fn() });
+  useTaskActionsMock.mockReturnValue({
+    completeTask: overrides.completeTask ?? jest.fn().mockResolvedValue(createTask('updated', { status: 'completed' })),
+    uncompleteTask: overrides.uncompleteTask ?? jest.fn().mockResolvedValue(createTask('updated')),
+    createTaskWithSubtasks: overrides.createTaskWithSubtasks ?? jest.fn().mockResolvedValue(createTask('created')),
+    toggleSubtask: overrides.toggleSubtask ?? jest.fn().mockResolvedValue(createTask('updated')),
+  });
+  useTodayCheckInsMock.mockReturnValue({
+    completedToday: overrides.completedToday ?? new Set(),
+    submittingHabitIds: new Set(),
+    completeHabit: overrides.completeHabit ?? jest.fn().mockResolvedValue(undefined),
+    undoHabit: overrides.undoHabit ?? jest.fn().mockResolvedValue(undefined),
+  });
+};
+
+describe('TodayScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, 'error').mockImplementation((message: unknown) => {
       if (typeof message === 'string' && message.includes('react-test-renderer is deprecated')) return;
     });
-    isPlannedDayMock.mockReturnValue(true);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('uses DashboardHabitRow for each habit and marks statuses correctly', () => {
-    const habits = [
-      createHabit('habit-1', { name: 'Morning Hydration' }),
-      createHabit('habit-2', { name: 'Deep Work' }),
-      createHabit('habit-3', { name: 'Zone 2 Cardio' }),
-    ];
-
-    useHabitsMock.mockReturnValue({ habits, loading: false });
-    useTodayCheckInsMock.mockReturnValue({
-      completedToday: new Set(['habit-1']),
-      submittingHabitIds: new Set(),
-      completeHabit: jest.fn(),
-      undoHabit: jest.fn(),
-    });
-
-    act(() => {
-      create(React.createElement(DashboardScreen));
-    });
-
-    const calls = dashboardHabitRowMock.mock.calls as Array<[any]>;
-
-    expect(dashboardHabitRowMock).toHaveBeenCalledTimes(3);
-    expect(calls[0]![0].status).toBe('completed');
-    expect(calls[1]![0].status).toBe('active');
-    expect(calls[1]![0].onPressRow).toBeDefined();
-    expect(calls[1]![0].onPressCheck).toBeDefined();
-    expect(calls[2]![0].status).toBe('pending');
-  });
-
-  it('shows Recovery fallback when all planned habits are completed', () => {
-    const habits = [
-      createHabit('habit-1', { name: 'Morning Hydration' }),
-      createHabit('habit-2', { name: 'Mobility Routine' }),
-    ];
-
-    useHabitsMock.mockReturnValue({ habits, loading: false });
-    useTodayCheckInsMock.mockReturnValue({
-      completedToday: new Set(['habit-1', 'habit-2']),
-      submittingHabitIds: new Set(),
-      completeHabit: jest.fn(),
-      undoHabit: jest.fn(),
+  it('renders today tasks with DashboardTaskRow and removes habit rows / Next Block', () => {
+    setup({
+      tasks: [
+        createTask('task-1', { title: 'Write proposal' }),
+        createTask('task-2', { title: 'Train', habit_id: 'habit-1', habits: { id: 'habit-1', name: 'Fitness' } }),
+      ],
     });
 
     let tree: any;
     act(() => {
-      tree = create(React.createElement(DashboardScreen));
+      tree = create(React.createElement(TodayScreen));
     });
 
     const textNodes = tree.root.findAll((node: any) => node.type === 'Text');
 
-    expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Recovery')).toBe(true);
-    expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Optimal alignment detected.')).toBe(true);
+    expect(dashboardTaskRowMock).toHaveBeenCalledTimes(2);
+    expect(dashboardHabitRowMock).not.toHaveBeenCalled();
+    expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Next Block')).toBe(false);
+    expect(textNodes.some((node: any) => readChildren(node.props.children) === 'Today Tasks')).toBe(true);
   });
 
-  it('calls completeHabit when checking a pending habit', async () => {
-    const habits = [
-      createHabit('habit-1', { name: 'Morning Hydration' }),
-      createHabit('habit-2', { name: 'Deep Work' }),
-    ];
-    const completeHabitMock = jest.fn().mockResolvedValue(undefined);
-    const undoHabitMock = jest.fn().mockResolvedValue(undefined);
+  it('opens a swipe task creation sheet instead of navigating to a new task route', () => {
+    setup();
 
-    useHabitsMock.mockReturnValue({ habits, loading: false });
-    useTodayCheckInsMock.mockReturnValue({
+    let tree: any;
+    act(() => {
+      tree = create(React.createElement(TodayScreen));
+    });
+
+    const addButtons = tree.root.findAll((node: any) => node.type === 'TouchableOpacity' && node.props.testID === 'today-add-task');
+    expect(addButtons).toHaveLength(2);
+
+    expect(taskCreateSheetMock).toHaveBeenLastCalledWith(expect.objectContaining({ visible: false }));
+
+    act(() => {
+      addButtons[0].props.onPress();
+    });
+
+    expect(pushMock).not.toHaveBeenCalled();
+    expect(taskCreateSheetMock).toHaveBeenLastCalledWith(expect.objectContaining({ visible: true }));
+  });
+
+
+
+  it('creates a Today task from the sheet with name, notes, and subtasks', async () => {
+    const createTaskWithSubtasks = jest.fn().mockResolvedValue(createTask('created'));
+    const refresh = jest.fn();
+    setup({ createTaskWithSubtasks });
+    useTodayTasksMock.mockReturnValue({ tasks: [], loading: false, refresh });
+
+    act(() => {
+      create(React.createElement(TodayScreen));
+    });
+
+    const sheetProps = taskCreateSheetMock.mock.calls.at(-1)?.[0];
+    await act(async () => {
+      await sheetProps.onSubmit({ title: 'Plan launch', notes: 'No shortcuts', subtasks: ['Write tests', 'Ship'] });
+    });
+
+    expect(createTaskWithSubtasks).toHaveBeenCalledWith({
+      title: 'Plan launch',
+      notes: 'No shortcuts',
+      subtasks: ['Write tests', 'Ship'],
+    });
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('registers the linked habit check-in once when completing a linked pending task', async () => {
+    const completeTask = jest.fn().mockResolvedValue(createTask('task-1', { status: 'completed', habit_id: 'habit-1' }));
+    const completeHabit = jest.fn().mockResolvedValue(undefined);
+    setup({
+      tasks: [createTask('task-1', { habit_id: 'habit-1', habits: { id: 'habit-1', name: 'Fitness' } })],
       completedToday: new Set(),
-      submittingHabitIds: new Set(),
-      completeHabit: completeHabitMock,
-      undoHabit: undoHabitMock,
+      completeTask,
+      completeHabit,
     });
 
     act(() => {
-      create(React.createElement(DashboardScreen));
+      create(React.createElement(TodayScreen));
     });
 
-    const calls = dashboardHabitRowMock.mock.calls as Array<[any]>;
+    const [rowProps] = dashboardTaskRowMock.mock.calls[0] as [any];
     await act(async () => {
-      await calls[0]![0].onPressCheck();
+      await rowProps.onPressCheck();
     });
 
-    expect(completeHabitMock).toHaveBeenCalledWith('habit-1');
-    expect(undoHabitMock).not.toHaveBeenCalled();
-    expect(pushMock).not.toHaveBeenCalled();
+    expect(completeTask).toHaveBeenCalledWith('task-1');
+    expect(completeHabit).toHaveBeenCalledTimes(1);
+    expect(completeHabit).toHaveBeenCalledWith('habit-1');
   });
 
-  it('calls undoHabit when unchecking a completed habit', async () => {
-    const habits = [
-      createHabit('habit-1', { name: 'Morning Hydration' }),
-      createHabit('habit-2', { name: 'Deep Work' }),
-    ];
-    const completeHabitMock = jest.fn().mockResolvedValue(undefined);
-    const undoHabitMock = jest.fn().mockResolvedValue(undefined);
-
-    useHabitsMock.mockReturnValue({ habits, loading: false });
-    useTodayCheckInsMock.mockReturnValue({
+  it('does not register a habit check-in again when the linked habit is already completed today', async () => {
+    const completeTask = jest.fn().mockResolvedValue(createTask('task-1', { status: 'completed', habit_id: 'habit-1' }));
+    const completeHabit = jest.fn().mockResolvedValue(undefined);
+    setup({
+      tasks: [createTask('task-1', { habit_id: 'habit-1', habits: { id: 'habit-1', name: 'Fitness' } })],
       completedToday: new Set(['habit-1']),
-      submittingHabitIds: new Set(),
-      completeHabit: completeHabitMock,
-      undoHabit: undoHabitMock,
+      completeTask,
+      completeHabit,
     });
 
     act(() => {
-      create(React.createElement(DashboardScreen));
+      create(React.createElement(TodayScreen));
     });
 
-    const calls = dashboardHabitRowMock.mock.calls as Array<[any]>;
+    const [rowProps] = dashboardTaskRowMock.mock.calls[0] as [any];
     await act(async () => {
-      await calls[0]![0].onPressCheck();
+      await rowProps.onPressCheck();
     });
 
-    expect(undoHabitMock).toHaveBeenCalledWith('habit-1');
-    expect(completeHabitMock).not.toHaveBeenCalled();
-    expect(pushMock).not.toHaveBeenCalled();
+    expect(completeTask).toHaveBeenCalledWith('task-1');
+    expect(completeHabit).not.toHaveBeenCalled();
   });
+
+  it('keeps the habit check-in when unchecking one linked task but another linked task remains completed', async () => {
+    const uncompleteTask = jest.fn().mockResolvedValue(createTask('task-1', { habit_id: 'habit-1' }));
+    const undoHabit = jest.fn().mockResolvedValue(undefined);
+    setup({
+      tasks: [
+        createTask('task-1', { habit_id: 'habit-1', status: 'completed', completed_at: '2026-05-24T10:00:00.000Z' }),
+        createTask('task-2', { habit_id: 'habit-1', status: 'completed', completed_at: '2026-05-24T11:00:00.000Z' }),
+      ],
+      completedToday: new Set(['habit-1']),
+      uncompleteTask,
+      undoHabit,
+    });
+
+    act(() => {
+      create(React.createElement(TodayScreen));
+    });
+
+    const [rowProps] = dashboardTaskRowMock.mock.calls[0] as [any];
+    await act(async () => {
+      await rowProps.onPressCheck();
+    });
+
+    expect(uncompleteTask).toHaveBeenCalledWith('task-1');
+    expect(undoHabit).not.toHaveBeenCalled();
+  });
+
+  it('forwards subtask toggles from task rows to task actions', async () => {
+    const toggleSubtask = jest.fn().mockResolvedValue(createTask('task-1'));
+    const refresh = jest.fn();
+    setup({
+      tasks: [createTask('task-1', {
+        task_subtasks: [
+          { id: 'sub-1', task_id: 'task-1', user_id: 'user-1', title: 'Write tests', status: 'pending', completed_at: null, order_index: 0, created_at: '2026-05-25T00:00:00.000Z' },
+        ],
+      })],
+      toggleSubtask,
+    });
+    useTodayTasksMock.mockReturnValue({ tasks: [createTask('task-1', {
+      task_subtasks: [
+        { id: 'sub-1', task_id: 'task-1', user_id: 'user-1', title: 'Write tests', status: 'pending', completed_at: null, order_index: 0, created_at: '2026-05-25T00:00:00.000Z' },
+      ],
+    })], loading: false, refresh });
+
+    act(() => {
+      create(React.createElement(TodayScreen));
+    });
+
+    const [rowProps] = dashboardTaskRowMock.mock.calls[0] as [any];
+    await act(async () => {
+      await rowProps.onPressSubtask('sub-1');
+    });
+
+    expect(toggleSubtask).toHaveBeenCalledWith('task-1', 'sub-1');
+    expect(refresh).toHaveBeenCalled();
+  });
+
 });

@@ -12,6 +12,16 @@ export const es = {
     empty_title: 'Empezá tu primer hábito',
     empty_body: 'Cultivá un Commitment Score.\nLa consistencia crea maestría.',
     create_habit: '+ Crear hábito',
+    create_task: '+ Crear tarea',
+    empty_tasks_title: 'Sin tareas para hoy',
+    empty_tasks_body: 'Creá una tarea con fecha para verla acá.',
+    today_protocol: 'Protocolo de hoy',
+    tasks_all_done: 'Alineación óptima detectada.',
+    tasks_today_one: '{{count}} tarea para hoy',
+    tasks_today_other: '{{count}} tareas para hoy',
+    tasks_section: 'Tareas de hoy',
+    tasks_completed: '{{completed}} / {{count}} completadas',
+    environment: 'Entorno',
     score_avg: 'SCORE PROMEDIO',
     habits_today_one: '{{count}} hábito planificado para hoy',
     habits_today_other: '{{count}} hábitos planificados para hoy',
@@ -79,7 +89,7 @@ export const es = {
   new_habit: {
     title: 'Nuevo hábito',
     subtitle: 'Construí un hábito que dure.',
-    create_button: 'Crear hábito',
+    create_button: 'Agregar hábito',
   },
 
   create_habit: {
@@ -140,22 +150,32 @@ export const es = {
   },
 
   categories: {
-    health:       { label: 'Salud',         description: 'Ejercicio, sueño, movimiento' },
-    mind:         { label: 'Mente',         description: 'Meditación, journaling, terapia' },
-    learning:     { label: 'Aprendizaje',   description: 'Lectura, cursos, idiomas' },
-    productivity: { label: 'Productividad', description: 'Deep work, planificación, foco' },
-    nutrition:    { label: 'Nutrición',     description: 'Hidratación, alimentación consciente' },
-    creativity:   { label: 'Creatividad',   description: 'Escribir, crear, side projects' },
-    social:       { label: 'Social',        description: 'Familia, amigos, networking' },
-    finance:      { label: 'Finanzas',      description: 'Ahorro, gastos, inversión' },
-    custom:       { label: 'Personalizado', description: 'Definí el tuyo' },
+    health: { label: 'Salud', description: 'Ejercicio, sueño, movimiento' },
+    mind: { label: 'Mente', description: 'Meditación, journaling, terapia' },
+    learning: { label: 'Aprendizaje', description: 'Lectura, cursos, idiomas' },
+    productivity: {
+      label: 'Productividad',
+      description: 'Deep work, planificación, foco',
+    },
+    nutrition: {
+      label: 'Nutrición',
+      description: 'Hidratación, alimentación consciente',
+    },
+    creativity: {
+      label: 'Creatividad',
+      description: 'Escribir, crear, side projects',
+    },
+    social: { label: 'Social', description: 'Familia, amigos, networking' },
+    finance: { label: 'Finanzas', description: 'Ahorro, gastos, inversión' },
+    custom: { label: 'Personalizado', description: 'Definí el tuyo' },
   },
 
   custom_category: {
     emoji_label: 'Ícono',
     name_label: 'Nombre',
     name_placeholder: 'Mi categoría',
-    uncategorized_banner: 'Este hábito no tiene categoría asignada. Editalo para clasificarlo.',
+    uncategorized_banner:
+      'Este hábito no tiene categoría asignada. Editalo para clasificarlo.',
   },
 
   frequency: {
@@ -176,7 +196,8 @@ export const es = {
     complete_action: '✓ Completar hoy',
     use_skip: '⏭ Usar skip semanal',
     skip_modal_title: 'Usar skip semanal',
-    skip_modal_body: 'Tenés 1 skip por semana ISO. Conta como cumplimiento — no rompe la racha. ¿Confirmás?',
+    skip_modal_body:
+      'Tenés 1 skip por semana ISO. Conta como cumplimiento — no rompe la racha. ¿Confirmás?',
   },
 
   theme_picker: {
@@ -217,6 +238,7 @@ export const es = {
 
   tabs: {
     habits: 'Hábitos',
+    today: 'Hoy',
     power_grid: 'Grid',
     stats: 'Stats',
     pomodoro: 'Pomodoro',
@@ -229,6 +251,17 @@ export const es = {
     empty_body: 'Creá tu primera tarea para empezar a tachar cosas.',
     new_task: '+ Nueva tarea',
     composer_placeholder: 'Agregar tarea…',
+    sheet: {
+      title: 'Nueva tarea',
+      name_label: 'Nombre de la tarea',
+      name_placeholder: '¿Qué hay que hacer?',
+      notes_label: 'Notas',
+      notes_placeholder: 'Agregá contexto, límites o detalles…',
+      subtasks_label: 'Subtareas',
+      subtask_placeholder: 'Subtarea',
+      add_subtask: 'Agregar subtarea',
+      create: 'Crear tarea',
+    },
     form: {
       title_label: 'Título',
       title_placeholder: '¿Qué hay que hacer?',

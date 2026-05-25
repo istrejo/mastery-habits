@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { tasksService } from '../services/tasks.service';
 import { useTasksStore } from '../states/tasks.store';
-import type { Task } from '../types';
+import type { TaskWithHabit } from '../types';
 
 export const useHabitTasks = (habitId: string) => {
   const { upsertTask, removeTask } = useTasksStore();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskWithHabit[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

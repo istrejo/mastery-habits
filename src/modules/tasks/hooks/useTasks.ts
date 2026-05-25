@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { tasksService } from '../services/tasks.service';
 import { useTasksStore } from '../states/tasks.store';
-import type { Task } from '../types';
+import type { TaskWithHabit } from '../types';
 
 export const useTasks = () => {
   const { tasks, setTasks } = useTasksStore();
