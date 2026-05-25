@@ -1,8 +1,104 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '@core/theming';
 import type { TaskSubtask, TaskWithHabit } from '../types';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+interface AnimatedSubtaskRowProps {
+  subtask: TaskSubtask;
+  onPress: () => void;
+  theme: any;
+}
+
+const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
+  subtask,
+  onPress,
+  theme,
+}) => {
+  const subtaskDone = subtask.status === 'completed';
+  const colorAnim = useRef(new Animated.Value(subtaskDone ? 1 : 0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(colorAnim, {
+        toValue: subtaskDone ? 1 : 0,
+        duration: 250,
+        useNativeDriver: false,
+      }),
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 0.95,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, [subtaskDone, colorAnim, scaleAnim]);
+
+  const textColor = colorAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [theme.text.secondary, theme.text.tertiary],
+  });
+
+  return (
+    <Animated.View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        transform: [{ scale: scaleAnim }],
+      }}
+    >
+      <TouchableOpacity
+        testID={`dashboard-subtask-check-${subtask.id}`}
+        onPress={onPress}
+        activeOpacity={0.82}
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: theme.radius.pill,
+          borderWidth: subtaskDone ? 0 : theme.borderWidth.default,
+          borderColor: theme.border.default,
+          backgroundColor: subtaskDone ? theme.text.primary : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {subtaskDone ? (
+          <MaterialIcons name='check' size={13} color={theme.text.inverse} />
+        ) : null}
+      </TouchableOpacity>
+      <Animated.Text
+        numberOfLines={1}
+        style={{
+          flex: 1,
+          color: textColor,
+          fontSize: theme.typography.scale.microBold.fontSize,
+          lineHeight: theme.typography.scale.microBold.lineHeight,
+          fontFamily: 'Lexend_400Regular',
+          textDecorationLine: subtaskDone ? 'line-through' : 'none',
+        }}
+      >
+        {subtask.title}
+      </Animated.Text>
+    </Animated.View>
+  );
+};
 
 export type DashboardTaskStatus = 'completed' | 'active' | 'pending';
 
@@ -19,7 +115,9 @@ interface DashboardTaskRowProps {
 
 const getSubtaskProgress = (subtasks: TaskSubtask[]) => {
   if (subtasks.length === 0) return 0;
-  const completed = subtasks.filter((subtask) => subtask.status === 'completed').length;
+  const completed = subtasks.filter(
+    (subtask) => subtask.status === 'completed'
+  ).length;
   return Math.round((completed / subtasks.length) * 100);
 };
 
@@ -38,7 +136,47 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
   const habitName = task.habits?.name;
   const subtasks = task.task_subtasks ?? [];
   const progressPercent = getSubtaskProgress(subtasks);
-  const metaText = task.description || (habitName ? `Habit: ${habitName}` : 'Standalone task');
+  const hasSubtasks = subtasks.length > 0;
+  const metaText =
+    task.description || (habitName ? `Habit: ${habitName}` : 'Standalone task');
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const checkOpacity = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(progressPercent)).current;
+
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: progressPercent,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [progressPercent, progressAnim]);
+
+  useEffect(() => {
+    if (isCompleted && hasSubtasks) {
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.2,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      Animated.timing(checkOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      checkOpacity.setValue(0);
+      scaleAnim.setValue(1);
+    }
+  }, [isCompleted, hasSubtasks, scaleAnim, checkOpacity]);
 
   return (
     <View
@@ -76,7 +214,7 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
             width: 28,
             height: 28,
             borderRadius: theme.radius.pill,
-            borderWidth: isCompleted ? 0 : 2,
+            borderWidth: isCompleted ? 0 : hasSubtasks ? 0 : 2,
             borderColor: isActive ? theme.text.primary : theme.border.default,
             backgroundColor: isCompleted ? theme.text.primary : 'transparent',
             alignItems: 'center',
@@ -87,9 +225,49 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
           testID={`dashboard-task-row-check-${task.id}`}
         >
           {submitting ? (
-            <ActivityIndicator size="small" color={theme.text.primary} />
+            <ActivityIndicator size='small' color={theme.text.primary} />
+          ) : hasSubtasks && !isCompleted ? (
+            <Svg
+              width={28}
+              height={28}
+              style={{ transform: [{ rotate: '-90deg' }] }}
+            >
+              <Circle
+                cx={14}
+                cy={14}
+                r={12}
+                stroke={theme.border.default}
+                strokeWidth={2}
+                fill='none'
+              />
+              <AnimatedCircle
+                cx={14}
+                cy={14}
+                r={12}
+                stroke={theme.text.primary}
+                strokeWidth={2}
+                fill='none'
+                strokeDasharray={75.4}
+                strokeDashoffset={progressAnim.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [75.4, 0],
+                })}
+                strokeLinecap='round'
+              />
+            </Svg>
           ) : isCompleted ? (
-            <MaterialIcons name="check" size={16} color={theme.text.inverse} />
+            <Animated.View
+              style={{
+                transform: [{ scale: scaleAnim }],
+                opacity: hasSubtasks ? checkOpacity : 1,
+              }}
+            >
+              <MaterialIcons
+                name='check'
+                size={16}
+                color={theme.text.inverse}
+              />
+            </Animated.View>
           ) : null}
         </TouchableOpacity>
 
@@ -100,7 +278,13 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
           testID={`dashboard-task-row-body-${task.id}`}
         >
           <View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.stackSm }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: theme.spacing.stackSm,
+              }}
+            >
               <View style={{ flex: 1 }}>
                 <Text
                   numberOfLines={1}
@@ -108,7 +292,9 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
                     color: theme.text.primary,
                     fontSize: theme.typography.scale.bodyMain.fontSize,
                     lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                    fontFamily: isActive ? 'Lexend_600SemiBold' : 'Lexend_500Medium',
+                    fontFamily: isActive
+                      ? 'Lexend_600SemiBold'
+                      : 'Lexend_500Medium',
                     textDecorationLine: isCompleted ? 'line-through' : 'none',
                   }}
                 >
@@ -137,7 +323,10 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
                     height: 44,
                     borderRadius: theme.radius.pill,
                     borderWidth: 2,
-                    borderColor: progressPercent === 100 ? theme.text.primary : theme.border.default,
+                    borderColor:
+                      progressPercent === 100
+                        ? theme.text.primary
+                        : theme.border.default,
                     color: theme.text.primary,
                     fontSize: theme.typography.scale.microBold.fontSize,
                     lineHeight: 40,
@@ -152,8 +341,19 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
             </View>
 
             {task.description && habitName ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                <MaterialIcons name="bolt" size={13} color={theme.text.secondary} />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 4,
+                  marginTop: 6,
+                }}
+              >
+                <MaterialIcons
+                  name='bolt'
+                  size={13}
+                  color={theme.text.secondary}
+                />
                 <Text
                   numberOfLines={1}
                   style={{
@@ -170,43 +370,14 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
 
             {subtasks.length > 0 ? (
               <View style={{ marginTop: 12, gap: 8 }}>
-                {subtasks.map((subtask) => {
-                  const subtaskDone = subtask.status === 'completed';
-                  return (
-                    <View key={subtask.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <TouchableOpacity
-                        testID={`dashboard-subtask-check-${subtask.id}`}
-                        onPress={() => onPressSubtask?.(subtask.id)}
-                        activeOpacity={0.82}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: theme.radius.pill,
-                          borderWidth: subtaskDone ? 0 : theme.borderWidth.default,
-                          borderColor: theme.border.default,
-                          backgroundColor: subtaskDone ? theme.text.primary : 'transparent',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {subtaskDone ? <MaterialIcons name="check" size={13} color={theme.text.inverse} /> : null}
-                      </TouchableOpacity>
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          flex: 1,
-                          color: subtaskDone ? theme.text.tertiary : theme.text.secondary,
-                          fontSize: theme.typography.scale.microBold.fontSize,
-                          lineHeight: theme.typography.scale.microBold.lineHeight,
-                          fontFamily: 'Lexend_400Regular',
-                          textDecorationLine: subtaskDone ? 'line-through' : 'none',
-                        }}
-                      >
-                        {subtask.title}
-                      </Text>
-                    </View>
-                  );
-                })}
+                {subtasks.map((subtask) => (
+                  <AnimatedSubtaskRow
+                    key={subtask.id}
+                    subtask={subtask}
+                    onPress={() => onPressSubtask?.(subtask.id)}
+                    theme={theme}
+                  />
+                ))}
               </View>
             ) : null}
           </View>
@@ -217,7 +388,11 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
           activeOpacity={0.82}
           testID={`dashboard-task-row-chevron-${task.id}`}
         >
-          <MaterialIcons name="chevron-right" size={20} color={theme.text.tertiary} />
+          <MaterialIcons
+            name='chevron-right'
+            size={20}
+            color={theme.text.tertiary}
+          />
         </TouchableOpacity>
       </View>
     </View>

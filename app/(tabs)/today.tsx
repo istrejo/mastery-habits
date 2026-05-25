@@ -5,8 +5,16 @@ import { useRouter } from 'expo-router';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Screen, Card, Skeleton, Button } from '@core/components';
+import {
+  Screen,
+  Card,
+  Skeleton,
+  Button,
+  SyncIndicator,
+} from '@core/components';
 import { useTheme } from '@core/theming';
+import { useAutoSync } from '@core/hooks/useAutoSync';
+import { isNetworkError } from '@core/utils/isNetworkError';
 import { useDateLocale } from '@core/i18n';
 import { useHabits } from '@habits/index';
 import { useTodayCheckIns } from '@checkin/index';
@@ -15,6 +23,7 @@ import {
   TaskCreateSheet,
   useTaskActions,
   useTodayTasks,
+  tasksService,
   type DashboardTaskStatus,
   type TaskCreateSheetValues,
   type TaskWithHabit,
@@ -32,17 +41,20 @@ function Header({ onAdd }: { onAdd: () => void }) {
         marginBottom: theme.spacing.stackMd,
       }}
     >
-      <Text
-        style={{
-          color: theme.text.primary,
-          fontSize: theme.typography.scale.microBold.fontSize,
-          fontFamily: 'Lexend_600SemiBold',
-          letterSpacing: theme.typography.scale.microBold.letterSpacing,
-          textTransform: 'uppercase',
-        }}
-      >
-        {t('dashboard.app_name')}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text
+          style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_600SemiBold',
+            letterSpacing: theme.typography.scale.microBold.letterSpacing,
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('dashboard.app_name')}
+        </Text>
+        <SyncIndicator />
+      </View>
       <TouchableOpacity
         testID='today-add-task'
         onPress={onAdd}
@@ -120,7 +132,14 @@ export default function TodayScreen() {
   const dateLocale = useDateLocale();
   const router = useRouter();
   const { habits, loading: habitsLoading } = useHabits();
-  const { tasks, loading: tasksLoading, refresh } = useTodayTasks();
+  const {
+    tasks,
+    loading: tasksLoading,
+    refresh,
+    updateTaskOptimistic,
+    updateSubtaskOptimistic,
+  } = useTodayTasks();
+  useAutoSync();
   const {
     completeTask,
     createTaskWithSubtasks,
@@ -208,23 +227,47 @@ export default function TodayScreen() {
   const handleInlineToggle = async (task: TaskWithHabit) => {
     if (submittingTaskIds.has(task.id)) return;
 
-    setTaskSubmitting(task.id, true);
-    try {
-      if (task.status === 'completed') {
-        const updated = await uncompleteTask(task.id);
-        await syncHabitAfterTaskStatusChange(task, updated);
-        await refresh();
-        return;
-      }
+    const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+    const completedAt =
+      newStatus === 'completed' ? new Date().toISOString() : null;
 
-      const updated = await completeTask(task.id);
+    const hasSubtasks = task.task_subtasks && task.task_subtasks.length > 0;
+
+    if (hasSubtasks && newStatus === 'completed') {
+      const updatedSubtasks = task.task_subtasks.map((st) => ({
+        ...st,
+        status: 'completed' as const,
+        completed_at: new Date().toISOString(),
+      }));
+
+      updateTaskOptimistic(task.id, {
+        status: newStatus,
+        completed_at: completedAt,
+        task_subtasks: updatedSubtasks,
+      });
+    } else {
+      updateTaskOptimistic(task.id, {
+        status: newStatus,
+        completed_at: completedAt,
+      });
+    }
+
+    try {
+      const updated = await (task.status === 'completed'
+        ? tasksService.uncompleteWithSync(task.id)
+        : tasksService.completeWithSync(task.id));
       await syncHabitAfterTaskStatusChange(task, updated);
-      await refresh();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'unknown_error';
-      Alert.alert('Could not update task', message);
-    } finally {
-      setTaskSubmitting(task.id, false);
+      if (!isNetworkError(error)) {
+        updateTaskOptimistic(task.id, {
+          status: task.status,
+          completed_at: task.completed_at,
+          task_subtasks: task.task_subtasks,
+        });
+        const message =
+          error instanceof Error ? error.message : 'unknown_error';
+        Alert.alert('Could not update task', message);
+      }
     }
   };
 
@@ -234,16 +277,57 @@ export default function TodayScreen() {
   ) => {
     if (submittingTaskIds.has(task.id)) return;
 
-    setTaskSubmitting(task.id, true);
+    const subtask = task.task_subtasks.find((st) => st.id === subtaskId);
+    if (!subtask) return;
+
+    const newSubtaskStatus =
+      subtask.status === 'completed' ? 'pending' : 'completed';
+
+    updateSubtaskOptimistic(task.id, subtaskId, newSubtaskStatus);
+
+    const allSubtasksWillBeCompleted = task.task_subtasks.every((st) =>
+      st.id === subtaskId
+        ? newSubtaskStatus === 'completed'
+        : st.status === 'completed'
+    );
+
+    const someSubtaskWillBePending = task.task_subtasks.some((st) =>
+      st.id === subtaskId
+        ? newSubtaskStatus === 'pending'
+        : st.status === 'pending'
+    );
+
+    if (task.status === 'completed' && someSubtaskWillBePending) {
+      updateTaskOptimistic(task.id, {
+        status: 'pending',
+        completed_at: null,
+      });
+    }
+
+    if (task.status === 'pending' && allSubtasksWillBeCompleted) {
+      updateTaskOptimistic(task.id, {
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      });
+    }
+
     try {
-      const updated = await toggleSubtask(task.id, subtaskId);
+      const updated = await tasksService.toggleSubtaskWithSync(
+        task.id,
+        subtaskId
+      );
       await syncHabitAfterTaskStatusChange(task, updated);
-      await refresh();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'unknown_error';
-      Alert.alert('Could not update subtask', message);
-    } finally {
-      setTaskSubmitting(task.id, false);
+      if (!isNetworkError(error)) {
+        updateSubtaskOptimistic(task.id, subtaskId, subtask.status);
+        updateTaskOptimistic(task.id, {
+          status: task.status,
+          completed_at: task.completed_at,
+        });
+        const message =
+          error instanceof Error ? error.message : 'unknown_error';
+        Alert.alert('Could not update subtask', message);
+      }
     }
   };
 
@@ -252,15 +336,18 @@ export default function TodayScreen() {
     try {
       if (sheetTask) {
         const before = sheetTask;
-        const updated = await updateTaskWithSubtasks(sheetTask.id, {
-          title: values.title,
-          notes: values.notes ?? null,
-          subtasks: values.subtasks,
-        });
+        const updated = await tasksService.updateWithSubtasksWithSync(
+          sheetTask.id,
+          {
+            title: values.title,
+            notes: values.notes ?? null,
+            subtasks: values.subtasks,
+          }
+        );
         if (!updated) throw new Error('task_not_updated');
         await syncHabitAfterTaskStatusChange(before, updated);
       } else {
-        const created = await createTaskWithSubtasks({
+        const created = await tasksService.createWithSubtasksWithSync({
           title: values.title,
           notes: values.notes ?? null,
           subtasks: values.subtasks,
@@ -269,12 +356,15 @@ export default function TodayScreen() {
       }
       await refresh();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'unknown_error';
-      Alert.alert(
-        sheetTask ? 'Could not update task' : 'Could not create task',
-        message
-      );
-      throw error;
+      if (!isNetworkError(error)) {
+        const message =
+          error instanceof Error ? error.message : 'unknown_error';
+        Alert.alert(
+          sheetTask ? 'Could not update task' : 'Could not create task',
+          message
+        );
+        throw error;
+      }
     } finally {
       setSubmittingSheet(false);
     }

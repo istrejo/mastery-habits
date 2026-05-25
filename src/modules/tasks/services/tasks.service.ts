@@ -1,6 +1,9 @@
 import { addDays, format } from 'date-fns';
 import { supabase } from '@core/lib/supabase';
 import { useSessionStore } from '@core/states/session.store';
+import { syncQueueService } from '@core/services/syncQueue.service';
+import { isNetworkError } from '@core/utils/isNetworkError';
+import { tasksCacheService } from './tasksCache.service';
 import type {
   CreateTaskWithSubtasksInput,
   TaskInsert,
@@ -278,5 +281,185 @@ export const tasksService = {
   async delete(id: string): Promise<void> {
     const { error } = await supabase.from('tasks').delete().eq('id', id);
     if (error) throw new Error(error.message);
+  },
+
+  async completeWithSync(id: string): Promise<TaskWithHabit> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'task_complete',
+      payload: { id },
+    });
+
+    try {
+      const result = await this.complete(id);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.upsert(result);
+      return result;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const cached = await tasksCacheService.load();
+        const task = cached.find((t) => t.id === id);
+        if (task) {
+          const optimistic = {
+            ...task,
+            status: 'completed' as const,
+            completed_at: new Date().toISOString(),
+          };
+          await tasksCacheService.upsert(optimistic);
+          return optimistic;
+        }
+      }
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
+  },
+
+  async uncompleteWithSync(id: string): Promise<TaskWithHabit> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'task_uncomplete',
+      payload: { id },
+    });
+
+    try {
+      const result = await this.uncomplete(id);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.upsert(result);
+      return result;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const cached = await tasksCacheService.load();
+        const task = cached.find((t) => t.id === id);
+        if (task) {
+          const optimistic = {
+            ...task,
+            status: 'pending' as const,
+            completed_at: null,
+          };
+          await tasksCacheService.upsert(optimistic);
+          return optimistic;
+        }
+      }
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
+  },
+
+  async toggleSubtaskWithSync(
+    taskId: string,
+    subtaskId: string
+  ): Promise<TaskWithHabit> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'subtask_toggle',
+      payload: { taskId, subtaskId },
+    });
+
+    try {
+      const result = await this.toggleSubtask(taskId, subtaskId);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.upsert(result);
+      return result;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const cached = await tasksCacheService.load();
+        const task = cached.find((t) => t.id === taskId);
+        if (task) {
+          return task;
+        }
+      }
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
+  },
+
+  async createWithSubtasksWithSync(
+    input: CreateTaskWithSubtasksInput
+  ): Promise<TaskWithHabit> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'task_create',
+      payload: input,
+    });
+
+    try {
+      const result = await this.createWithSubtasks(input);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.upsert(result);
+      return result;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const tempId = `temp_${Date.now()}`;
+        const optimistic: TaskWithHabit = {
+          id: tempId,
+          user_id: requireUserId(),
+          title: input.title,
+          description: input.notes || null,
+          status: 'pending',
+          due_date: format(new Date(), 'yyyy-MM-dd'),
+          habit_id: null,
+          completed_at: null,
+          created_at: new Date().toISOString(),
+          habits: null,
+          task_subtasks: (input.subtasks || []).map((title, index) => ({
+            id: `temp_sub_${Date.now()}_${index}`,
+            task_id: tempId,
+            user_id: requireUserId(),
+            title,
+            status: 'pending' as const,
+            order_index: index,
+            completed_at: null,
+            created_at: new Date().toISOString(),
+          })),
+        };
+        await tasksCacheService.upsert(optimistic);
+        return optimistic;
+      }
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
+  },
+
+  async updateWithSubtasksWithSync(
+    id: string,
+    input: CreateTaskWithSubtasksInput
+  ): Promise<TaskWithHabit> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'task_update',
+      payload: { id, ...input },
+    });
+
+    try {
+      const result = await this.updateWithSubtasks(id, input);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.upsert(result);
+      return result;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const cached = await tasksCacheService.load();
+        const task = cached.find((t) => t.id === id);
+        if (task) {
+          return task;
+        }
+      }
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
+  },
+
+  async deleteWithSync(id: string): Promise<void> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'task_delete',
+      payload: { id },
+    });
+
+    try {
+      await this.delete(id);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.remove(id);
+    } catch (error) {
+      if (isNetworkError(error)) {
+        await tasksCacheService.remove(id);
+        return;
+      }
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
   },
 };
