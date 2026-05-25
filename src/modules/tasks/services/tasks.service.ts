@@ -105,8 +105,8 @@ export const tasksService = {
     const userId = requireUserId();
     const title = input.title.trim();
     const subtasks = (input.subtasks ?? [])
-      .map((item) => item.trim())
-      .filter(Boolean);
+      .map((item) => ({ title: item.title.trim(), completed: item.completed }))
+      .filter((item) => item.title);
     const today = format(new Date(), 'yyyy-MM-dd');
 
     const task = await tasksService.create({
@@ -121,7 +121,9 @@ export const tasksService = {
     const rows = subtasks.map((subtask, index) => ({
       task_id: task.id,
       user_id: userId,
-      title: subtask,
+      title: subtask.title,
+      status: subtask.completed ? ('completed' as const) : ('pending' as const),
+      completed_at: subtask.completed ? new Date().toISOString() : null,
       order_index: index,
     }));
 
@@ -244,8 +246,8 @@ export const tasksService = {
     const userId = requireUserId();
     const title = input.title.trim();
     const newSubtasks = (input.subtasks ?? [])
-      .map((item) => item.trim())
-      .filter(Boolean);
+      .map((item) => ({ title: item.title.trim(), completed: item.completed }))
+      .filter((item) => item.title);
 
     const task = await tasksService.update(id, {
       title,
@@ -264,7 +266,9 @@ export const tasksService = {
     const rows = newSubtasks.map((subtask, index) => ({
       task_id: id,
       user_id: userId,
-      title: subtask,
+      title: subtask.title,
+      status: subtask.completed ? ('completed' as const) : ('pending' as const),
+      completed_at: subtask.completed ? new Date().toISOString() : null,
       order_index: index,
     }));
 
@@ -397,14 +401,16 @@ export const tasksService = {
           completed_at: null,
           created_at: new Date().toISOString(),
           habits: null,
-          task_subtasks: (input.subtasks || []).map((title, index) => ({
+          task_subtasks: (input.subtasks || []).map((subtask, index) => ({
             id: `temp_sub_${Date.now()}_${index}`,
             task_id: tempId,
             user_id: requireUserId(),
-            title,
-            status: 'pending' as const,
+            title: subtask.title,
+            status: subtask.completed
+              ? ('completed' as const)
+              : ('pending' as const),
             order_index: index,
-            completed_at: null,
+            completed_at: subtask.completed ? new Date().toISOString() : null,
             created_at: new Date().toISOString(),
           })),
         };

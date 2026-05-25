@@ -19,7 +19,7 @@ import type { TaskWithHabit } from '../types';
 export interface TaskCreateSheetValues {
   title: string;
   notes?: string | null;
-  subtasks: string[];
+  subtasks: Array<{ title: string; completed: boolean }>;
 }
 
 interface TaskCreateSheetProps {
@@ -42,15 +42,26 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
   const translateY = useRef(new Animated.Value(0)).current;
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
-  const [subtasks, setSubtasks] = useState<string[]>([]);
+  const [subtasks, setSubtasks] = useState<
+    Array<{ title: string; completed: boolean }>
+  >([]);
   const [subtaskDraft, setSubtaskDraft] = useState('');
+  const [editingSubtaskIndex, setEditingSubtaskIndex] = useState<number | null>(
+    null
+  );
+  const [editingSubtaskText, setEditingSubtaskText] = useState('');
   const isEditMode = !!task;
 
   useEffect(() => {
     if (task && visible) {
       setTitle(task.title);
       setNotes(task.description || '');
-      setSubtasks((task.task_subtasks ?? []).map((st) => st.title));
+      setSubtasks(
+        (task.task_subtasks ?? []).map((st) => ({
+          title: st.title,
+          completed: st.status === 'completed',
+        }))
+      );
       setSubtaskDraft('');
     } else if (!visible) {
       setTitle('');
@@ -93,12 +104,16 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
     const trimmedTitle = title.trim();
     if (!trimmedTitle || submitting) return;
 
+    const allSubtasks = [...subtasks];
+    const trimmedDraft = subtaskDraft.trim();
+    if (trimmedDraft) {
+      allSubtasks.push({ title: trimmedDraft, completed: false });
+    }
+
     await onSubmit({
       title: trimmedTitle,
       notes: notes.trim() || null,
-      subtasks: [...subtasks, subtaskDraft]
-        .map((item) => item.trim())
-        .filter(Boolean),
+      subtasks: allSubtasks,
     });
     if (!isEditMode) {
       reset();
@@ -109,12 +124,44 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
   const commitSubtaskDraft = () => {
     const trimmed = subtaskDraft.trim();
     if (!trimmed) return;
-    setSubtasks((current) => [...current, trimmed]);
+    setSubtasks((current) => [
+      ...current,
+      { title: trimmed, completed: false },
+    ]);
     setSubtaskDraft('');
   };
 
   const removeSubtask = (index: number) => {
     setSubtasks((current) => current.filter((_item, i) => i !== index));
+  };
+
+  const toggleSubtaskCompleted = (index: number) => {
+    setSubtasks((current) =>
+      current.map((item, i) =>
+        i === index ? { ...item, completed: !item.completed } : item
+      )
+    );
+  };
+
+  const startEditingSubtask = (index: number) => {
+    setEditingSubtaskIndex(index);
+    setEditingSubtaskText(subtasks[index]?.title || '');
+  };
+
+  const saveEditingSubtask = () => {
+    if (editingSubtaskIndex === null) return;
+    const trimmed = editingSubtaskText.trim();
+    if (!trimmed) {
+      removeSubtask(editingSubtaskIndex);
+    } else {
+      setSubtasks((current) =>
+        current.map((item, i) =>
+          i === editingSubtaskIndex ? { ...item, title: trimmed } : item
+        )
+      );
+    }
+    setEditingSubtaskIndex(null);
+    setEditingSubtaskText('');
   };
 
   return (
@@ -290,45 +337,112 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                   >
                     {t('tasks.sheet.subtasks_label')}
                   </Text>
-                  {subtasks.map((subtask, index) => (
-                    <View
-                      key={`${subtask}-${index}`}
-                      testID={`task-sheet-subtask-row-${index}`}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: theme.spacing.stackSm,
-                      }}
-                    >
-                      <TouchableOpacity
-                        testID={`task-sheet-subtask-checkbox-${index}`}
-                        onPress={() => removeSubtask(index)}
-                        activeOpacity={0.82}
+                  {subtasks.map((subtask, index) => {
+                    const isEditing = editingSubtaskIndex === index;
+                    return (
+                      <View
+                        key={`${subtask.title}-${index}`}
+                        testID={`task-sheet-subtask-row-${index}`}
                         style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: theme.radius.sm,
-                          borderWidth: theme.borderWidth.default,
-                          borderColor: theme.text.primary,
+                          flexDirection: 'row',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      />
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          flex: 1,
-                          color: theme.text.primary,
-                          fontFamily: 'Lexend_600SemiBold',
-                          fontSize: theme.typography.scale.bodyMain.fontSize,
-                          lineHeight:
-                            theme.typography.scale.bodyMain.lineHeight,
+                          gap: theme.spacing.stackSm,
                         }}
                       >
-                        {subtask}
-                      </Text>
-                    </View>
-                  ))}
+                        <TouchableOpacity
+                          testID={`task-sheet-subtask-checkbox-${index}`}
+                          onPress={() => toggleSubtaskCompleted(index)}
+                          activeOpacity={0.82}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: theme.radius.sm,
+                            borderWidth: theme.borderWidth.default,
+                            borderColor: theme.text.primary,
+                            backgroundColor: subtask.completed
+                              ? theme.accent.primary
+                              : 'transparent',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {subtask.completed && (
+                            <MaterialIcons
+                              name='check'
+                              size={18}
+                              color={theme.accent.onPrimary}
+                            />
+                          )}
+                        </TouchableOpacity>
+                        {isEditing ? (
+                          <TextInput
+                            testID={`task-sheet-subtask-edit-input-${index}`}
+                            value={editingSubtaskText}
+                            onChangeText={setEditingSubtaskText}
+                            onBlur={saveEditingSubtask}
+                            onSubmitEditing={saveEditingSubtask}
+                            autoFocus
+                            returnKeyType='done'
+                            style={{
+                              flex: 1,
+                              color: theme.accent.primary,
+                              fontFamily: 'Lexend_600SemiBold',
+                              fontSize:
+                                theme.typography.scale.bodyMain.fontSize,
+                              lineHeight:
+                                theme.typography.scale.bodyMain.lineHeight,
+                              paddingVertical: 0,
+                            }}
+                          />
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => startEditingSubtask(index)}
+                            activeOpacity={0.82}
+                            style={{ flex: 1 }}
+                          >
+                            <Text
+                              numberOfLines={1}
+                              style={{
+                                color: theme.text.primary,
+                                fontFamily: 'Lexend_600SemiBold',
+                                fontSize:
+                                  theme.typography.scale.bodyMain.fontSize,
+                                lineHeight:
+                                  theme.typography.scale.bodyMain.lineHeight,
+                                textDecorationLine: subtask.completed
+                                  ? 'line-through'
+                                  : 'none',
+                                opacity: subtask.completed ? 0.6 : 1,
+                              }}
+                            >
+                              {subtask.title}
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                        {isEditing && (
+                          <TouchableOpacity
+                            testID={`task-sheet-subtask-delete-${index}`}
+                            onPress={() => {
+                              removeSubtask(index);
+                              setEditingSubtaskIndex(null);
+                              setEditingSubtaskText('');
+                            }}
+                            activeOpacity={0.82}
+                            hitSlop={8}
+                            style={{
+                              padding: 4,
+                            }}
+                          >
+                            <MaterialIcons
+                              name='delete-outline'
+                              size={20}
+                              color={theme.text.tertiary}
+                            />
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    );
+                  })}
                   <View
                     style={{
                       flexDirection: 'row',

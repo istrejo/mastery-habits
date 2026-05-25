@@ -5,7 +5,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@core/components';
 import { useTheme } from '@core/theming';
-import { useTasks, useTaskActions, TaskCreateSheet, TaskList } from '@tasks/index';
+import {
+  useTasks,
+  useTaskActions,
+  TaskCreateSheet,
+  TaskList,
+} from '@tasks/index';
 import type { Task } from '@tasks/index';
 
 export default function TasksIndexScreen() {
@@ -13,7 +18,8 @@ export default function TasksIndexScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { tasks, loading, refresh } = useTasks();
-  const { completeTask, createTaskWithSubtasks, uncompleteTask, deleteTask } = useTaskActions();
+  const { completeTask, createTaskWithSubtasks, uncompleteTask, deleteTask } =
+    useTaskActions();
   const [createSheetVisible, setCreateSheetVisible] = useState(false);
   const [creatingTask, setCreatingTask] = useState(false);
 
@@ -34,7 +40,11 @@ export default function TasksIndexScreen() {
     await refresh();
   };
 
-  const handleCreate = async (values: { title: string; notes?: string | null; subtasks: string[] }) => {
+  const handleCreate = async (values: {
+    title: string;
+    notes?: string | null;
+    subtasks: Array<{ title: string; completed: boolean }>;
+  }) => {
     setCreatingTask(true);
     try {
       await createTaskWithSubtasks(values);
@@ -65,9 +75,18 @@ export default function TasksIndexScreen() {
         >
           <TouchableOpacity
             onPress={() => router.back()}
-            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <MaterialIcons name="arrow-back" size={22} color={theme.text.primary} />
+            <MaterialIcons
+              name='arrow-back'
+              size={22}
+              color={theme.text.primary}
+            />
           </TouchableOpacity>
           <Text
             style={{
@@ -82,9 +101,14 @@ export default function TasksIndexScreen() {
           </Text>
           <TouchableOpacity
             onPress={() => setCreateSheetVisible(true)}
-            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <MaterialIcons name="add" size={22} color={theme.text.primary} />
+            <MaterialIcons name='add' size={22} color={theme.text.primary} />
           </TouchableOpacity>
         </View>
 
