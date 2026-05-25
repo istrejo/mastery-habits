@@ -39,7 +39,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const translateY = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(600)).current;
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [subtasks, setSubtasks] = useState<
@@ -51,6 +51,19 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
   );
   const [editingSubtaskText, setEditingSubtaskText] = useState('');
   const isEditMode = !!task;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.spring(translateY, {
+        toValue: 0,
+        useNativeDriver: true,
+        damping: 20,
+        stiffness: 90,
+      }).start();
+    } else {
+      translateY.setValue(600);
+    }
+  }, [visible, translateY]);
 
   useEffect(() => {
     if (task && visible) {
@@ -80,13 +93,15 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
         },
         onPanResponderRelease: (_event, gesture) => {
           if (gesture.dy > 90) {
-            translateY.setValue(0);
+            translateY.setValue(600);
             onClose();
             return;
           }
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
+            damping: 20,
+            stiffness: 90,
           }).start();
         },
       }),
@@ -168,7 +183,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType='slide'
+      animationType='none'
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
