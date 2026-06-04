@@ -40,10 +40,22 @@
     "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "babel-preset-expo": "^55.0.19",
+    "eas-cli": "^20.0.0",
     "jest": "^30.3.0",
     "jest-expo": "^55.0.16",
     "ts-jest": "^29.4.9",
     "typescript": "~5.9.2"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "^0.8.13",
+    "ajv": "^8.18.0",
+    "diff": "^8.0.3",
+    "minimatch": "^10.2.5",
+    "node-forge": "^1.4.0",
+    "postcss": "^8.5.10",
+    "tar": "^7.5.11",
+    "uuid": "^11.1.1",
+    "yaml": "^2.8.3"
   },
   "private": true
 }
