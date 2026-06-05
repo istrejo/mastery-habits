@@ -24,7 +24,6 @@ import {
   TaskCreateSheet,
   useTaskActions,
   useTodayTasks,
-  tasksService,
   type DashboardTaskStatus,
   type TaskCreateSheetValues,
   type TaskWithHabit,
@@ -263,8 +262,9 @@ export default function TodayScreen() {
 
     try {
       const updated = await (task.status === 'completed'
-        ? tasksService.uncompleteWithSync(task.id)
-        : tasksService.completeWithSync(task.id));
+        ? uncompleteTask(task.id)
+        : completeTask(task.id));
+      if (!updated) throw new Error('task_not_updated');
       await syncHabitAfterTaskStatusChange(task, updated);
     } catch (error) {
       if (!isNetworkError(error)) {
@@ -321,10 +321,8 @@ export default function TodayScreen() {
     }
 
     try {
-      const updated = await tasksService.toggleSubtaskWithSync(
-        task.id,
-        subtaskId
-      );
+      const updated = await toggleSubtask(task.id, subtaskId);
+      if (!updated) throw new Error('task_not_updated');
       await syncHabitAfterTaskStatusChange(task, updated);
     } catch (error) {
       if (!isNetworkError(error)) {
@@ -345,18 +343,15 @@ export default function TodayScreen() {
     try {
       if (sheetTask) {
         const before = sheetTask;
-        const updated = await tasksService.updateWithSubtasksWithSync(
-          sheetTask.id,
-          {
-            title: values.title,
-            notes: values.notes ?? null,
-            subtasks: values.subtasks,
-          }
-        );
+        const updated = await updateTaskWithSubtasks(sheetTask.id, {
+          title: values.title,
+          notes: values.notes ?? null,
+          subtasks: values.subtasks,
+        });
         if (!updated) throw new Error('task_not_updated');
         await syncHabitAfterTaskStatusChange(before, updated);
       } else {
-        const created = await tasksService.createWithSubtasksWithSync({
+        const created = await createTaskWithSubtasks({
           title: values.title,
           notes: values.notes ?? null,
           subtasks: values.subtasks,

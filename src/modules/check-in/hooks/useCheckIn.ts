@@ -29,18 +29,23 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const today = new Date();
+  const load = useCallback(async (date: Date = new Date()) => {
+    if (!habit) {
+      setTodayCheckIn(null);
+      setLast30Days([]);
+      setAllCheckIns([]);
+      setSkipAvailable(false);
+      return;
+    }
 
-  const load = useCallback(async () => {
-    if (!habit) return;
     setLoading(true);
     setError(null);
     try {
       const [checkIn, history, fullHistory, usedSkip] = await Promise.all([
-        checkinService.getCheckIn(habit.id, today),
+        checkinService.getCheckIn(habit.id, date),
         checkinService.getLast30Days(habit.id),
         checkinService.getAllForHabit(habit.id),
-        hasUsedSkipThisWeek(habit.id, today),
+        hasUsedSkipThisWeek(habit.id, date),
       ]);
       setTodayCheckIn(checkIn);
       setLast30Days(history);
@@ -51,7 +56,7 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
     } finally {
       setLoading(false);
     }
-  }, [habit?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [habit]);
 
   useEffect(() => {
     void load();
@@ -60,18 +65,20 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
   const register = useCallback(
     async (status: CheckInStatus) => {
       if (!habit) return;
+
+      const currentDate = new Date();
       setError(null);
       try {
-        await checkinService.register(habit.id, today, status);
-        await load();
+        await checkinService.register(habit.id, currentDate, status);
+        await load(currentDate);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'unknown_error');
       }
     },
-    [habit, load], // eslint-disable-line react-hooks/exhaustive-deps
+    [habit, load],
   );
 
-  const canCheckInToday = habit ? isPlannedDay(habit, today) : false;
+  const canCheckInToday = habit ? isPlannedDay(habit, new Date()) : false;
   const alreadyCheckedIn = todayCheckIn !== null;
 
   return {

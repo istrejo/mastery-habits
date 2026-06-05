@@ -11,7 +11,7 @@ export const useTaskActions = () => {
     async (input: Omit<TaskInsert, 'user_id'>) => {
       setError(null);
       try {
-        const task = await tasksService.create(input);
+        const task = await tasksService.createWithSync(input);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -27,7 +27,7 @@ export const useTaskActions = () => {
     async (input: CreateTaskWithSubtasksInput) => {
       setError(null);
       try {
-        const task = await tasksService.createWithSubtasks(input);
+        const task = await tasksService.createWithSubtasksWithSync(input);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -43,7 +43,7 @@ export const useTaskActions = () => {
     async (id: string) => {
       setError(null);
       try {
-        const task = await tasksService.complete(id);
+        const task = await tasksService.completeWithSync(id);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -59,7 +59,7 @@ export const useTaskActions = () => {
     async (id: string) => {
       setError(null);
       try {
-        const task = await tasksService.uncomplete(id);
+        const task = await tasksService.uncompleteWithSync(id);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -75,7 +75,7 @@ export const useTaskActions = () => {
     async (taskId: string, subtaskId: string) => {
       setError(null);
       try {
-        const task = await tasksService.toggleSubtask(taskId, subtaskId);
+        const task = await tasksService.toggleSubtaskWithSync(taskId, subtaskId);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -91,7 +91,7 @@ export const useTaskActions = () => {
     async (id: string, input: CreateTaskWithSubtasksInput) => {
       setError(null);
       try {
-        const task = await tasksService.updateWithSubtasks(id, input);
+        const task = await tasksService.updateWithSubtasksWithSync(id, input);
         upsertTask(task);
         return task;
       } catch (err) {
@@ -107,7 +107,7 @@ export const useTaskActions = () => {
     async (id: string) => {
       setError(null);
       try {
-        await tasksService.delete(id);
+        await tasksService.deleteWithSync(id);
         removeTask(id);
         return true;
       } catch (err) {

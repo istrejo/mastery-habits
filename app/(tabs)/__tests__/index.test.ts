@@ -16,6 +16,8 @@ const useTodayCheckInsMock = jest.fn();
 const dashboardTaskRowMock = jest.fn((props: any) => React.createElement('DashboardTaskRow', props));
 const taskCreateSheetMock = jest.fn((props: any) => React.createElement('TaskCreateSheet', props));
 const dashboardHabitRowMock = jest.fn((props: any) => React.createElement('DashboardHabitRow', props));
+const updateTaskOptimisticMock = jest.fn();
+const updateSubtaskOptimisticMock = jest.fn();
 
 const mockTheme = {
   bg: { base: '#FAFAFA', surface: '#FFFFFF', surfaceAlt: '#F4F4F4', elevated: '#FFFFFF' },
@@ -110,8 +112,13 @@ jest.mock('@core/components', () => {
     Skeleton: mock('Skeleton'),
     Button: (props: any) => ReactLocal.createElement('Button', props, props.label),
     ProgressBar: mock('ProgressBar'),
+    SyncIndicator: mock('SyncIndicator'),
   };
 });
+
+jest.mock('@core/hooks/useAutoSync', () => ({
+  useAutoSync: jest.fn(),
+}));
 
 jest.mock('@tasks/index', () => ({
   useTodayTasks: () => useTodayTasksMock(),
@@ -155,12 +162,20 @@ const setup = (overrides: Partial<{
   toggleSubtask: jest.Mock;
 }> = {}) => {
   useHabitsMock.mockReturnValue({ habits: [], loading: false });
-  useTodayTasksMock.mockReturnValue({ tasks: overrides.tasks ?? [], loading: false, refresh: jest.fn() });
+  useTodayTasksMock.mockReturnValue({
+    tasks: overrides.tasks ?? [],
+    loading: false,
+    refresh: jest.fn(),
+    updateTaskOptimistic: updateTaskOptimisticMock,
+    updateSubtaskOptimistic: updateSubtaskOptimisticMock,
+  });
   useTaskActionsMock.mockReturnValue({
     completeTask: overrides.completeTask ?? jest.fn().mockResolvedValue(createTask('updated', { status: 'completed' })),
     uncompleteTask: overrides.uncompleteTask ?? jest.fn().mockResolvedValue(createTask('updated')),
     createTaskWithSubtasks: overrides.createTaskWithSubtasks ?? jest.fn().mockResolvedValue(createTask('created')),
+    updateTaskWithSubtasks: jest.fn().mockResolvedValue(createTask('updated')),
     toggleSubtask: overrides.toggleSubtask ?? jest.fn().mockResolvedValue(createTask('updated')),
+    deleteTask: jest.fn().mockResolvedValue(true),
   });
   useTodayCheckInsMock.mockReturnValue({
     completedToday: overrides.completedToday ?? new Set(),
@@ -173,6 +188,8 @@ const setup = (overrides: Partial<{
 describe('TodayScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    updateTaskOptimisticMock.mockReset();
+    updateSubtaskOptimisticMock.mockReset();
     jest.spyOn(console, 'error').mockImplementation((message: unknown) => {
       if (typeof message === 'string' && message.includes('react-test-renderer is deprecated')) return;
     });
@@ -230,7 +247,13 @@ describe('TodayScreen', () => {
     const createTaskWithSubtasks = jest.fn().mockResolvedValue(createTask('created'));
     const refresh = jest.fn();
     setup({ createTaskWithSubtasks });
-    useTodayTasksMock.mockReturnValue({ tasks: [], loading: false, refresh });
+    useTodayTasksMock.mockReturnValue({
+      tasks: [],
+      loading: false,
+      refresh,
+      updateTaskOptimistic: updateTaskOptimisticMock,
+      updateSubtaskOptimistic: updateSubtaskOptimisticMock,
+    });
 
     act(() => {
       create(React.createElement(TodayScreen));
@@ -337,7 +360,12 @@ describe('TodayScreen', () => {
       task_subtasks: [
         { id: 'sub-1', task_id: 'task-1', user_id: 'user-1', title: 'Write tests', status: 'pending', completed_at: null, order_index: 0, created_at: '2026-05-25T00:00:00.000Z' },
       ],
-    })], loading: false, refresh });
+    })],
+      loading: false,
+      refresh,
+      updateTaskOptimistic: updateTaskOptimisticMock,
+      updateSubtaskOptimistic: updateSubtaskOptimisticMock,
+    });
 
     act(() => {
       create(React.createElement(TodayScreen));
@@ -349,7 +377,7 @@ describe('TodayScreen', () => {
     });
 
     expect(toggleSubtask).toHaveBeenCalledWith('task-1', 'sub-1');
-    expect(refresh).toHaveBeenCalled();
+    expect(updateSubtaskOptimisticMock).toHaveBeenCalledWith('task-1', 'sub-1', 'completed');
   });
 
 });

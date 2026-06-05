@@ -31,11 +31,35 @@ jest.mock('react-native', () => {
     Component.displayName = name;
     return Component;
   };
+  const AnimatedComponent = mock('AnimatedComponent');
   return {
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
     ActivityIndicator: mock('ActivityIndicator'),
+    Animated: {
+      View: mock('AnimatedView'),
+      Text: mock('AnimatedText'),
+      Value: class {
+        value: number;
+
+        constructor(value: number) {
+          this.value = value;
+        }
+
+        setValue(next: number) {
+          this.value = next;
+        }
+
+        interpolate() {
+          return this.value;
+        }
+      },
+      createAnimatedComponent: () => AnimatedComponent,
+      timing: () => ({ start: () => undefined }),
+      sequence: () => ({ start: () => undefined }),
+      parallel: () => ({ start: () => undefined }),
+    },
   };
 });
 

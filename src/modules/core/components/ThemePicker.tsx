@@ -10,9 +10,14 @@ import {
   type EnabledThemeId,
 } from '@core/theming';
 
+type ThemeNameKey = 'theme_picker.light_name' | 'theme_picker.dark_name';
+type ThemeDescriptionKey =
+  | 'theme_picker.light_description'
+  | 'theme_picker.dark_description';
+
 const THEME_COPY: Record<
   EnabledThemeId,
-  { nameKey: string; descriptionKey: string }
+  { nameKey: ThemeNameKey; descriptionKey: ThemeDescriptionKey }
 > = {
   'minimal-light': {
     nameKey: 'theme_picker.light_name',

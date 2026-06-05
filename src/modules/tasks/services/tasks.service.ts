@@ -38,6 +38,48 @@ const requireUserId = () => {
   return userId;
 };
 
+const buildOptimisticTask = (
+  input: Omit<TaskInsert, 'user_id'>,
+  id: string = `temp_${Date.now()}`
+): TaskWithHabit => ({
+  id,
+  user_id: requireUserId(),
+  title: input.title,
+  description: input.description ?? null,
+  due_date: input.due_date ?? null,
+  habit_id: input.habit_id ?? null,
+  status: input.status ?? 'pending',
+  completed_at: input.completed_at ?? null,
+  created_at: new Date().toISOString(),
+  habits: null,
+  task_subtasks: [],
+});
+
+const buildOptimisticTaskWithSubtasks = (
+  input: CreateTaskWithSubtasksInput,
+  tempId: string = `temp_${Date.now()}`
+): TaskWithHabit => ({
+  ...buildOptimisticTask(
+    {
+      title: input.title,
+      description: input.notes || null,
+      due_date: format(new Date(), 'yyyy-MM-dd'),
+      habit_id: null,
+    },
+    tempId
+  ),
+  task_subtasks: (input.subtasks || []).map((subtask, index) => ({
+    id: `temp_sub_${Date.now()}_${index}`,
+    task_id: tempId,
+    user_id: requireUserId(),
+    title: subtask.title,
+    status: subtask.completed ? ('completed' as const) : ('pending' as const),
+    order_index: index,
+    completed_at: subtask.completed ? new Date().toISOString() : null,
+    created_at: new Date().toISOString(),
+  })),
+});
+
 export const tasksService = {
   async list(): Promise<TaskWithHabit[]> {
     const userId = requireUserId();
@@ -97,6 +139,31 @@ export const tasksService = {
 
     if (error) throw new Error(error.message);
     return sortTaskSubtasks(data as TaskWithHabit);
+  },
+
+  async createWithSync(
+    input: Omit<TaskInsert, 'user_id'>
+  ): Promise<TaskWithHabit> {
+    const operationId = await syncQueueService.enqueue({
+      type: 'task_create',
+      payload: { mode: 'plain', input },
+    });
+
+    try {
+      const result = await this.create(input);
+      await syncQueueService.dequeue(operationId);
+      await tasksCacheService.upsert(result);
+      return result;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const optimistic = buildOptimisticTask(input);
+        await tasksCacheService.upsert(optimistic);
+        return optimistic;
+      }
+
+      await syncQueueService.dequeue(operationId);
+      throw error;
+    }
   },
 
   async createWithSubtasks(
@@ -379,7 +446,7 @@ export const tasksService = {
   ): Promise<TaskWithHabit> {
     const operationId = await syncQueueService.enqueue({
       type: 'task_create',
-      payload: input,
+      payload: { mode: 'withSubtasks', input },
     });
 
     try {
@@ -389,31 +456,7 @@ export const tasksService = {
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
-        const tempId = `temp_${Date.now()}`;
-        const optimistic: TaskWithHabit = {
-          id: tempId,
-          user_id: requireUserId(),
-          title: input.title,
-          description: input.notes || null,
-          status: 'pending',
-          due_date: format(new Date(), 'yyyy-MM-dd'),
-          habit_id: null,
-          completed_at: null,
-          created_at: new Date().toISOString(),
-          habits: null,
-          task_subtasks: (input.subtasks || []).map((subtask, index) => ({
-            id: `temp_sub_${Date.now()}_${index}`,
-            task_id: tempId,
-            user_id: requireUserId(),
-            title: subtask.title,
-            status: subtask.completed
-              ? ('completed' as const)
-              : ('pending' as const),
-            order_index: index,
-            completed_at: subtask.completed ? new Date().toISOString() : null,
-            created_at: new Date().toISOString(),
-          })),
-        };
+        const optimistic = buildOptimisticTaskWithSubtasks(input);
         await tasksCacheService.upsert(optimistic);
         return optimistic;
       }

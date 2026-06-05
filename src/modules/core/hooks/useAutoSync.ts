@@ -24,6 +24,16 @@ export const useAutoSync = () => {
           await tasksService.uncomplete(operation.payload.id);
           break;
         case 'task_create':
+          if (operation.payload?.mode === 'plain') {
+            await tasksService.create(operation.payload.input);
+            break;
+          }
+
+          if (operation.payload?.mode === 'withSubtasks') {
+            await tasksService.createWithSubtasks(operation.payload.input);
+            break;
+          }
+
           await tasksService.createWithSubtasks(operation.payload);
           break;
         case 'task_update':
