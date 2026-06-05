@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@auth/index";
+import { useAuth, SocialAuthButtons } from "@auth/index";
 import { Screen, Input, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 
@@ -56,6 +56,8 @@ export default function LoginScreen() {
             </Pressable>
           </Link>
         </View>
+
+        <SocialAuthButtons />
       </View>
     </Screen>
   );
