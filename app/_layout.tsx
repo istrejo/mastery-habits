@@ -13,6 +13,7 @@ import { ThemeProvider } from "@core/theming";
 import { LocaleProvider, initI18n, resolveLocale, useLocaleStore } from "@core/i18n";
 import { useSessionStore } from "@core/states/session.store";
 import { supabase } from "@core/lib/supabase";
+import { useTaskAutoSync } from '@tasks/index';
 
 initI18n(resolveLocale(useLocaleStore.getState().locale));
 
@@ -72,6 +73,11 @@ function AuthGate({ onReady }: { onReady: (ready: boolean) => void }) {
   return null;
 }
 
+function TaskSyncBootstrap() {
+  useTaskAutoSync();
+  return null;
+}
+
 export default function RootLayout() {
   const [authReady, setAuthReady] = useState(false);
   const [fontsLoaded] = useFonts({
@@ -86,6 +92,7 @@ export default function RootLayout() {
     <ThemeProvider>
       <LocaleProvider>
         {fontsLoaded ? <AuthGate onReady={setAuthReady} /> : null}
+        {fontsLoaded ? <TaskSyncBootstrap /> : null}
         {fontsLoaded && authReady ? (
           <Stack screenOptions={{ headerShown: false }} />
         ) : null}

@@ -12,6 +12,28 @@ export interface PendingOperation {
 const QUEUE_KEY = '@mastery_habits:sync_queue';
 const MAX_RETRIES = 5;
 
+const replaceOperationReferences = (
+  operation: PendingOperation,
+  taskIdMap: Record<string, string>,
+  subtaskIdMap: Record<string, string>
+): PendingOperation => {
+  const payload = { ...operation.payload };
+
+  if (typeof payload.id === 'string' && taskIdMap[payload.id]) {
+    payload.id = taskIdMap[payload.id];
+  }
+
+  if (typeof payload.taskId === 'string' && taskIdMap[payload.taskId]) {
+    payload.taskId = taskIdMap[payload.taskId];
+  }
+
+  if (typeof payload.subtaskId === 'string' && subtaskIdMap[payload.subtaskId]) {
+    payload.subtaskId = subtaskIdMap[payload.subtaskId];
+  }
+
+  return { ...operation, payload };
+};
+
 export const syncQueueService = {
   async enqueue(operation: Omit<PendingOperation, 'id' | 'timestamp' | 'retries'>): Promise<string> {
     const queue = await this.getAll();
@@ -45,6 +67,11 @@ export const syncQueueService = {
     }
   },
 
+  async hydratePendingCount(): Promise<void> {
+    const queue = await this.getAll();
+    useSyncStore.getState().setPendingCount(queue.length);
+  },
+
   async incrementRetry(operationId: string): Promise<void> {
     const queue = await this.getAll();
     const updated = queue.map((op) =>
@@ -65,18 +92,36 @@ export const syncQueueService = {
     useSyncStore.getState().setPendingCount(0);
   },
 
-  async processQueue(executor: (op: PendingOperation) => Promise<void>): Promise<void> {
+  async replaceEntityReferences(
+    taskIdMap: Record<string, string>,
+    subtaskIdMap: Record<string, string> = {}
+  ): Promise<void> {
     const queue = await this.getAll();
-    if (queue.length === 0) return;
+    const updated = queue.map((operation) =>
+      replaceOperationReferences(operation, taskIdMap, subtaskIdMap)
+    );
+
+    await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(updated));
+  },
+
+  async processQueue(executor: (op: PendingOperation) => Promise<void>): Promise<void> {
+    const queuedIds = (await this.getAll()).map((operation) => operation.id);
+    if (queuedIds.length === 0) return;
 
     useSyncStore.getState().setSyncing(true);
 
-    for (const operation of queue) {
+    for (const operationId of queuedIds) {
+      const currentOperation = (await this.getAll()).find(
+        (operation) => operation.id === operationId
+      );
+
+      if (!currentOperation) continue;
+
       try {
-        await executor(operation);
-        await this.dequeue(operation.id);
+        await executor(currentOperation);
+        await this.dequeue(currentOperation.id);
       } catch (error) {
-        await this.incrementRetry(operation.id);
+        await this.incrementRetry(currentOperation.id);
       }
     }
 

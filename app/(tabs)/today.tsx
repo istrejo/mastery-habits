@@ -22,7 +22,6 @@ import {
   DashboardTaskRow,
   TaskCreateSheet,
   useTaskActions,
-  useTaskAutoSync,
   useTodayTasks,
   type DashboardTaskStatus,
   type TaskCreateSheetValues,
@@ -139,7 +138,6 @@ export default function TodayScreen() {
     updateTaskOptimistic,
     updateSubtaskOptimistic,
   } = useTodayTasks();
-  useTaskAutoSync();
   const {
     completeTask,
     createTaskWithSubtasks,

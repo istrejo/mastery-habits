@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSyncStore } from '@core/states/sync.store';
 import { tasksService } from '../services/tasks.service';
 import { tasksCacheService } from '../services/tasksCache.service';
 import type { TaskWithHabit } from '../types';
 
 export const useTodayTasks = () => {
+  const lastSyncAt = useSyncStore((state) => state.lastSyncAt);
   const [tasks, setTasks] = useState<TaskWithHabit[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +90,11 @@ export const useTodayTasks = () => {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!lastSyncAt) return;
+    void load();
+  }, [lastSyncAt, load]);
 
   return {
     tasks,

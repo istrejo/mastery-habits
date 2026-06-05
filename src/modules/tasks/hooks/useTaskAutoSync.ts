@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNetworkStatus } from '@core/hooks/useNetworkStatus';
 import { syncQueueService, type PendingOperation } from '@core/services/syncQueue.service';
 import { useSyncStore } from '@core/states/sync.store';
+import { useSessionStore } from '@core/states/session.store';
 import { tasksCacheService } from '../services/tasksCache.service';
 import { tasksService } from '../services/tasks.service';
 
@@ -16,6 +17,24 @@ const syncCreateOperation = async (operation: PendingOperation) => {
     createdTask = await tasksService.createWithSubtasks(operation.payload);
   }
 
+  const taskIdMap = operation.payload?.optimisticId
+    ? { [operation.payload.optimisticId]: createdTask.id }
+    : {};
+  const optimisticSubtaskIds = operation.payload?.optimisticSubtaskIds ?? [];
+  const subtaskIdMap = Object.fromEntries(
+    optimisticSubtaskIds
+      .map((tempId: string, index: number) => {
+        const createdSubtask = createdTask.task_subtasks[index];
+        return createdSubtask ? [tempId, createdSubtask.id] : null;
+      })
+      .filter(
+        (entry: [string, string] | null): entry is [string, string] =>
+          entry !== null
+      )
+  );
+
+  await syncQueueService.replaceEntityReferences(taskIdMap, subtaskIdMap);
+
   if (operation.payload?.optimisticId) {
     await tasksCacheService.remove(operation.payload.optimisticId);
   }
@@ -26,12 +45,17 @@ const syncCreateOperation = async (operation: PendingOperation) => {
 export const useTaskAutoSync = () => {
   const { isOnline } = useNetworkStatus();
   const { isSyncing, pendingCount } = useSyncStore();
+  const userId = useSessionStore((state) => state.user?.id ?? null);
 
   useEffect(() => {
-    if (isOnline && !isSyncing && pendingCount > 0) {
+    void syncQueueService.hydratePendingCount();
+  }, []);
+
+  useEffect(() => {
+    if (isOnline && userId && !isSyncing && pendingCount > 0) {
       void processQueue();
     }
-  }, [isOnline, isSyncing, pendingCount]);
+  }, [isOnline, isSyncing, pendingCount, userId]);
 
   const processQueue = async () => {
     await syncQueueService.processQueue(async (operation: PendingOperation) => {
