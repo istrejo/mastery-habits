@@ -1,10 +1,29 @@
 import { useEffect } from 'react';
-import { useNetworkStatus } from './useNetworkStatus';
-import { useSyncStore } from '../states/sync.store';
-import { syncQueueService, type PendingOperation } from '../services/syncQueue.service';
-import { tasksService } from '@tasks/services/tasks.service';
+import { useNetworkStatus } from '@core/hooks/useNetworkStatus';
+import { syncQueueService, type PendingOperation } from '@core/services/syncQueue.service';
+import { useSyncStore } from '@core/states/sync.store';
+import { tasksCacheService } from '../services/tasksCache.service';
+import { tasksService } from '../services/tasks.service';
 
-export const useAutoSync = () => {
+const syncCreateOperation = async (operation: PendingOperation) => {
+  let createdTask;
+
+  if (operation.payload?.mode === 'plain') {
+    createdTask = await tasksService.create(operation.payload.input);
+  } else if (operation.payload?.mode === 'withSubtasks') {
+    createdTask = await tasksService.createWithSubtasks(operation.payload.input);
+  } else {
+    createdTask = await tasksService.createWithSubtasks(operation.payload);
+  }
+
+  if (operation.payload?.optimisticId) {
+    await tasksCacheService.remove(operation.payload.optimisticId);
+  }
+
+  await tasksCacheService.upsert(createdTask);
+};
+
+export const useTaskAutoSync = () => {
   const { isOnline } = useNetworkStatus();
   const { isSyncing, pendingCount } = useSyncStore();
 
@@ -24,17 +43,7 @@ export const useAutoSync = () => {
           await tasksService.uncomplete(operation.payload.id);
           break;
         case 'task_create':
-          if (operation.payload?.mode === 'plain') {
-            await tasksService.create(operation.payload.input);
-            break;
-          }
-
-          if (operation.payload?.mode === 'withSubtasks') {
-            await tasksService.createWithSubtasks(operation.payload.input);
-            break;
-          }
-
-          await tasksService.createWithSubtasks(operation.payload);
+          await syncCreateOperation(operation);
           break;
         case 'task_update':
           await tasksService.updateWithSubtasks(operation.payload.id, operation.payload);

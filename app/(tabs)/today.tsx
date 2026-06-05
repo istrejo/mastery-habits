@@ -14,7 +14,6 @@ import {
   SyncIndicator,
 } from '@core/components';
 import { useTheme } from '@core/theming';
-import { useAutoSync } from '@core/hooks/useAutoSync';
 import { isNetworkError } from '@core/utils/isNetworkError';
 import { useDateLocale } from '@core/i18n';
 import { useHabits } from '@habits/index';
@@ -23,6 +22,7 @@ import {
   DashboardTaskRow,
   TaskCreateSheet,
   useTaskActions,
+  useTaskAutoSync,
   useTodayTasks,
   type DashboardTaskStatus,
   type TaskCreateSheetValues,
@@ -139,7 +139,7 @@ export default function TodayScreen() {
     updateTaskOptimistic,
     updateSubtaskOptimistic,
   } = useTodayTasks();
-  useAutoSync();
+  useTaskAutoSync();
   const {
     completeTask,
     createTaskWithSubtasks,

@@ -144,9 +144,10 @@ export const tasksService = {
   async createWithSync(
     input: Omit<TaskInsert, 'user_id'>
   ): Promise<TaskWithHabit> {
+    const optimisticId = `temp_${Date.now()}`;
     const operationId = await syncQueueService.enqueue({
       type: 'task_create',
-      payload: { mode: 'plain', input },
+      payload: { mode: 'plain', optimisticId, input },
     });
 
     try {
@@ -156,7 +157,7 @@ export const tasksService = {
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
-        const optimistic = buildOptimisticTask(input);
+        const optimistic = buildOptimisticTask(input, optimisticId);
         await tasksCacheService.upsert(optimistic);
         return optimistic;
       }
@@ -444,9 +445,10 @@ export const tasksService = {
   async createWithSubtasksWithSync(
     input: CreateTaskWithSubtasksInput
   ): Promise<TaskWithHabit> {
+    const optimisticId = `temp_${Date.now()}`;
     const operationId = await syncQueueService.enqueue({
       type: 'task_create',
-      payload: { mode: 'withSubtasks', input },
+      payload: { mode: 'withSubtasks', optimisticId, input },
     });
 
     try {
@@ -456,7 +458,7 @@ export const tasksService = {
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
-        const optimistic = buildOptimisticTaskWithSubtasks(input);
+        const optimistic = buildOptimisticTaskWithSubtasks(input, optimisticId);
         await tasksCacheService.upsert(optimistic);
         return optimistic;
       }

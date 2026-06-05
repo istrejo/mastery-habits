@@ -4,6 +4,7 @@ export { useTasks } from './hooks/useTasks';
 export { useHabitTasks } from './hooks/useHabitTasks';
 export { useTodayTasks } from './hooks/useTodayTasks';
 export { useTaskActions } from './hooks/useTaskActions';
+export { useTaskAutoSync } from './hooks/useTaskAutoSync';
 export { TaskRow } from './components/TaskRow';
 export { DashboardTaskRow } from './components/DashboardTaskRow';
 export { TaskList } from './components/TaskList';

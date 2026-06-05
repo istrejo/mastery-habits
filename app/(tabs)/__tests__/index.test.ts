@@ -116,13 +116,10 @@ jest.mock('@core/components', () => {
   };
 });
 
-jest.mock('@core/hooks/useAutoSync', () => ({
-  useAutoSync: jest.fn(),
-}));
-
 jest.mock('@tasks/index', () => ({
   useTodayTasks: () => useTodayTasksMock(),
   useTaskActions: () => useTaskActionsMock(),
+  useTaskAutoSync: jest.fn(),
   DashboardTaskRow: (props: any) => dashboardTaskRowMock(props),
   TaskCreateSheet: (props: any) => taskCreateSheetMock(props),
 }));
