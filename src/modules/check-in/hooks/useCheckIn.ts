@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { checkinService, type CheckInRecord } from '../services/checkin.service';
+import { checkinService, CheckInError, type CheckInErrorCode, type CheckInRecord } from '../services/checkin.service';
 import { isPlannedDay } from '../utils/isPlannedDay';
 import { hasUsedSkipThisWeek } from '../utils/hasUsedSkipThisWeek';
 import type { Habit } from '@habits/types';
@@ -15,7 +15,7 @@ interface UseCheckInResult {
   alreadyCheckedIn: boolean;
   skipAvailable: boolean;
   loading: boolean;
-  error: string | null;
+  errorCode: CheckInErrorCode | null;
   markCompleted: () => Promise<void>;
   markSkipped: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -27,7 +27,7 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
   const [allCheckIns, setAllCheckIns] = useState<CheckInRecord[]>([]);
   const [skipAvailable, setSkipAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<CheckInErrorCode | null>(null);
 
   const load = useCallback(async (date: Date = new Date()) => {
     if (!habit) {
@@ -39,7 +39,7 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
     }
 
     setLoading(true);
-    setError(null);
+    setErrorCode(null);
     try {
       const [checkIn, history, fullHistory, usedSkip] = await Promise.all([
         checkinService.getCheckIn(habit.id, date),
@@ -52,7 +52,7 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
       setAllCheckIns(fullHistory);
       setSkipAvailable(!usedSkip);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'unknown_error');
+      setErrorCode(err instanceof CheckInError ? err.code : 'unknown_error');
     } finally {
       setLoading(false);
     }
@@ -67,12 +67,12 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
       if (!habit) return;
 
       const currentDate = new Date();
-      setError(null);
+      setErrorCode(null);
       try {
         await checkinService.register(habit.id, currentDate, status);
         await load(currentDate);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'unknown_error');
+        setErrorCode(err instanceof CheckInError ? err.code : 'unknown_error');
       }
     },
     [habit, load],
@@ -89,7 +89,7 @@ export function useCheckIn(habit: Habit | null): UseCheckInResult {
     alreadyCheckedIn,
     skipAvailable,
     loading,
-    error,
+    errorCode,
     markCompleted: () => register('completed'),
     markSkipped: () => register('skipped'),
     refresh: load,

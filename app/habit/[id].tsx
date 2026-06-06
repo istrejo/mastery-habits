@@ -276,7 +276,7 @@ export default function HabitDetailScreen() {
     alreadyCheckedIn,
     skipAvailable,
     loading: checkInLoading,
-    error: checkInError,
+    errorCode: checkInErrorCode,
     markCompleted,
     markSkipped,
   } = useCheckIn(habit ?? null);
@@ -876,7 +876,7 @@ export default function HabitDetailScreen() {
             style={{ width: '100%' }}
           />
 
-          {checkInError ? (
+          {checkInErrorCode ? (
             <Text
               style={{
                 color: theme.status.danger,
@@ -884,7 +884,15 @@ export default function HabitDetailScreen() {
                 fontFamily: 'Lexend_500Medium',
               }}
             >
-              {t('habit_detail.checkin_error')}
+              {checkInErrorCode === 'cannot_recover_missed_day'
+                ? t('habit_detail.checkin_error_missed')
+                : checkInErrorCode === 'checkin_too_old'
+                ? t('habit_detail.checkin_error_too_old')
+                : checkInErrorCode === 'weekly_skip_already_used'
+                ? t('checkin.skip_used')
+                : checkInErrorCode === 'checkin_in_future'
+                ? t('habit_detail.checkin_error_future')
+                : t('habit_detail.checkin_error')}
             </Text>
           ) : null}
         </View>

@@ -9,6 +9,41 @@ import type { Database } from '@shared/types/database.types';
 
 type CheckInStatus = Database['public']['Enums']['checkin_status'];
 
+export type CheckInErrorCode =
+  | 'unauthenticated'
+  | 'habit_not_found'
+  | 'weekly_skip_already_used'
+  | 'cannot_recover_missed_day'
+  | 'checkin_too_old'
+  | 'checkin_in_future'
+  | 'unknown_error';
+
+const KNOWN_CHECK_IN_CODES: ReadonlySet<string> = new Set<CheckInErrorCode>([
+  'unauthenticated',
+  'habit_not_found',
+  'weekly_skip_already_used',
+  'cannot_recover_missed_day',
+  'checkin_too_old',
+  'checkin_in_future',
+]);
+
+export class CheckInError extends Error {
+  public readonly code: CheckInErrorCode;
+
+  constructor(code: CheckInErrorCode, message?: string) {
+    super(message ?? code);
+    this.code = code;
+    this.name = 'CheckInError';
+  }
+}
+
+function toCheckInError(err: unknown): CheckInError {
+  if (err instanceof CheckInError) return err;
+  const message = err instanceof Error ? err.message : 'unknown_error';
+  const code = KNOWN_CHECK_IN_CODES.has(message) ? (message as CheckInErrorCode) : 'unknown_error';
+  return new CheckInError(code);
+}
+
 export interface CheckInRecord {
   id: string;
   habit_id: string;
@@ -115,7 +150,11 @@ export const checkinService = {
     status: CheckInStatus,
   ): Promise<{ score: number; level: string; used_skip: boolean }> => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    const result = await scoreService.registerCheckIn(habitId, dateStr, status);
+    const result = await scoreService
+      .registerCheckIn(habitId, dateStr, status)
+      .catch((err: unknown) => {
+        throw toCheckInError(err);
+      });
     useScoreStore.getState().setScore(habitId, result.score, result.level);
     return result;
   },
