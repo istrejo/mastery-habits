@@ -4,28 +4,16 @@ import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useAuth, CheckEmailView } from "@auth/index";
 import { Screen, Input, Button, Card } from "@core/components";
 import { useTheme } from "@core/theming";
 
-export default function SignupScreen() {
+function SignupForm() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const router = useRouter();
-  const { signUp, loading, error, signupEmail, clearSignupSuccess } = useAuth();
-
-  if (signupEmail) {
-    return (
-      <Screen scrollable contentStyle={{ flexGrow: 1 }}>
-        <CheckEmailView
-          email={signupEmail}
-          onDifferentEmail={clearSignupSuccess}
-        />
-      </Screen>
-    );
-  }
+  const { signUp, loading, error } = useAuth();
 
   const schema = useMemo(() => z.object({
     displayName: z.string().min(2, t("signup.error_name_min")).max(40),
@@ -81,4 +69,21 @@ export default function SignupScreen() {
       </View>
     </Screen>
   );
+}
+
+export default function SignupScreen() {
+  const { signupEmail, clearSignupSuccess } = useAuth();
+
+  if (signupEmail) {
+    return (
+      <Screen scrollable contentStyle={{ flexGrow: 1 }}>
+        <CheckEmailView
+          email={signupEmail}
+          onDifferentEmail={clearSignupSuccess}
+        />
+      </Screen>
+    );
+  }
+
+  return <SignupForm />;
 }

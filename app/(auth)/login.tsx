@@ -13,7 +13,7 @@ import { useTheme } from "@core/theming";
 export default function LoginScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { signIn, resendVerification, loading, error } = useAuth();
+  const { signIn, resendVerification, loading, error, resendSent } = useAuth();
   const [resending, setResending] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
@@ -26,13 +26,12 @@ export default function LoginScreen() {
   };
 
   const errorMessage = useMemo(() => {
+    if (resendSent) return t("login.resend_sent");
     if (!error) return null;
     if (error === "email_not_confirmed") return t("login.error_email_not_confirmed");
-    if (error === "resend_sent") return t("login.resend_sent");
-    if (error === "signup_success_check_inbox") return null;
     if (error.endsWith("_timeout")) return t("login.error_oauth_timeout");
     return error;
-  }, [error, t]);
+  }, [error, resendSent, t]);
 
   const onResend = () => {
     const email = pendingEmail ?? getValues('email');
@@ -66,7 +65,7 @@ export default function LoginScreen() {
             </Pressable>
           </View>
           {errorMessage ? (
-            <Text style={{ color: error === "resend_sent" ? theme.status.success : theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>
+            <Text style={{ color: resendSent ? theme.status.success : theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>
               {errorMessage}
             </Text>
           ) : null}
