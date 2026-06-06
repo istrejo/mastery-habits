@@ -1,4 +1,4 @@
-import { calculateScore, calculateMasteryLevel } from '../utils/calculateScore';
+import { calculateScore, calculateMasteryLevel, pickPrevScore } from '../utils/calculateScore';
 
 describe('calculateScore', () => {
   describe('planned day — completed', () => {
@@ -83,4 +83,69 @@ describe('calculateMasteryLevel', () => {
   it('forest at 90', () => expect(calculateMasteryLevel(90)).toBe('forest'));
   it('ancient at 91', () => expect(calculateMasteryLevel(91)).toBe('ancient'));
   it('ancient at 100', () => expect(calculateMasteryLevel(100)).toBe('ancient'));
+});
+
+describe('pickPrevScore', () => {
+  it('returns 0 for empty history', () => {
+    expect(pickPrevScore([], '2026-06-06')).toBe(0);
+  });
+
+  it('returns 0 when no snapshot is strictly before the target date', () => {
+    const history = [{ last_calculated_date: '2026-06-06', score: 80 }];
+    expect(pickPrevScore(history, '2026-06-06')).toBe(0);
+  });
+
+  it('returns the score of the most recent snapshot before the target', () => {
+    const history = [
+      { last_calculated_date: '2026-06-01', score: 20 },
+      { last_calculated_date: '2026-06-04', score: 60 },
+      { last_calculated_date: '2026-06-05', score: 80 },
+    ];
+    expect(pickPrevScore(history, '2026-06-06')).toBe(80);
+  });
+
+  it('ignores null last_calculated_date', () => {
+    const history = [
+      { last_calculated_date: null, score: 999 },
+      { last_calculated_date: '2026-06-04', score: 60 },
+    ];
+    expect(pickPrevScore(history, '2026-06-06')).toBe(60);
+  });
+
+  it('is order-independent (sorts internally)', () => {
+    const history = [
+      { last_calculated_date: '2026-06-05', score: 80 },
+      { last_calculated_date: '2026-06-01', score: 20 },
+      { last_calculated_date: '2026-06-04', score: 60 },
+    ];
+    expect(pickPrevScore(history, '2026-06-06')).toBe(80);
+  });
+});
+
+describe('backfill parity with SQL register_check_in', () => {
+  it('uses the score from the day before, not the latest persisted score', () => {
+    const history = [
+      { last_calculated_date: '2026-06-01', score: 20 },
+      { last_calculated_date: '2026-06-04', score: 60 },
+    ];
+    const targetDate = '2026-06-05';
+    const prev = pickPrevScore(history, targetDate);
+    const { score } = calculateScore(prev, 'completed', true);
+    expect(score).toBe(68);
+  });
+
+  it('parity: replaying a backfill day uses the prior day score', () => {
+    const history: { last_calculated_date: string; score: number }[] = [];
+    const dates = ['2026-06-01', '2026-06-02', '2026-06-03'];
+
+    for (const date of dates) {
+      const prev = pickPrevScore(history, date);
+      const { score } = calculateScore(prev, 'completed', true);
+      history.push({ last_calculated_date: date, score });
+    }
+
+    expect(history[0]?.score).toBe(20);
+    expect(history[1]?.score).toBe(36);
+    expect(history[2]?.score).toBe(48.8);
+  });
 });
