@@ -148,6 +148,12 @@ export const en: TranslationKeys = {
     error_passwords_match: 'Passwords do not match',
     success_check_inbox:
       'Account created. Check your inbox to confirm your email before signing in.',
+    check_inbox_title: 'Check your inbox',
+    check_inbox_body:
+      'We sent a verification link to {{email}}. Click it to activate your account.',
+    check_inbox_spam_hint: "Didn't get it? Check spam or resend below.",
+    check_inbox_resend: 'Resend verification email',
+    check_inbox_different_email: 'Use a different email',
   },
 
   habit_form: {

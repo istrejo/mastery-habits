@@ -4,16 +4,28 @@ import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@auth/index";
+import { useAuth, CheckEmailView } from "@auth/index";
 import { Screen, Input, Button, Card } from "@core/components";
 import { useTheme } from "@core/theming";
 
 export default function SignupScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { signUp, loading, error } = useAuth();
+  const router = useRouter();
+  const { signUp, loading, error, signupEmail, clearSignupSuccess } = useAuth();
+
+  if (signupEmail) {
+    return (
+      <Screen scrollable contentStyle={{ flexGrow: 1 }}>
+        <CheckEmailView
+          email={signupEmail}
+          onDifferentEmail={clearSignupSuccess}
+        />
+      </Screen>
+    );
+  }
 
   const schema = useMemo(() => z.object({
     displayName: z.string().min(2, t("signup.error_name_min")).max(40),
@@ -26,11 +38,7 @@ export default function SignupScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
   const onSubmit = (data: FormData) => signUp(data.email, data.password, data.displayName);
 
-  const successMessage = error === "signup_success_check_inbox" ? t("signup.success_check_inbox") : null;
-  const errorMessage =
-    error && error !== "signup_success_check_inbox" && !error.endsWith("_timeout")
-      ? error
-      : null;
+  const errorMessage = error && !error.endsWith("_timeout") ? error : null;
   const timeoutMessage = error && error.endsWith("_timeout") ? t("login.error_oauth_timeout") : null;
 
   return (
@@ -58,9 +66,6 @@ export default function SignupScreen() {
           ) : null}
           {timeoutMessage ? (
             <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{timeoutMessage}</Text>
-          ) : null}
-          {successMessage ? (
-            <Text style={{ color: theme.status.success, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{successMessage}</Text>
           ) : null}
           <Button label={t("signup.submit")} onPress={handleSubmit(onSubmit)} loading={loading} iconRight="arrow-forward" />
         </Card>

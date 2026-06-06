@@ -146,6 +146,12 @@ export const es = {
     error_passwords_match: 'Las contraseñas no coinciden',
     success_check_inbox:
       'Cuenta creada. Revisá tu casilla para confirmar el email antes de iniciar sesión.',
+    check_inbox_title: 'Revisá tu casilla',
+    check_inbox_body:
+      'Mandamos un link de verificación a {{email}}. Tocalo para activar tu cuenta.',
+    check_inbox_spam_hint: '¿No te llegó? Revisá spam o reenvialo abajo.',
+    check_inbox_resend: 'Reenviar email de verificación',
+    check_inbox_different_email: 'Usar otro email',
   },
 
   habit_form: {

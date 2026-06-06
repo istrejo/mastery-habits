@@ -15,6 +15,8 @@ const OAUTH_TIMEOUT_MS = 60_000;
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signupEmail, setSignupEmail] = useState<string | null>(null);
+  const [resendSent, setResendSent] = useState(false);
   const { session, user, clear } = useSessionStore();
 
   const signIn = async (email: string, password: string) => {
@@ -33,12 +35,14 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, displayName?: string) => {
     setLoading(true);
     setError(null);
+    setSignupEmail(null);
+    setResendSent(false);
     try {
       const { error: err } = await authService.signUp(email, password, displayName);
       if (err) {
         setError(err.message);
       } else {
-        setError('signup_success_check_inbox');
+        setSignupEmail(email);
       }
     } finally {
       setLoading(false);
@@ -48,16 +52,23 @@ export const useAuth = () => {
   const resendVerification = async (email: string) => {
     setLoading(true);
     setError(null);
+    setResendSent(false);
     try {
       const { error: err } = await authService.resendVerificationEmail(email);
       if (err) {
         setError(err.message);
       } else {
-        setError('resend_sent');
+        setResendSent(true);
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearSignupSuccess = () => {
+    setSignupEmail(null);
+    setResendSent(false);
+    setError(null);
   };
 
   const signOut = async () => {
@@ -167,5 +178,5 @@ export const useAuth = () => {
     }
   };
 
-  return { session, user, loading, error, signIn, signUp, signOut, signInWithMagicLink, signInWithGoogle, signInWithApple, resendVerification };
+  return { session, user, loading, error, signIn, signUp, signOut, signInWithMagicLink, signInWithGoogle, signInWithApple, resendVerification, signupEmail, resendSent, clearSignupSuccess };
 };
