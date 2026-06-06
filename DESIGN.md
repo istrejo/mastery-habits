@@ -383,3 +383,139 @@ User
         └─ CheckIn (date, status: completed|skipped|missed)
         └─ MasteryScore (score: 0–100, level: seed|sprout|tree|forest|ancient)
 ```
+
+---
+
+## Theming System
+
+### TypeScript Contract
+
+```ts
+export type ThemeId =
+  | 'tech-neon'
+  | 'organic-growth'
+  | 'minimal-light'
+  | 'brutalist-editorial'
+  | 'cyberpunk'
+  | 'terminal-phosphor';
+
+export type MasteryLevel = 'seed' | 'sprout' | 'tree' | 'forest' | 'ancient';
+
+export interface ThemeTokens {
+  bg: {
+    base: string;        // App background
+    surface: string;     // Cards
+    surfaceAlt: string;  // Active cards / hover
+    elevated: string;    // Modals
+  };
+  border: {
+    subtle: string;   // 0.5px faint
+    default: string;  // Standard
+    strong: string;   // 1.5px brutalist or emphasized
+  };
+  text: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+    inverse: string;  // Text on accent background
+  };
+  accent: {
+    primary: string;    // Hero color (buttons, high score)
+    onPrimary: string;  // Text on accent
+    muted: string;      // Subdued version for backgrounds
+  };
+  score: {
+    excellent: string;  // 71–100
+    good: string;       // 46–70
+    warning: string;    // 21–45
+    critical: string;   // 0–20
+  };
+  level: Record<MasteryLevel, { fg: string; bg: string; border: string }>;
+  status: {
+    success: string;  // Check-in completed
+    skip: string;     // Weekly skip used
+    danger: string;   // Missed day
+    info: string;
+  };
+  radius: { sm: number; md: number; lg: number; pill: number };
+  borderWidth: { hairline: number; default: number; bold: number };
+  typography: {
+    displayFontFamily?: string;
+    bodyFontFamily?: string;
+    numericFeatures: string;  // 'tnum' always
+  };
+  meta: { id: ThemeId; name: string; mode: 'light' | 'dark'; tier: 'free' | 'premium' };
+}
+```
+
+### Theme Definitions
+
+**Tech Neon** (default, free) — dark, neon green accent
+
+```ts
+bg: { base: '#0a0a0a', surface: '#18181b', surfaceAlt: '#27272a', elevated: '#1f1f23' }
+accent.primary: '#4ade80'
+radius: { sm: 6, md: 10, lg: 12, pill: 999 }
+```
+
+**Organic Growth** (premium) — dark, muted green/earth tones, serif display font
+
+```ts
+bg: { base: '#1a2418', surface: '#243023', surfaceAlt: '#2a3528', elevated: '#2f3b2d' }
+accent.primary: '#87a96b'
+typography.displayFontFamily: 'Georgia'
+radius: { sm: 8, md: 14, lg: 18, pill: 999 }
+```
+
+**Minimal Light** (free) — light, monochrome ink
+
+```ts
+bg: { base: '#fafaf9', surface: '#ffffff', surfaceAlt: '#f5f5f4', elevated: '#ffffff' }
+accent.primary: '#1c1917'
+radius: { sm: 6, md: 10, lg: 14, pill: 999 }
+```
+
+**Brutalist Editorial** (premium) — light, paper texture, no border radius, bold borders
+
+```ts
+bg: { base: '#f4f0e8', surface: '#f4f0e8', surfaceAlt: '#ebe6da', elevated: '#ffffff' }
+accent.primary: '#ff5722'
+radius: { sm: 0, md: 0, lg: 0, pill: 0 }  // No radius — brutalism
+borderWidth: { hairline: 1.5, default: 1.5, bold: 2 }
+typography.displayFontFamily: 'Georgia'
+```
+
+**Cyberpunk** (premium) — dark, magenta/cyan neon
+
+```ts
+bg: { base: '#0d0221', surface: '#1a0635', surfaceAlt: '#2d1b4e', elevated: '#22094a' }
+accent.primary: '#05d9e8'
+border.default: '#ff2a6d'
+radius: { sm: 2, md: 4, lg: 8, pill: 999 }
+```
+
+**Terminal Phosphor** (premium) — dark, phosphor green monochrome, monospace
+
+```ts
+bg: { base: '#001100', surface: '#002200', surfaceAlt: '#001a00', elevated: '#003300' }
+accent.primary: '#00ff41'
+radius: { sm: 0, md: 0, lg: 0, pill: 0 }
+typography: { displayFontFamily: 'Courier New', bodyFontFamily: 'Courier New', numericFeatures: 'tnum' }
+```
+
+Full hex values: see `src/modules/core/theming/themes/*.theme.ts`.
+
+### Component Rules
+
+All design system components consume tokens via `useTheme()`. **Never hardcode colors or radii.**
+
+```tsx
+// CORRECT
+const t = useTheme();
+<View style={{ backgroundColor: t.bg.surface, borderRadius: t.radius.lg }} />
+
+// WRONG — breaks on theme change
+<View style={{ backgroundColor: '#18181b', borderRadius: 12 }} />
+```
+
+Theme persists via `theme.store.ts` (Zustand + AsyncStorage). Change is instant, no app restart.
