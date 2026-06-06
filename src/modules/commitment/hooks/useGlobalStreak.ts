@@ -26,17 +26,11 @@ export function useGlobalStreak(): UseGlobalStreakResult {
     let cancelled = false;
     setLoading(true);
 
-    Promise.all(
-      habits.map(async (h) => {
-        const records = await checkinService.getLast30Days(h.id);
-        return [h.id, records] as const;
-      }),
-    )
-      .then((entries) => {
+    checkinService
+      .getAllForHabits(habits.map((habit) => habit.id))
+      .then((records) => {
         if (cancelled) return;
-        const map: Record<string, CheckInRecord[]> = {};
-        for (const [id, recs] of entries) map[id] = recs;
-        setCheckInsByHabit(map);
+        setCheckInsByHabit(records);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

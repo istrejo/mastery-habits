@@ -25,6 +25,12 @@
       ],
       "@shared/*": [
         "src/shared/*"
+      ],
+      "@tasks/*": [
+        "src/modules/tasks/*"
+      ],
+      "@pomodoro/*": [
+        "src/modules/pomodoro/*"
       ]
     }
   },

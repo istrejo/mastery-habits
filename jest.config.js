@@ -9,7 +9,10 @@ module.exports = {
     '^@commitment/(.*)$': '<rootDir>/src/modules/commitment/$1',
     '^@progression/(.*)$': '<rootDir>/src/modules/progression/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+    '^@tasks/(.*)$': '<rootDir>/src/modules/tasks/$1',
+    '^@pomodoro/(.*)$': '<rootDir>/src/modules/pomodoro/$1',
   },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { tsconfig: { strict: true, jsx: 'react-jsx' } }],

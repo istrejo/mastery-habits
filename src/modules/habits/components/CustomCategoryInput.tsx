@@ -4,7 +4,7 @@ import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@core/components';
 
-const QUICK_EMOJIS = ['⭐', '🎯', '🔥', '💎', '🚀', '🌟', '💡', '⚙️'];
+const QUICK_ICONS = ['✦', '◆', '■', '▲', '●', '✚', '✳', '⬢'];
 
 interface CustomCategoryInputProps {
   label: string;
@@ -14,37 +14,50 @@ interface CustomCategoryInputProps {
 
 export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
   label,
-  emoji,
+  emoji = '✦',
   onChange,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
 
   return (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: theme.spacing.stackMd }}>
       <View style={{ gap: 8 }}>
-        <Input
-          label={t('custom_category.emoji_label')}
-          value={emoji}
-          onChangeText={(val) => onChange({ label, emoji: val })}
-          placeholder="✨"
-          maxLength={8}
-        />
+        <Text
+          style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontWeight: '500',
+            fontFamily: 'Lexend_500Medium',
+            letterSpacing: theme.typography.scale.microBold.letterSpacing,
+            marginBottom: theme.spacing.stackSm,
+          }}
+        >
+          {t('custom_category.emoji_label')}
+        </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {QUICK_EMOJIS.map((e) => (
+          {QUICK_ICONS.map((e) => (
             <TouchableOpacity
               key={e}
               onPress={() => onChange({ label, emoji: e })}
               style={{
-                backgroundColor: theme.bg.surface,
-                borderColor: emoji === e ? theme.border.strong : theme.border.default,
-                borderWidth: emoji === e ? theme.borderWidth.bold : theme.borderWidth.default,
+                backgroundColor: emoji === e ? theme.text.primary : theme.bg.surface,
+                borderColor: theme.text.primary,
+                borderWidth: theme.borderWidth.default,
                 borderRadius: theme.radius.md,
-                paddingHorizontal: 10,
-                paddingVertical: 6,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
               }}
             >
-              <Text style={{ fontSize: 20 }}>{e}</Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: emoji === e ? theme.text.inverse : theme.text.primary,
+                  fontFamily: 'Lexend_600SemiBold',
+                }}
+              >
+                {e}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -57,6 +70,7 @@ export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
           onChangeText={(val) => onChange({ label: val, emoji })}
           placeholder={t('custom_category.name_placeholder')}
           maxLength={30}
+          variant="underline"
         />
         <Text style={{ color: theme.text.tertiary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: 'Lexend_400Regular', textAlign: 'right' }}>
           {label.length}/30

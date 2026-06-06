@@ -17,12 +17,8 @@ npx expo start --android # Android emulator
 npm test                          # all tests
 npm test -- --testPathPattern=commitment  # single module
 
-# Supabase (requires Docker)
-npx supabase start       # start local DB
-npx supabase db reset    # apply all migrations from scratch
-
-# Regenerate TypeScript types from local DB
-npx supabase gen types typescript --local > src/shared/types/database.types.ts
+# Regenerate TypeScript types from Supabase
+npx supabase gen types typescript --project-id <project-id> > src/shared/types/database.types.ts
 # Note: command mixes stderr (version warnings) with stdout — pipe only stdout
 ```
 
@@ -109,10 +105,13 @@ Score runs in two places: Supabase RPC `register_check_in` (production) and `src
 
 ## Database
 
-3 SQL migrations in `supabase/migrations/`:
+5 SQL migrations in `supabase/migrations/`:
 - `0001` → tables: `profiles`, `habits`, `check_ins`, `mastery_scores`
 - `0002` → RLS policies + auto-create profile on signup trigger
 - `0003` → RPCs: `register_check_in`, `calculate_mastery_level`, `has_used_weekly_skip`
+- `0004` → habit_category enum + custom_label/custom_emoji columns
+- `0005` → table `tasks` (task_status enum, habit_id FK on delete set null)
+- `0006` → table `pomodoro_sessions` (pomodoro_phase/outcome enums, XOR habit_id/task_id)
 
 RLS enforces row-level user isolation — no cross-user data access.
 

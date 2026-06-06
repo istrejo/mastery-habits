@@ -53,6 +53,28 @@ export const checkinService = {
     return (data ?? []) as CheckInRecord[];
   },
 
+  getAllForHabits: async (habitIds: string[]): Promise<Record<string, CheckInRecord[]>> => {
+    if (habitIds.length === 0) return {};
+
+    const { data, error } = await supabase
+      .from('check_ins')
+      .select('id, habit_id, check_date, status')
+      .in('habit_id', habitIds)
+      .order('check_date', { ascending: true });
+
+    if (error) throw new Error(error.message);
+
+    const grouped = Object.fromEntries(
+      habitIds.map((habitId) => [habitId, [] as CheckInRecord[]]),
+    );
+
+    for (const record of (data ?? []) as CheckInRecord[]) {
+      grouped[record.habit_id]?.push(record);
+    }
+
+    return grouped;
+  },
+
   getTodayForHabits: async (habitIds: string[], date: Date = new Date()): Promise<CheckInRecord[]> => {
     if (habitIds.length === 0) return [];
     const dateStr = format(date, 'yyyy-MM-dd');

@@ -143,6 +143,66 @@ export type Database = {
           },
         ]
       }
+      pomodoro_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          habit_id: string | null
+          task_id: string | null
+          phase: Database["public"]["Enums"]["pomodoro_phase"]
+          planned_duration_seconds: number
+          actual_duration_seconds: number
+          outcome: Database["public"]["Enums"]["pomodoro_outcome"]
+          cycle_index: number
+          started_at: string
+          ended_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          habit_id?: string | null
+          task_id?: string | null
+          phase: Database["public"]["Enums"]["pomodoro_phase"]
+          planned_duration_seconds: number
+          actual_duration_seconds: number
+          outcome: Database["public"]["Enums"]["pomodoro_outcome"]
+          cycle_index?: number
+          started_at: string
+          ended_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          habit_id?: string | null
+          task_id?: string | null
+          phase?: Database["public"]["Enums"]["pomodoro_phase"]
+          planned_duration_seconds?: number
+          actual_duration_seconds?: number
+          outcome?: Database["public"]["Enums"]["pomodoro_outcome"]
+          cycle_index?: number
+          started_at?: string
+          ended_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pomodoro_sessions_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pomodoro_sessions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -163,6 +223,91 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      task_subtasks: {
+        Row: {
+          id: string
+          task_id: string
+          user_id: string
+          title: string
+          status: Database["public"]["Enums"]["task_status"]
+          completed_at: string | null
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          task_id: string
+          user_id: string
+          title: string
+          status?: Database["public"]["Enums"]["task_status"]
+          completed_at?: string | null
+          order_index?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          task_id?: string
+          user_id?: string
+          title?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          completed_at?: string | null
+          order_index?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_subtasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          id: string
+          user_id: string
+          habit_id: string | null
+          title: string
+          description: string | null
+          due_date: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          completed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          habit_id?: string | null
+          title: string
+          description?: string | null
+          due_date?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          completed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          habit_id?: string | null
+          title?: string
+          description?: string | null
+          due_date?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          completed_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -199,6 +344,9 @@ export type Database = {
         | "social"
         | "finance"
         | "custom"
+      task_status: "pending" | "completed"
+      pomodoro_phase: "work" | "short_break" | "long_break"
+      pomodoro_outcome: "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -341,6 +489,9 @@ export const Constants = {
         "finance",
         "custom",
       ],
+      task_status: ["pending", "completed"],
+      pomodoro_phase: ["work", "short_break", "long_break"],
+      pomodoro_outcome: ["completed", "cancelled"],
     },
   },
 } as const

@@ -12,6 +12,16 @@ export const es = {
     empty_title: 'Empezá tu primer hábito',
     empty_body: 'Cultivá un Commitment Score.\nLa consistencia crea maestría.',
     create_habit: '+ Crear hábito',
+    create_task: '+ Crear tarea',
+    empty_tasks_title: 'Sin tareas para hoy',
+    empty_tasks_body: 'Creá una tarea con fecha para verla acá.',
+    today_protocol: 'Protocolo de hoy',
+    tasks_all_done: 'Alineación óptima detectada.',
+    tasks_today_one: '{{count}} tarea para hoy',
+    tasks_today_other: '{{count}} tareas para hoy',
+    tasks_section: 'Tareas de hoy',
+    tasks_completed: '{{completed}} / {{count}} completadas',
+    environment: 'Entorno',
     score_avg: 'SCORE PROMEDIO',
     habits_today_one: '{{count}} hábito planificado para hoy',
     habits_today_other: '{{count}} hábitos planificados para hoy',
@@ -22,8 +32,10 @@ export const es = {
     title: 'PERFIL',
     edit: 'Editar perfil',
     score_global: 'SCORE GLOBAL',
+    level_chip: 'Nivel {{level}}',
     habits_count_one: '{{count}} hábito',
     habits_count_other: '{{count}} hábitos',
+    levels_section: 'NIVELES DE HÁBITO',
     distribution: 'DISTRIBUCIÓN',
     theme_section: 'TEMA',
     language_section: 'IDIOMA',
@@ -77,7 +89,22 @@ export const es = {
   new_habit: {
     title: 'Nuevo hábito',
     subtitle: 'Construí un hábito que dure.',
-    create_button: 'Crear hábito',
+    create_button: 'Agregar hábito',
+  },
+
+  create_habit: {
+    sections: {
+      identity: 'Identidad',
+      category: 'Categoría',
+      frequency: 'Frecuencia',
+    },
+    frequency_presets: {
+      daily: 'Diario',
+      mon_fri: 'Lun-Vie',
+      custom: 'Personalizado',
+    },
+    select_days: 'Seleccionar días',
+    custom_category_error: 'Personalizado requiere nombre e ícono',
   },
 
   login: {
@@ -123,22 +150,32 @@ export const es = {
   },
 
   categories: {
-    health:       { label: 'Salud',         description: 'Ejercicio, sueño, movimiento' },
-    mind:         { label: 'Mente',         description: 'Meditación, journaling, terapia' },
-    learning:     { label: 'Aprendizaje',   description: 'Lectura, cursos, idiomas' },
-    productivity: { label: 'Productividad', description: 'Deep work, planificación, foco' },
-    nutrition:    { label: 'Nutrición',     description: 'Hidratación, alimentación consciente' },
-    creativity:   { label: 'Creatividad',   description: 'Escribir, crear, side projects' },
-    social:       { label: 'Social',        description: 'Familia, amigos, networking' },
-    finance:      { label: 'Finanzas',      description: 'Ahorro, gastos, inversión' },
-    custom:       { label: 'Personalizado', description: 'Definí el tuyo' },
+    health: { label: 'Salud', description: 'Ejercicio, sueño, movimiento' },
+    mind: { label: 'Mente', description: 'Meditación, journaling, terapia' },
+    learning: { label: 'Aprendizaje', description: 'Lectura, cursos, idiomas' },
+    productivity: {
+      label: 'Productividad',
+      description: 'Deep work, planificación, foco',
+    },
+    nutrition: {
+      label: 'Nutrición',
+      description: 'Hidratación, alimentación consciente',
+    },
+    creativity: {
+      label: 'Creatividad',
+      description: 'Escribir, crear, side projects',
+    },
+    social: { label: 'Social', description: 'Familia, amigos, networking' },
+    finance: { label: 'Finanzas', description: 'Ahorro, gastos, inversión' },
+    custom: { label: 'Personalizado', description: 'Definí el tuyo' },
   },
 
   custom_category: {
-    emoji_label: 'Emoji',
+    emoji_label: 'Ícono',
     name_label: 'Nombre',
     name_placeholder: 'Mi categoría',
-    uncategorized_banner: 'Este hábito no tiene categoría asignada. Editalo para clasificarlo.',
+    uncategorized_banner:
+      'Este hábito no tiene categoría asignada. Editalo para clasificarlo.',
   },
 
   frequency: {
@@ -159,19 +196,16 @@ export const es = {
     complete_action: '✓ Completar hoy',
     use_skip: '⏭ Usar skip semanal',
     skip_modal_title: 'Usar skip semanal',
-    skip_modal_body: 'Tenés 1 skip por semana ISO. Conta como cumplimiento — no rompe la racha. ¿Confirmás?',
+    skip_modal_body:
+      'Tenés 1 skip por semana ISO. Conta como cumplimiento — no rompe la racha. ¿Confirmás?',
   },
 
   theme_picker: {
-    free_tier: 'GRATIS',
-    premium_tier: 'PREMIUM',
-    badge_free: 'FREE',
-    badge_premium: 'PREMIUM',
-    coming_soon_title: 'Próximamente',
-    coming_soon_body: 'Los temas premium estarán disponibles en la versión completa de Mastery Habits.',
-    understood: 'Entendido',
-    light_active: 'Light activo',
-    theming_soon_body: 'El tema light queda fijo en esta versión. El theming completo vuelve más adelante.',
+    active_badge: 'Activo',
+    light_name: 'Mastery Habits Light',
+    light_description: 'Paleta editorial clara, limpia y de alto contraste.',
+    dark_name: 'Mastery Habits Dark',
+    dark_description: 'Inversión monocromática oscura basada en Stitch.',
   },
 
   language_picker: {
@@ -195,18 +229,110 @@ export const es = {
   },
 
   levels: {
-    seed: 'Seed',
-    sprout: 'Sprout',
-    tree: 'Tree',
-    forest: 'Forest',
-    ancient: 'Ancient',
+    seed: 'Semilla',
+    sprout: 'Brote',
+    tree: 'Árbol',
+    forest: 'Bosque',
+    ancient: 'Ancestral',
   },
 
   tabs: {
     habits: 'Hábitos',
+    today: 'Hoy',
     power_grid: 'Grid',
     stats: 'Stats',
+    pomodoro: 'Pomodoro',
     profile: 'Perfil',
+  },
+
+  tasks: {
+    title: 'Tareas',
+    empty_title: 'Sin tareas todavía',
+    empty_body: 'Creá tu primera tarea para empezar a tachar cosas.',
+    new_task: '+ Nueva tarea',
+    composer_placeholder: 'Agregar tarea…',
+    sheet: {
+      title: 'Nueva tarea',
+      name_label: 'Nombre de la tarea',
+      name_placeholder: '¿Qué hay que hacer?',
+      notes_label: 'Notas',
+      notes_placeholder: 'Agregá contexto, límites o detalles…',
+      subtasks_label: 'Subtareas',
+      subtask_placeholder: 'Subtarea',
+      add_subtask: 'Agregar subtarea',
+      create: 'Crear tarea',
+      save: 'Guardar',
+    },
+    form: {
+      title_label: 'Título',
+      title_placeholder: '¿Qué hay que hacer?',
+      description_label: 'Descripción (opcional)',
+      due_date_label: 'Fecha límite (opcional)',
+      habit_label: 'Asociar a hábito (opcional)',
+      habit_none: 'Sin hábito',
+      submit_create: 'Crear tarea',
+      submit_save: 'Guardar cambios',
+      error_title_required: 'El título es requerido',
+      error_title_max: 'Máximo 120 caracteres',
+    },
+    row: {
+      complete: 'Completar',
+      uncomplete: 'Marcar pendiente',
+      delete: 'Eliminar',
+      overdue: 'Vencida',
+      due_today: 'Vence hoy',
+      due_tomorrow: 'Vence mañana',
+    },
+    filters: {
+      all: 'Todas',
+      pending: 'Pendientes',
+      completed: 'Completadas',
+      overdue: 'Vencidas',
+    },
+    delete_confirm_title: 'Eliminar tarea',
+    delete_confirm_body: 'No se puede deshacer.',
+  },
+
+  pomodoro: {
+    title: 'Pomodoro',
+    phases: {
+      work: 'Foco',
+      short_break: 'Descanso corto',
+      long_break: 'Descanso largo',
+    },
+    controls: {
+      start: 'Iniciar',
+      pause: 'Pausar',
+      resume: 'Continuar',
+      skip: 'Saltar',
+      reset: 'Reiniciar',
+    },
+    target: {
+      section_label: 'Trabajando en',
+      none: 'Nada en particular',
+      habit_picker: 'Hábito',
+      task_picker: 'Tarea',
+    },
+    cycle_indicator: 'Ciclo {{current}} de {{total}}',
+    finished_title: 'Fase completada',
+    finished_body_work: 'Buen trabajo. Tomá un descanso.',
+    finished_body_break: 'Fin del descanso. ¡A trabajar!',
+    auto_check_label: 'Auto check-in al terminar foco',
+    auto_complete_task_label: 'Auto-completar tarea al terminar foco',
+    settings: {
+      title: 'Configuración Pomodoro',
+      work_label: 'Duración foco (min)',
+      short_break_label: 'Descanso corto (min)',
+      long_break_label: 'Descanso largo (min)',
+      cycles_per_round_label: 'Ciclos por ronda',
+    },
+    history: {
+      section_label: 'Sesiones recientes',
+      empty: 'Todavía no hay sesiones registradas.',
+    },
+    floating: {
+      a11y_label: 'Abrir timer Pomodoro',
+    },
   },
 
   stats: {

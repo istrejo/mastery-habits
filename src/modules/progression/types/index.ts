@@ -1,6 +1,7 @@
+export type LevelKey = 'seed' | 'sprout' | 'tree' | 'forest' | 'ancient';
+
 export interface Level {
-  key: string;
-  label: string;
+  key: LevelKey;
   emoji: string;
   min: number;
   max: number;
