@@ -134,9 +134,9 @@ export default function TodayScreen() {
   const {
     tasks,
     loading: tasksLoading,
-    refresh,
     updateTaskOptimistic,
     updateSubtaskOptimistic,
+    addTaskOptimistic,
   } = useTodayTasks();
   const {
     completeTask,
@@ -355,8 +355,8 @@ export default function TodayScreen() {
           subtasks: values.subtasks,
         });
         if (!created) throw new Error('task_not_created');
+        addTaskOptimistic(created);
       }
-      await refresh();
     } catch (error) {
       if (!isNetworkError(error)) {
         const message =

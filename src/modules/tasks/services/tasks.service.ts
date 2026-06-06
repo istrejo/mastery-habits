@@ -145,23 +145,19 @@ export const tasksService = {
     input: Omit<TaskInsert, 'user_id'>
   ): Promise<TaskWithHabit> {
     const optimisticTask = buildOptimisticTask(input);
-    const operationId = await syncQueueService.enqueue({
-      type: 'task_create',
-      payload: { mode: 'plain', optimisticId: optimisticTask.id, input },
-    });
-
     try {
       const result = await this.create(input);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.upsert(result);
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({
+          type: 'task_create',
+          payload: { mode: 'plain', optimisticId: optimisticTask.id, input },
+        });
         await tasksCacheService.upsert(optimisticTask);
         return optimisticTask;
       }
-
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },
@@ -355,18 +351,13 @@ export const tasksService = {
   },
 
   async completeWithSync(id: string): Promise<TaskWithHabit> {
-    const operationId = await syncQueueService.enqueue({
-      type: 'task_complete',
-      payload: { id },
-    });
-
     try {
       const result = await this.complete(id);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.upsert(result);
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({ type: 'task_complete', payload: { id } });
         const cached = await tasksCacheService.load();
         const task = cached.find((t) => t.id === id);
         if (task) {
@@ -379,24 +370,18 @@ export const tasksService = {
           return optimistic;
         }
       }
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },
 
   async uncompleteWithSync(id: string): Promise<TaskWithHabit> {
-    const operationId = await syncQueueService.enqueue({
-      type: 'task_uncomplete',
-      payload: { id },
-    });
-
     try {
       const result = await this.uncomplete(id);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.upsert(result);
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({ type: 'task_uncomplete', payload: { id } });
         const cached = await tasksCacheService.load();
         const task = cached.find((t) => t.id === id);
         if (task) {
@@ -409,7 +394,6 @@ export const tasksService = {
           return optimistic;
         }
       }
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },
@@ -418,25 +402,22 @@ export const tasksService = {
     taskId: string,
     subtaskId: string
   ): Promise<TaskWithHabit> {
-    const operationId = await syncQueueService.enqueue({
-      type: 'subtask_toggle',
-      payload: { taskId, subtaskId },
-    });
-
     try {
       const result = await this.toggleSubtask(taskId, subtaskId);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.upsert(result);
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({
+          type: 'subtask_toggle',
+          payload: { taskId, subtaskId },
+        });
         const cached = await tasksCacheService.load();
         const task = cached.find((t) => t.id === taskId);
         if (task) {
           return task;
         }
       }
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },
@@ -445,27 +426,24 @@ export const tasksService = {
     input: CreateTaskWithSubtasksInput
   ): Promise<TaskWithHabit> {
     const optimisticTask = buildOptimisticTaskWithSubtasks(input);
-    const operationId = await syncQueueService.enqueue({
-      type: 'task_create',
-      payload: {
-        mode: 'withSubtasks',
-        optimisticId: optimisticTask.id,
-        optimisticSubtaskIds: optimisticTask.task_subtasks.map((subtask) => subtask.id),
-        input,
-      },
-    });
-
     try {
       const result = await this.createWithSubtasks(input);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.upsert(result);
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({
+          type: 'task_create',
+          payload: {
+            mode: 'withSubtasks',
+            optimisticId: optimisticTask.id,
+            optimisticSubtaskIds: optimisticTask.task_subtasks.map((subtask) => subtask.id),
+            input,
+          },
+        });
         await tasksCacheService.upsert(optimisticTask);
         return optimisticTask;
       }
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },
@@ -474,45 +452,36 @@ export const tasksService = {
     id: string,
     input: CreateTaskWithSubtasksInput
   ): Promise<TaskWithHabit> {
-    const operationId = await syncQueueService.enqueue({
-      type: 'task_update',
-      payload: { id, ...input },
-    });
-
     try {
       const result = await this.updateWithSubtasks(id, input);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.upsert(result);
       return result;
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({
+          type: 'task_update',
+          payload: { id, ...input },
+        });
         const cached = await tasksCacheService.load();
         const task = cached.find((t) => t.id === id);
         if (task) {
           return task;
         }
       }
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },
 
   async deleteWithSync(id: string): Promise<void> {
-    const operationId = await syncQueueService.enqueue({
-      type: 'task_delete',
-      payload: { id },
-    });
-
     try {
       await this.delete(id);
-      await syncQueueService.dequeue(operationId);
       await tasksCacheService.remove(id);
     } catch (error) {
       if (isNetworkError(error)) {
+        await syncQueueService.enqueue({ type: 'task_delete', payload: { id } });
         await tasksCacheService.remove(id);
         return;
       }
-      await syncQueueService.dequeue(operationId);
       throw error;
     }
   },

@@ -1,10 +1,8 @@
-import { Text } from "react-native";
-import { Screen } from "@core/components";
+import { Redirect } from 'expo-router';
+import { useSessionStore } from '@core/states/session.store';
 
 export default function HomeScreen() {
-  return (
-    <Screen>
-      <Text>Mastery Habits — Phase 4</Text>
-    </Screen>
-  );
+  const session = useSessionStore((state) => state.session);
+
+  return <Redirect href={session ? '/(tabs)' : '/(auth)/login'} />;
 }

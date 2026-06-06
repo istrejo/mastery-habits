@@ -242,12 +242,12 @@ describe('TodayScreen', () => {
 
   it('creates a Today task from the sheet with name, notes, and subtasks', async () => {
     const createTaskWithSubtasks = jest.fn().mockResolvedValue(createTask('created'));
-    const refresh = jest.fn();
+    const addTaskOptimistic = jest.fn();
     setup({ createTaskWithSubtasks });
     useTodayTasksMock.mockReturnValue({
       tasks: [],
       loading: false,
-      refresh,
+      addTaskOptimistic,
       updateTaskOptimistic: updateTaskOptimisticMock,
       updateSubtaskOptimistic: updateSubtaskOptimisticMock,
     });
@@ -266,7 +266,7 @@ describe('TodayScreen', () => {
       notes: 'No shortcuts',
       subtasks: ['Write tests', 'Ship'],
     });
-    expect(refresh).toHaveBeenCalled();
+    expect(addTaskOptimistic).toHaveBeenCalledWith(createTask('created'));
   });
 
   it('registers the linked habit check-in once when completing a linked pending task', async () => {
