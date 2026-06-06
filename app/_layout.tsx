@@ -18,7 +18,7 @@ import { useTaskAutoSync } from '@tasks/index';
 
 initI18n(resolveLocale(useLocaleStore.getState().locale));
 
-function AuthGate({ onReady }: { onReady: (ready: boolean) => void }) {
+function AuthGate() {
   const router = useRouter();
   const segments = useSegments();
   const { session, setSession } = useSessionStore();
@@ -58,10 +58,6 @@ function AuthGate({ onReady }: { onReady: (ready: boolean) => void }) {
   }, []);
 
   useEffect(() => {
-    onReady(sessionResolved);
-  }, [onReady, sessionResolved]);
-
-  useEffect(() => {
     if (!mounted || !sessionResolved) return;
     const inAuthGroup = segments[0] === "(auth)";
     if (!session && !inAuthGroup) {
@@ -80,7 +76,6 @@ function TaskSyncBootstrap() {
 }
 
 export default function RootLayout() {
-  const [authReady, setAuthReady] = useState(false);
   const [fontsLoaded] = useFonts({
     Anton_400Regular,
     Lexend_400Regular,
@@ -93,10 +88,12 @@ export default function RootLayout() {
     <ThemeProvider>
       <LocaleProvider>
         <ErrorBoundary>
-          {fontsLoaded ? <AuthGate onReady={setAuthReady} /> : null}
-          {fontsLoaded ? <TaskSyncBootstrap /> : null}
-          {fontsLoaded && authReady ? (
-            <Stack screenOptions={{ headerShown: false }} />
+          {fontsLoaded ? (
+            <>
+              <AuthGate />
+              <TaskSyncBootstrap />
+              <Stack screenOptions={{ headerShown: false }} />
+            </>
           ) : null}
         </ErrorBoundary>
       </LocaleProvider>
