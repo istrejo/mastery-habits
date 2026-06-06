@@ -79,6 +79,10 @@ export const en: TranslationKeys = {
     open_actions: 'Open actions',
     this_week: 'This week',
     checkin_error: 'We could not update this habit. Please try again.',
+    checkin_error_missed:
+      "Once a day is marked as missed, it can't be recovered. Move on and protect tomorrow's streak.",
+    checkin_error_too_old: 'You can only backfill check-ins from the last 7 days.',
+    checkin_error_future: "You can't register check-ins for a future date.",
     day_mon: 'Mon',
     day_tue: 'Tue',
     day_wed: 'Wed',
@@ -120,6 +124,12 @@ export const en: TranslationKeys = {
     go_signup: 'Sign up',
     error_email: 'Invalid email',
     error_password_min: 'Minimum 6 characters',
+    error_email_not_confirmed:
+      'Check your inbox to confirm your email, then sign in again.',
+    resend_verification: 'Resend verification email',
+    resend_sent: 'Verification email re-sent. Check your inbox.',
+    error_oauth_timeout:
+      'The sign-in window took too long. Close it and try again.',
   },
 
   signup: {
@@ -136,6 +146,8 @@ export const en: TranslationKeys = {
     error_email: 'Invalid email',
     error_password_min: 'Minimum 6 characters',
     error_passwords_match: 'Passwords do not match',
+    success_check_inbox:
+      'Account created. Check your inbox to confirm your email before signing in.',
   },
 
   habit_form: {
@@ -354,5 +366,12 @@ export const en: TranslationKeys = {
     total_power: 'Total Power',
     low_energy: 'Low Energy',
     full_power: 'Full Power',
+  },
+
+  errors: {
+    boundary_title: 'Something broke',
+    boundary_message:
+      'The app hit an unexpected error. Your data is safe — try reloading. If the problem keeps happening, restart the app.',
+    boundary_reload: 'Reload',
   },
 };

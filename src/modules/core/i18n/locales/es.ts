@@ -77,6 +77,10 @@ export const es = {
     open_actions: 'Abrir acciones',
     this_week: 'Esta semana',
     checkin_error: 'No pudimos actualizar este hábito. Probá de nuevo.',
+    checkin_error_missed:
+      'Un día marcado como fallado no se puede recuperar. Seguí adelante y protegé la racha de mañana.',
+    checkin_error_too_old: 'Solo podés registrar check-ins de los últimos 7 días.',
+    checkin_error_future: 'No podés registrar check-ins para una fecha futura.',
     day_mon: 'Lun',
     day_tue: 'Mar',
     day_wed: 'Mié',
@@ -118,6 +122,12 @@ export const es = {
     go_signup: 'Registrate',
     error_email: 'Email inválido',
     error_password_min: 'Mínimo 6 caracteres',
+    error_email_not_confirmed:
+      'Revisá tu casilla para confirmar el email y volvé a intentar.',
+    resend_verification: 'Reenviar email de verificación',
+    resend_sent: 'Email de verificación reenviado. Revisá tu casilla.',
+    error_oauth_timeout:
+      'La ventana de inicio de sesión tardó demasiado. Cerrala y volvé a intentar.',
   },
 
   signup: {
@@ -134,6 +144,8 @@ export const es = {
     error_email: 'Email inválido',
     error_password_min: 'Mínimo 6 caracteres',
     error_passwords_match: 'Las contraseñas no coinciden',
+    success_check_inbox:
+      'Cuenta creada. Revisá tu casilla para confirmar el email antes de iniciar sesión.',
   },
 
   habit_form: {
@@ -356,6 +368,13 @@ export const es = {
     total_power: 'Total Power',
     low_energy: 'Baja Energía',
     full_power: 'Máxima Energía',
+  },
+
+  errors: {
+    boundary_title: 'Algo se rompió',
+    boundary_message:
+      'La app encontró un error inesperado. Tus datos están a salvo — probá recargar. Si el problema sigue, reiniciá la app.',
+    boundary_reload: 'Recargar',
   },
 };
 
