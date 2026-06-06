@@ -2,6 +2,8 @@
 
 This file provides guidance to AI coding agents (Codex, Cursor, etc.) when working with code in this repository.
 
+> **⚠️ Local ↔ remote schema divergence (in progress).** This repo's `supabase/migrations/` and the deployed Supabase project have drifted. See the "Local vs remote schema" section below before running migrations or assuming any table exists in production.
+
 ## Stack
 
 | Layer | Tech |
@@ -13,6 +15,7 @@ This file provides guidance to AI coding agents (Codex, Cursor, etc.) when worki
 | Forms | react-hook-form + zod |
 | i18n | i18next (ES / EN) |
 | Tests | Jest + ts-jest (node env) |
+| Notifications | expo-notifications (required by Pomodoro timer) |
 
 ---
 
@@ -283,16 +286,52 @@ Two locales: `en` and `es`. Language detected from device on first launch, overr
 
 See `cloud.md` for full schema, RPCs, and RLS details.
 
-6 SQL migrations in `supabase/migrations/`:
+7 SQL migrations in `supabase/migrations/` (numbering gap is deliberate, see "Local vs remote schema" below):
 
 - `0001` → tables: `profiles`, `habits`, `check_ins`, `mastery_scores`
 - `0002` → RLS policies + auto-create profile on signup trigger
 - `0003` → RPCs: `register_check_in`, `calculate_mastery_level`, `has_used_weekly_skip`
 - `0004` → `habit_category` enum + `custom_label`/`custom_emoji` columns on `habits`
-- `0005` → table `tasks` (`task_status` enum, `habit_id` FK ON DELETE SET NULL)
-- `0006` → table `pomodoro_sessions` (`pomodoro_phase`/`outcome` enums, XOR `habit_id`/`task_id` FK)
+- `0008` → table `tasks` (`task_status` enum, `habit_id` FK ON DELETE SET NULL)
+- `0009` → table `pomodoro_sessions` (`pomodoro_phase`/`outcome` enums, XOR `habit_id`/`task_id` FK)
+- `0010` → table `task_subtasks` (subtasks linked to tasks, `order_index` ordering)
+- `0011` → `register_check_in`: blocks `missed → completed/skipped` transitions with `FOR UPDATE` lock
+- `0012` → `register_check_in`: looks up prev score from most recent check-in **before** target date (correct backfill)
+- `0013` → `register_check_in`: rejects check-ins older than 7 days or in the future
 
 RLS enforces row-level user isolation — no cross-user data access.
+
+---
+
+## Local vs remote schema (DIVERGENCE — UNRESOLVED)
+
+The `supabase/migrations/` folder in this repo is **not** the source of truth for the deployed Supabase project. They have diverged.
+
+**What exists in the REMOTE Supabase project:**
+
+- Migrations `0001`–`0007` (note: `0005`/`0006`/`0007` are about `session_logs`/`milestones`/`session_log_rpc` — these files are **not** in this repo)
+- Timestamp migrations `20260525003116` (`tasks`) and `20260525003121` (`task_subtasks`)
+- Tables: `check_ins, habit_subtask_templates, habits, mastery_scores, milestone_celebrations, profiles, session_items, session_logs, task_subtasks, tasks`
+- **Missing:** `pomodoro_sessions`
+
+**What the LOCAL repo declares (but is NOT applied to remote):**
+
+- Migrations `0008_tasks.sql`, `0009_pomodoro_sessions.sql`, `0010_task_subtasks.sql`
+- Table `pomodoro_sessions` referenced by the local `pomodoro/` module
+
+**Migrations applied to the remote during the `fix/security-and-scoring` branch:**
+
+- `0011_prevent_checkin_gaming` — anti-gaming on `register_check_in`
+- `0012_correct_backfill_score` — backfill uses previous-day score
+- `0013_block_old_checkins` — 7-day window
+
+**Implications:**
+
+- Do not assume `supabase db reset` will produce the same schema as production.
+- The `pomodoro/` module code is not currently usable in production (its table doesn't exist).
+- The remote has tables the local app doesn't use (`habit_subtask_templates`, `session_logs`, `session_items`, `milestone_celebrations`) — these are dead code on the remote.
+
+**To resolve:** open a follow-up issue to either (a) drop the unused tables on the remote and apply `0008/0009/0010` from this repo, or (b) import the remote's `0005/0006/0007` into this repo and rewrite the local migrations to match the timestamped ones.
 
 ---
 
@@ -313,3 +352,4 @@ Required in `.env`:
 - react-hook-form + zod — forms and validation
 - date-fns — all date arithmetic
 - `@supabase/supabase-js` v2 — client in `src/modules/core/lib/supabase.ts`
+- `expo-notifications` is **required** by the Pomodoro timer (`src/modules/pomodoro/hooks/usePomodoroTimer.ts:2,8,44`). The plugin in `app.json` (icon/color config for EAS) must stay. Do not remove the dep or the plugin.
