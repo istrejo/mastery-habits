@@ -1,5 +1,5 @@
 /* stitch: login */
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,12 +13,33 @@ import { useTheme } from "@core/theming";
 export default function LoginScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { signIn, loading, error } = useAuth();
+  const { signIn, resendVerification, loading, error } = useAuth();
+  const [resending, setResending] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   const schema = useMemo(() => z.object({ email: z.string().email(t("login.error_email")), password: z.string().min(6, t("login.error_password_min")) }), [t]);
   type FormData = z.infer<typeof schema>;
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
-  const onSubmit = (data: FormData) => signIn(data.email, data.password);
+  const { control, handleSubmit, formState: { errors }, getValues } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const onSubmit = (data: FormData) => {
+    setPendingEmail(data.email);
+    void signIn(data.email, data.password);
+  };
+
+  const errorMessage = useMemo(() => {
+    if (!error) return null;
+    if (error === "email_not_confirmed") return t("login.error_email_not_confirmed");
+    if (error === "resend_sent") return t("login.resend_sent");
+    if (error === "signup_success_check_inbox") return null;
+    if (error.endsWith("_timeout")) return t("login.error_oauth_timeout");
+    return error;
+  }, [error, t]);
+
+  const onResend = () => {
+    const email = pendingEmail ?? getValues('email');
+    if (!email) return;
+    setResending(true);
+    void resendVerification(email).finally(() => setResending(false));
+  };
 
   return (
     <Screen scrollable={false} contentStyle={{ justifyContent: "center", alignItems: "center" }}>
@@ -44,7 +65,19 @@ export default function LoginScreen() {
               <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{t("login.forgot")}</Text>
             </Pressable>
           </View>
-          {error ? <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{error}</Text> : null}
+          {errorMessage ? (
+            <Text style={{ color: error === "resend_sent" ? theme.status.success : theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>
+              {errorMessage}
+            </Text>
+          ) : null}
+          {error === "email_not_confirmed" ? (
+            <Button
+              label={t("login.resend_verification")}
+              onPress={onResend}
+              loading={resending}
+              variant="secondary"
+            />
+          ) : null}
           <Button label={t("login.submit")} onPress={handleSubmit(onSubmit)} loading={loading} iconRight="arrow-forward" style={{ marginTop: theme.spacing.stackSm }} />
         </View>
 

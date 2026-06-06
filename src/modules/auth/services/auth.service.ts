@@ -35,4 +35,10 @@ export const authService = {
   signOut: () => supabase.auth.signOut(),
 
   getSession: () => supabase.auth.getSession(),
+
+  resendVerificationEmail: (email: string) =>
+    supabase.auth.resend({
+      type: 'signup',
+      email,
+    }),
 };
