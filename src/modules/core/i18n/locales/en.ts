@@ -154,6 +154,12 @@ export const en: TranslationKeys = {
     check_inbox_spam_hint: "Didn't get it? Check spam or resend below.",
     check_inbox_resend: 'Resend verification email',
     check_inbox_different_email: 'Use a different email',
+    error_already_registered:
+      'This email is already registered. Try signing in or use a different email.',
+    error_weak_password: 'Password is too weak. Use at least 8 characters with letters and numbers.',
+    error_invalid_email: 'That email address is invalid.',
+    error_network: 'Network error. Check your connection and try again.',
+    error_generic: 'Sign-up failed. Please try again.',
   },
 
   habit_form: {

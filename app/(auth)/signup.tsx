@@ -6,9 +6,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { useAuth, CheckEmailView } from "@auth/index";
-import { Screen, Input, Button, Card } from "@core/components";
+import { Screen, Input, Button, Card, Toast } from "@core/components";
 import { useTheme } from "@core/theming";
+
+function mapSignupError(
+  message: string | null,
+  t: TFunction,
+): string | null {
+  if (!message) return null;
+  const lower = message.toLowerCase();
+  if (lower.includes("already registered") || lower.includes("already been registered")) {
+    return t("signup.error_already_registered");
+  }
+  if (lower.includes("password") && (lower.includes("short") || lower.includes("6 character"))) {
+    return t("signup.error_weak_password");
+  }
+  if (lower.includes("invalid email") || lower.includes("email address is invalid")) {
+    return t("signup.error_invalid_email");
+  }
+  if (lower.includes("network") || lower.includes("fetch") || lower.includes("timeout")) {
+    return t("signup.error_network");
+  }
+  return t("signup.error_generic");
+}
 
 function SignupForm() {
   const theme = useTheme();
@@ -26,11 +48,13 @@ function SignupForm() {
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
   const onSubmit = (data: FormData) => signUp(data.email, data.password, data.displayName);
 
-  const errorMessage = error && !error.endsWith("_timeout") ? error : null;
+  const toastMessage = useMemo(() => mapSignupError(error, t), [error, t]);
+  const inlineError = error && !error.endsWith("_timeout") ? error : null;
   const timeoutMessage = error && error.endsWith("_timeout") ? t("login.error_oauth_timeout") : null;
 
   return (
     <Screen scrollable contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
+      <Toast message={toastMessage} variant="error" />
       <View style={{ width: "100%", maxWidth: 440, alignSelf: "center" }}>
         <View style={{ marginBottom: theme.spacing.stackLg }}>
           <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: theme.spacing.stackSm }}>
@@ -49,8 +73,8 @@ function SignupForm() {
           <Controller control={control} name="email" render={({ field: { onChange, value } }) => <Input label={t("signup.email_label")} onChangeText={onChange} value={value} keyboardType="email-address" autoCapitalize="none" autoComplete="email" error={errors.email?.message} />} />
           <Controller control={control} name="password" render={({ field: { onChange, value } }) => <Input label={t("signup.password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="new-password" error={errors.password?.message} />} />
           <Controller control={control} name="confirmPassword" render={({ field: { onChange, value } }) => <Input label={t("signup.confirm_password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="new-password" error={errors.confirmPassword?.message} />} />
-          {errorMessage ? (
-            <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{errorMessage}</Text>
+          {inlineError && !toastMessage ? (
+            <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{inlineError}</Text>
           ) : null}
           {timeoutMessage ? (
             <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{timeoutMessage}</Text>

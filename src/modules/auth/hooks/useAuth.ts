@@ -44,6 +44,8 @@ export const useAuth = () => {
       } else {
         setSignupEmail(email);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'unknown_error');
     } finally {
       setLoading(false);
     }

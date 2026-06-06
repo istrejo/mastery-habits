@@ -10,3 +10,5 @@ export { LanguagePicker } from './LanguagePicker';
 export { LanguageSelector } from './LanguageSelector';
 export { SyncIndicator } from './SyncIndicator';
 export { ErrorBoundary } from './ErrorBoundary';
+export { Toast } from './Toast';
+export type { ToastVariant } from './Toast';

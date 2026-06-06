@@ -152,6 +152,12 @@ export const es = {
     check_inbox_spam_hint: '¿No te llegó? Revisá spam o reenvialo abajo.',
     check_inbox_resend: 'Reenviar email de verificación',
     check_inbox_different_email: 'Usar otro email',
+    error_already_registered:
+      'Este email ya está registrado. Probá iniciar sesión o usá otro email.',
+    error_weak_password: 'La contraseña es muy débil. Usá al menos 8 caracteres con letras y números.',
+    error_invalid_email: 'Esa dirección de email no es válida.',
+    error_network: 'Error de red. Revisá tu conexión y volvé a intentar.',
+    error_generic: 'No pudimos crear la cuenta. Probá de nuevo.',
   },
 
   habit_form: {
