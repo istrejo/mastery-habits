@@ -10,6 +10,7 @@ import {
   Lexend_700Bold,
 } from "@expo-google-fonts/lexend";
 import { ThemeProvider } from "@core/theming";
+import { ErrorBoundary } from "@core/components";
 import { LocaleProvider, initI18n, resolveLocale, useLocaleStore } from "@core/i18n";
 import { useSessionStore } from "@core/states/session.store";
 import { supabase } from "@core/lib/supabase";
@@ -91,11 +92,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <LocaleProvider>
-        {fontsLoaded ? <AuthGate onReady={setAuthReady} /> : null}
-        {fontsLoaded ? <TaskSyncBootstrap /> : null}
-        {fontsLoaded && authReady ? (
-          <Stack screenOptions={{ headerShown: false }} />
-        ) : null}
+        <ErrorBoundary>
+          {fontsLoaded ? <AuthGate onReady={setAuthReady} /> : null}
+          {fontsLoaded ? <TaskSyncBootstrap /> : null}
+          {fontsLoaded && authReady ? (
+            <Stack screenOptions={{ headerShown: false }} />
+          ) : null}
+        </ErrorBoundary>
       </LocaleProvider>
     </ThemeProvider>
   );

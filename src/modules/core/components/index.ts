@@ -9,3 +9,4 @@ export { ThemePicker } from './ThemePicker';
 export { LanguagePicker } from './LanguagePicker';
 export { LanguageSelector } from './LanguageSelector';
 export { SyncIndicator } from './SyncIndicator';
+export { ErrorBoundary } from './ErrorBoundary';
