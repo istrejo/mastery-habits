@@ -43,7 +43,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Stack />
+        <Stack screenOptions={{ headerShown: false }} />
         <AuthGuard />
       </ThemeProvider>
     </QueryClientProvider>
