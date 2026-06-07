@@ -15,4 +15,6 @@ export const authService = {
 
   verifyOtp: (email: string, token: string) =>
     supabase.auth.verifyOtp({ email, token, type: 'signup' }),
+
+  signOut: () => supabase.auth.signOut(),
 };
