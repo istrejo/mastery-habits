@@ -1,14 +1,10 @@
-import "../global.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { supabase } from "../src/core/api/supabase";
-import { useAuthStore } from "../src/features/auth/useAuthStore";
+import { useRouter, useSegments } from "expo-router";
+import { supabase } from "../../core/api/supabase";
+import { useAuthStore } from "./useAuthStore";
 
-const queryClient = new QueryClient();
-
-function AuthGuard() {
-  const { session, isLoading, setSession, setLoading } = useAuthStore();
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { setSession, setLoading, session } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
 
@@ -26,23 +22,14 @@ function AuthGuard() {
   }, []);
 
   useEffect(() => {
-    if (isLoading) return;
     const inAuthGroup = segments[0] === "(auth)";
+
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");
     } else if (session && inAuthGroup) {
       router.replace("/(tabs)/today");
     }
-  }, [session, segments, isLoading]);
+  }, [session, segments]);
 
-  return null;
-}
-
-export default function RootLayout() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Stack />
-      <AuthGuard />
-    </QueryClientProvider>
-  );
+  return <>{children}</>;
 }
