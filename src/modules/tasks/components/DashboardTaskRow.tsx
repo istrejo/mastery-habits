@@ -1,19 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+  Animated,
   View,
   Text,
   Pressable,
   ActivityIndicator,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  withTiming,
-  withSequence,
-  useAnimatedStyle,
-  useAnimatedProps,
-  interpolate,
-  interpolateColor,
-} from 'react-native-reanimated';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '@core/theming';
@@ -51,28 +43,26 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
   theme,
 }) => {
   const subtaskDone = subtask.status === 'completed';
-  const colorAnim = useSharedValue(subtaskDone ? 1 : 0);
-  const scaleAnim = useSharedValue(1);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    colorAnim.value = withTiming(subtaskDone ? 1 : 0, { duration: 250 });
-    scaleAnim.value = withSequence(
-      withTiming(0.95, { duration: 100 }),
-      withTiming(1, { duration: 100 }),
-    );
-  }, [subtaskDone, colorAnim, scaleAnim]);
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [subtaskDone, scaleAnim]);
 
-  const textAnimatedStyle = useAnimatedStyle(() => ({
-    color: interpolateColor(
-      colorAnim.value,
-      [0, 1],
-      [theme.text.secondary, theme.text.tertiary],
-    ),
-  }));
-
-  const viewAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleAnim.value }],
-  }));
+  const viewAnimatedStyle = {
+    transform: [{ scale: scaleAnim }],
+  };
 
   return (
     <Animated.View
@@ -106,8 +96,8 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
       <Animated.Text
         numberOfLines={1}
         style={[
-          textAnimatedStyle,
           {
+            color: subtaskDone ? theme.text.tertiary : theme.text.secondary,
             flex: 1,
             fontSize: theme.typography.scale.microBold.fontSize,
             lineHeight: theme.typography.scale.microBold.lineHeight,
@@ -162,39 +152,52 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
   const metaText =
     task.description || (habitName ? `Habit: ${habitName}` : 'Standalone task');
 
-  const scaleAnim = useSharedValue(1);
-  const checkOpacity = useSharedValue(0);
-  const progressAnim = useSharedValue(progressPercent);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const checkOpacity = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(progressPercent)).current;
+  const circleStrokeDashoffset = progressAnim.interpolate({
+    inputRange: [0, 100],
+    outputRange: [75.4, 0],
+    extrapolate: 'clamp',
+  });
 
   useEffect(() => {
-    progressAnim.value = withTiming(progressPercent, { duration: 300 });
+    Animated.timing(progressAnim, {
+      toValue: progressPercent,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
   }, [progressPercent, progressAnim]);
 
   useEffect(() => {
     if (isCompleted && hasSubtasks) {
-      scaleAnim.value = withSequence(
-        withTiming(1.2, { duration: 150 }),
-        withTiming(1, { duration: 150 }),
-      );
-      checkOpacity.value = withTiming(1, { duration: 200 });
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.2,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      Animated.timing(checkOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
     } else {
-      checkOpacity.value = 0;
-      scaleAnim.value = 1;
+      checkOpacity.setValue(0);
+      scaleAnim.setValue(1);
     }
   }, [isCompleted, hasSubtasks, scaleAnim, checkOpacity]);
 
-  const checkIconAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleAnim.value }],
-    opacity: hasSubtasks ? checkOpacity.value : 1,
-  }));
-
-  const circleAnimatedProps = useAnimatedProps(() => ({
-    strokeDashoffset: interpolate(
-      progressAnim.value,
-      [0, 100],
-      [75.4, 0],
-    ),
-  }));
+  const checkIconAnimatedStyle = {
+    transform: [{ scale: scaleAnim }],
+    opacity: hasSubtasks ? checkOpacity : 1,
+  };
 
   return (
     <View
@@ -263,7 +266,7 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
                 strokeWidth={2}
                 fill='none'
                 strokeDasharray={75.4}
-                animatedProps={circleAnimatedProps}
+                strokeDashoffset={circleStrokeDashoffset}
                 strokeLinecap='round'
               />
             </Svg>

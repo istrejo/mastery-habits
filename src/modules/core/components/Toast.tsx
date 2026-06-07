@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-  runOnJS,
-  cancelAnimation,
-} from 'react-native-reanimated';
+import { Animated, Text, View } from 'react-native';
 import { useTheme } from '@core/theming';
 
 export type ToastVariant = 'error' | 'success' | 'info';
@@ -21,7 +14,10 @@ interface ToastProps {
 const toastAnimatedBase = {
   flexDirection: 'row' as const,
   alignItems: 'center' as const,
-  boxShadow: [{ offsetX: 0, offsetY: 4, blurRadius: 8, color: 'rgba(0, 0, 0, 0.15)' }] as const,
+  shadowColor: 'rgba(0, 0, 0, 0.15)' as const,
+  shadowOffset: { width: 0, height: 4 } as const,
+  shadowOpacity: 1 as const,
+  shadowRadius: 8 as const,
 };
 
 export const Toast: React.FC<ToastProps> = ({
@@ -32,8 +28,8 @@ export const Toast: React.FC<ToastProps> = ({
 }) => {
   const theme = useTheme();
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(-40);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(-40)).current;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hideAndNotify = useCallback(() => {
@@ -51,28 +47,32 @@ export const Toast: React.FC<ToastProps> = ({
       hideTimer.current = null;
     }
 
+    const animateIn = () => {
+      opacity.setValue(0);
+      translateY.setValue(-40);
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, duration: 220, useNativeDriver: true }),
+      ]).start();
+    };
+
+    const animateOut = (callback: () => void) => {
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 0, duration: 180, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: -40, duration: 220, useNativeDriver: true }),
+      ]).start(({ finished }) => {
+        if (finished) callback();
+      });
+    };
+
     if (message) {
       setCurrentMessage(message);
-      opacity.value = 0;
-      translateY.value = -40;
-      opacity.value = withTiming(1, { duration: 180 });
-      translateY.value = withTiming(0, { duration: 220 });
-
+      animateIn();
       hideTimer.current = setTimeout(() => {
-        opacity.value = withTiming(0, { duration: 180 });
-        translateY.value = withTiming(-40, { duration: 220 }, (finished) => {
-          if (finished) {
-            runOnJS(hideAndNotify)();
-          }
-        });
+        animateOut(hideAndNotify);
       }, duration);
-    } else {
-      opacity.value = withTiming(0, { duration: 180 });
-      translateY.value = withTiming(-40, { duration: 220 }, (finished) => {
-        if (finished) {
-          runOnJS(hideSilently)();
-        }
-      });
+    } else if (currentMessage) {
+      animateOut(hideSilently);
     }
 
     return () => {
@@ -81,12 +81,7 @@ export const Toast: React.FC<ToastProps> = ({
         hideTimer.current = null;
       }
     };
-  }, [message, duration, hideAndNotify, hideSilently, opacity, translateY]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
+  }, [message, duration, hideAndNotify, hideSilently, currentMessage, opacity, translateY]);
 
   if (!currentMessage) return null;
 

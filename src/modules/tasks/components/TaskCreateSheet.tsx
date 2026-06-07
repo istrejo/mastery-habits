@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useReducer, useRef } from 'react';
 import {
+  Animated,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,11 +11,6 @@ import {
   View,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  withSpring,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
@@ -403,15 +399,24 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const translateY = useSharedValue(600);
+  const translateY = useRef(new Animated.Value(600)).current;
   const [state, dispatch] = useReducer(taskFormReducer, initialFormState);
   const isEditMode = !!task;
 
   useEffect(() => {
     if (visible) {
-      translateY.value = withSpring(0, { damping: 20, stiffness: 90 });
+      Animated.spring(translateY, {
+        toValue: 0,
+        damping: 20,
+        stiffness: 90,
+        useNativeDriver: true,
+      }).start();
     } else {
-      translateY.value = 600;
+      Animated.timing(translateY, {
+        toValue: 600,
+        duration: 220,
+        useNativeDriver: true,
+      }).start();
     }
   }, [visible, translateY]);
 
@@ -443,15 +448,25 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
       Gesture.Pan()
         .minDistance(12)
         .onUpdate((event) => {
-          if (event.translationY > 0) translateY.value = event.translationY;
+          if (event.translationY > 0) {
+            translateY.setValue(event.translationY);
+          }
         })
         .onEnd((event) => {
           if (event.translationY > 90) {
-            translateY.value = 600;
-            onClose();
+            Animated.timing(translateY, {
+              toValue: 600,
+              duration: 220,
+              useNativeDriver: true,
+            }).start(() => onClose());
             return;
           }
-          translateY.value = withSpring(0, { damping: 20, stiffness: 90 });
+          Animated.spring(translateY, {
+            toValue: 0,
+            damping: 20,
+            stiffness: 90,
+            useNativeDriver: true,
+          }).start();
         }),
     [onClose, translateY]
   );
@@ -512,9 +527,9 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
     dispatch({ type: 'SET_EDITING_TEXT', payload: '' });
   };
 
-  const animatedSheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
+  const animatedSheetStyle = {
+    transform: [{ translateY }],
+  };
 
   return (
     <Modal
