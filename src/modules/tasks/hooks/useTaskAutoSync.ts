@@ -42,6 +42,31 @@ const syncCreateOperation = async (operation: PendingOperation) => {
   await tasksCacheService.upsert(createdTask);
 };
 
+const processQueue = async () => {
+  await syncQueueService.processQueue(async (operation: PendingOperation) => {
+    switch (operation.type) {
+      case 'task_complete':
+        await tasksService.complete(operation.payload.id);
+        break;
+      case 'task_uncomplete':
+        await tasksService.uncomplete(operation.payload.id);
+        break;
+      case 'task_create':
+        await syncCreateOperation(operation);
+        break;
+      case 'task_update':
+        await tasksService.updateWithSubtasks(operation.payload.id, operation.payload);
+        break;
+      case 'task_delete':
+        await tasksService.delete(operation.payload.id);
+        break;
+      case 'subtask_toggle':
+        await tasksService.toggleSubtask(operation.payload.taskId, operation.payload.subtaskId);
+        break;
+    }
+  });
+};
+
 export const useTaskAutoSync = () => {
   const { isOnline } = useNetworkStatus();
   const { isSyncing, pendingCount } = useSyncStore();
@@ -56,31 +81,6 @@ export const useTaskAutoSync = () => {
       void processQueue();
     }
   }, [isOnline, isSyncing, pendingCount, userId]);
-
-  const processQueue = async () => {
-    await syncQueueService.processQueue(async (operation: PendingOperation) => {
-      switch (operation.type) {
-        case 'task_complete':
-          await tasksService.complete(operation.payload.id);
-          break;
-        case 'task_uncomplete':
-          await tasksService.uncomplete(operation.payload.id);
-          break;
-        case 'task_create':
-          await syncCreateOperation(operation);
-          break;
-        case 'task_update':
-          await tasksService.updateWithSubtasks(operation.payload.id, operation.payload);
-          break;
-        case 'task_delete':
-          await tasksService.delete(operation.payload.id);
-          break;
-        case 'subtask_toggle':
-          await tasksService.toggleSubtask(operation.payload.taskId, operation.payload.subtaskId);
-          break;
-      }
-    });
-  };
 
   return { isSyncing, isOnline, pendingCount };
 };

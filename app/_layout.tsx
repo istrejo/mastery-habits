@@ -1,5 +1,5 @@
 import "../global.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
 import { Anton_400Regular } from "@expo-google-fonts/anton";
@@ -23,7 +23,7 @@ function AuthGate() {
   const segments = useSegments();
   const { session, setSession } = useSessionStore();
   const mounted = useRef(false);
-  const [sessionResolved, setSessionResolved] = useState(false);
+  const sessionResolvedRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -38,13 +38,13 @@ function AuthGate() {
         setSession(data.session);
       }
 
-      setSessionResolved(true);
+      sessionResolvedRef.current = true;
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       if (!active) return;
       setSession(s);
-      setSessionResolved(true);
+      sessionResolvedRef.current = true;
     });
 
     return () => {
@@ -58,14 +58,14 @@ function AuthGate() {
   }, []);
 
   useEffect(() => {
-    if (!mounted.current || !sessionResolved) return;
+    if (!mounted.current || !sessionResolvedRef.current) return;
     const inAuthGroup = segments[0] === "(auth)";
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");
     } else if (session && inAuthGroup) {
       router.replace("/(tabs)");
     }
-  }, [session, sessionResolved, segments, router, mounted]);
+  }, [session, segments, router]);
 
   return null;
 }

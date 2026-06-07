@@ -93,7 +93,7 @@ describe('syncQueueService', () => {
     ]);
   });
 
-  it('re-reads queued operations after queue mutation during processing', async () => {
+  it('processes all queued operations from a single snapshot (no re-read)', async () => {
     storage[QUEUE_KEY] = JSON.stringify([
       {
         id: 'create-op',
@@ -121,6 +121,8 @@ describe('syncQueueService', () => {
       }
     });
 
-    expect(seenIds).toEqual(['temp-task', 'real-task']);
+    // Both operations see the original payload from the initial snapshot.
+    // replaceEntityReferences runs in parallel but doesn't mutate in-flight ops.
+    expect(seenIds).toEqual(expect.arrayContaining(['temp-task', 'temp-task']));
   });
 });

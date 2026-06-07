@@ -10,6 +10,13 @@ import { useAuth, SocialAuthButtons } from "@auth/index";
 import { Screen, Input, Button } from "@core/components";
 import { useTheme } from "@core/theming";
 
+const taglineBase = {
+  fontFamily: "Lexend_600SemiBold" as const,
+  letterSpacing: 1.2,
+  textTransform: "uppercase" as const,
+  textAlign: "center" as const,
+};
+
 export default function LoginScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -17,7 +24,7 @@ export default function LoginScreen() {
   const [resending, setResending] = useState(false);
   const pendingEmailRef = useRef<string | null>(null);
 
-  const schema = useMemo(() => z.object({ email: z.string().email(t("login.error_email")), password: z.string().min(6, t("login.error_password_min")) }), [t]);
+  const schema = useMemo(() => z.object({ email: z.email({ error: t("login.error_email") }), password: z.string().min(6, t("login.error_password_min")) }), [t]);
   type FormData = z.infer<typeof schema>;
   const { control, handleSubmit, formState: { errors }, getValues } = useForm<FormData>({ resolver: zodResolver(schema) });
   const onSubmit = (data: FormData) => {
@@ -47,7 +54,17 @@ export default function LoginScreen() {
           <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.displaySm.fontSize, lineHeight: theme.typography.scale.displaySm.lineHeight, fontFamily: "Anton_400Regular", letterSpacing: theme.typography.scale.displaySm.letterSpacing, textTransform: "uppercase", textAlign: "center" }}>
             {t("login.app_title")}
           </Text>
-          <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: 1.2, textTransform: "uppercase", textAlign: "center", borderTopWidth: theme.borderWidth.default, borderTopColor: theme.border.default, paddingTop: theme.spacing.stackSm, marginTop: theme.spacing.stackSm }}>
+          <Text style={[
+            taglineBase,
+            {
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              borderTopWidth: theme.borderWidth.default,
+              borderTopColor: theme.border.default,
+              paddingTop: theme.spacing.stackSm,
+              marginTop: theme.spacing.stackSm,
+            },
+          ]}>
             {t("login.tagline")}
           </Text>
         </View>

@@ -99,6 +99,56 @@ function LegendItem({
   );
 }
 
+function PowerScaleBar() {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <Card style={{ gap: theme.spacing.stackSm }}>
+      <View
+        style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+      >
+        <Text
+          style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_600SemiBold',
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('power_grid.low_energy')}
+        </Text>
+        <Text
+          style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_600SemiBold',
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('power_grid.full_power')}
+        </Text>
+      </View>
+
+      <LinearGradient
+        colors={[
+          theme.bg.surface,
+          theme.bg.surfaceAlt,
+          theme.accent.primary,
+        ]}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={{
+          height: 10,
+          borderRadius: theme.radius.pill,
+          borderWidth: theme.borderWidth.default,
+          borderColor: theme.border.default,
+        }}
+      />
+    </Card>
+  );
+}
+
 function CellContent({ cell }: { cell: PowerGridDayCell }) {
   const theme = useTheme();
 
@@ -466,48 +516,7 @@ export default function PowerGridScreen() {
             />
           </View>
 
-          <Card style={{ gap: theme.spacing.stackSm }}>
-            <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-            >
-              <Text
-                style={{
-                  color: theme.text.secondary,
-                  fontSize: theme.typography.scale.microBold.fontSize,
-                  fontFamily: 'Lexend_600SemiBold',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('power_grid.low_energy')}
-              </Text>
-              <Text
-                style={{
-                  color: theme.text.primary,
-                  fontSize: theme.typography.scale.microBold.fontSize,
-                  fontFamily: 'Lexend_600SemiBold',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('power_grid.full_power')}
-              </Text>
-            </View>
-
-            <LinearGradient
-              colors={[
-                theme.bg.surface,
-                theme.bg.surfaceAlt,
-                theme.accent.primary,
-              ]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={{
-                height: 10,
-                borderRadius: theme.radius.pill,
-                borderWidth: theme.borderWidth.default,
-                borderColor: theme.border.default,
-              }}
-            />
-          </Card>
+          <PowerScaleBar />
         </View>
       )}
     </Screen>

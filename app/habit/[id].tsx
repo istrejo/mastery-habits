@@ -28,11 +28,39 @@ import {
   getWeeklyRhythm,
   type WeeklyRhythmStatus,
 } from '@habits/utils/habitDetailMetrics';
-import { CheckInButton, useCheckIn } from '@checkin/index';
+import { CheckInButton, useCheckIn, type CheckInRecord } from '@checkin/index';
 import { calculateStreak } from '@commitment/index';
 import { getLevel, getLocalizedLevelLabel, LevelProgress, MasteryBadge, type LevelKey } from '@progression/index';
 import { useHabitTasks, useTaskActions, TaskComposer, TaskList } from '@tasks/index';
 import type { Task } from '@tasks/index';
+
+const completionRingBase = {
+  width: 108,
+  height: 108,
+  borderWidth: 8,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
+const habitHeaderRowBase = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  justifyContent: 'space-between' as const,
+};
+
+const rhythmCellBase = {
+  width: '100%' as const,
+  aspectRatio: 1,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
+const bottomBarBase = {
+  position: 'absolute' as const,
+  left: 0,
+  right: 0,
+  bottom: 0,
+};
 
 function HistoryGrid({
   checkIns,
@@ -141,16 +169,14 @@ function CompletionRing({ percent, label }: { percent: number; label: string }) 
   return (
     <View style={{ alignItems: 'center', gap: theme.spacing.stackSm }}>
       <View
-        style={{
-          width: 108,
-          height: 108,
-          borderRadius: theme.radius.pill,
-          borderWidth: 8,
-          borderColor: theme.text.primary,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: theme.bg.base,
-        }}
+        style={[
+          completionRingBase,
+          {
+            borderRadius: theme.radius.pill,
+            borderColor: theme.text.primary,
+            backgroundColor: theme.bg.base,
+          },
+        ]}
       >
         <Text
           style={{
@@ -260,6 +286,307 @@ function getRhythmColors(status: WeeklyRhythmStatus, isToday: boolean, theme: Re
   };
 }
 
+function ErrorDisplay({ message }: { message: string }) {
+  const theme = useTheme();
+  return (
+    <Screen>
+      <Text style={{ color: theme.status.danger }}>{message}</Text>
+    </Screen>
+  );
+}
+
+function LoadingSpinner() {
+  const theme = useTheme();
+  return (
+    <Screen>
+      <ActivityIndicator color={theme.text.primary} style={{ marginTop: 40 }} />
+    </Screen>
+  );
+}
+
+function HabitDetailHeader({
+  title,
+  onBack,
+  onActions,
+}: {
+  title: string;
+  onBack: () => void;
+  onActions: () => void;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View
+      style={[
+        habitHeaderRowBase,
+        {
+          paddingHorizontal: theme.spacing.marginMobile,
+          paddingTop: theme.spacing.stackSm,
+          paddingBottom: theme.spacing.stackSm,
+          borderBottomWidth: theme.borderWidth.default,
+          borderBottomColor: theme.border.default,
+          backgroundColor: theme.bg.base,
+          gap: theme.spacing.stackSm,
+        },
+      ]}
+    >
+      <Pressable
+        onPress={onBack}
+        style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
+      >
+        <MaterialIcons name="arrow-back" size={22} color={theme.text.primary} />
+      </Pressable>
+
+      <Text
+        numberOfLines={1}
+        style={{
+          flex: 1,
+          textAlign: 'center',
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontFamily: 'Lexend_600SemiBold',
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: 'uppercase',
+        }}
+      >
+        {title}
+      </Text>
+
+      <Pressable
+        accessibilityLabel={t('habit_detail.open_actions')}
+        onPress={onActions}
+        style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
+      >
+        <MaterialIcons name="more-horiz" size={22} color={theme.text.primary} />
+      </Pressable>
+    </View>
+  );
+}
+
+function WeeklyRhythmSection({
+  weeklyRhythm,
+  weekStart,
+  weekEnd,
+  days,
+  dayLabels,
+}: {
+  weeklyRhythm: ReturnType<typeof getWeeklyRhythm>;
+  weekStart: Date | undefined;
+  weekEnd: Date | undefined;
+  days: number[];
+  dayLabels: Record<number, string>;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <Card style={{ marginBottom: theme.spacing.stackMd }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: theme.spacing.stackMd,
+        }}
+      >
+        <Text
+          style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.titleSm.fontSize,
+            lineHeight: theme.typography.scale.titleSm.lineHeight,
+            fontFamily: 'Anton_400Regular',
+            letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('habit_detail.weekly_rhythm')}
+        </Text>
+        <Text
+          style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_600SemiBold',
+            letterSpacing: theme.typography.scale.microBold.letterSpacing,
+            textTransform: 'uppercase',
+          }}
+        >
+          {weekStart && weekEnd
+            ? `${format(weekStart, 'MMM d')} — ${format(weekEnd, 'MMM d')}`
+            : t('habit_detail.this_week')}
+        </Text>
+      </View>
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.unit * 2 }}>
+        {weeklyRhythm.map((day) => {
+          const rhythmStyle = getRhythmColors(day.status, day.isToday, theme);
+          const label = dayLabels[day.isoDay] ?? '';
+
+          return (
+            <View
+              key={day.dateKey}
+              style={{ flex: 1, alignItems: 'center', gap: theme.spacing.stackSm }}
+            >
+              <Text
+                style={{
+                  color: day.isToday ? theme.text.primary : theme.text.secondary,
+                  fontSize: theme.typography.scale.microBold.fontSize,
+                  fontFamily: 'Lexend_600SemiBold',
+                  letterSpacing: theme.typography.scale.microBold.letterSpacing,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {label.slice(0, 1)}
+              </Text>
+              <View
+                style={[
+                  rhythmCellBase,
+                  {
+                    borderRadius: theme.radius.md,
+                    borderWidth: theme.borderWidth.default,
+                    borderColor: rhythmStyle.borderColor,
+                    backgroundColor: rhythmStyle.backgroundColor,
+                  },
+                ]}
+              >
+                {rhythmStyle.icon ? (
+                  <MaterialIcons
+                    name={rhythmStyle.icon}
+                    size={16}
+                    color={rhythmStyle.iconColor}
+                  />
+                ) : null}
+              </View>
+            </View>
+          );
+        })}
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing.stackSm,
+          marginTop: theme.spacing.stackMd,
+          marginBottom: theme.spacing.stackSm,
+        }}
+      >
+        <LegendItem color={theme.text.primary} label={t('habit_detail.legend_completed')} />
+        <LegendItem color={theme.text.secondary} label={t('habit_detail.legend_skip')} outlined />
+        <LegendItem color={theme.status.danger} label={t('habit_detail.legend_missed')} />
+        <LegendItem color={theme.border.strong} label={t('habit_detail.legend_pending')} outlined />
+      </View>
+
+      <Text
+        style={{
+          color: theme.text.secondary,
+          fontSize: theme.typography.scale.bodyMain.fontSize,
+          lineHeight: theme.typography.scale.bodyMain.lineHeight,
+          fontFamily: 'Lexend_400Regular',
+        }}
+      >
+        {t('habit_detail.frequency_section')}: {days.map((day) => dayLabels[day]).join(' · ')}
+      </Text>
+    </Card>
+  );
+}
+
+function getCheckInErrorMessage(
+  errorCode: string | null,
+  t: ReturnType<typeof useTranslation>['t']
+): string {
+  if (!errorCode) return '';
+  switch (errorCode) {
+    case 'cannot_recover_missed_day':
+      return t('habit_detail.checkin_error_missed');
+    case 'checkin_too_old':
+      return t('habit_detail.checkin_error_too_old');
+    case 'weekly_skip_already_used':
+      return t('checkin.skip_used');
+    case 'checkin_in_future':
+      return t('habit_detail.checkin_error_future');
+    default:
+      return t('habit_detail.checkin_error');
+  }
+}
+
+function BottomCheckInBar({
+  bottomBarPadding,
+  canCheckInToday,
+  alreadyCheckedIn,
+  todayCheckIn,
+  skipAvailable,
+  checkInLoading,
+  checkInErrorCode,
+  onComplete,
+  onSkip,
+}: {
+  bottomBarPadding: number;
+  canCheckInToday: boolean;
+  alreadyCheckedIn: boolean;
+  todayCheckIn: CheckInRecord | null;
+  skipAvailable: boolean;
+  checkInLoading: boolean;
+  checkInErrorCode: string | null;
+  onComplete: () => Promise<void>;
+  onSkip: () => Promise<void>;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View
+      style={[
+        bottomBarBase,
+        {
+          paddingHorizontal: theme.spacing.marginMobile,
+          paddingTop: theme.spacing.stackSm,
+          paddingBottom: bottomBarPadding + theme.spacing.stackSm,
+          backgroundColor: theme.bg.base,
+          borderTopWidth: theme.borderWidth.default,
+          borderTopColor: theme.border.default,
+          gap: theme.spacing.stackSm,
+        },
+      ]}
+    >
+      <Text
+        style={{
+          color: theme.text.secondary,
+          fontSize: theme.typography.scale.labelCaps.fontSize,
+          fontFamily: 'Lexend_600SemiBold',
+          letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+          textTransform: 'uppercase',
+        }}
+      >
+        {t('habit_detail.today_section')}
+      </Text>
+
+      <CheckInButton
+        canCheckIn={canCheckInToday}
+        alreadyCheckedIn={alreadyCheckedIn}
+        todayCheckIn={todayCheckIn}
+        skipAvailable={skipAvailable}
+        loading={checkInLoading}
+        onComplete={onComplete}
+        onSkip={onSkip}
+        style={{ width: '100%' }}
+      />
+
+      {checkInErrorCode ? (
+        <Text
+          style={{
+            color: theme.status.danger,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            fontFamily: 'Lexend_500Medium',
+          }}
+        >
+          {getCheckInErrorMessage(checkInErrorCode, t)}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 export default function HabitDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theme = useTheme();
@@ -350,21 +677,11 @@ export default function HabitDetailScreen() {
   const bottomBarPadding = Math.max(insets.bottom, theme.spacing.stackSm);
 
   if (loading) {
-    return (
-      <Screen>
-        <ActivityIndicator color={theme.text.primary} style={{ marginTop: 40 }} />
-      </Screen>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error || !habit) {
-    return (
-      <Screen>
-        <Text style={{ color: theme.status.danger }}>
-          {error ?? t('habit_detail.not_found')}
-        </Text>
-      </Screen>
-    );
+    return <ErrorDisplay message={error ?? t('habit_detail.not_found')} />;
   }
 
   const score = habit.mastery_scores?.score ?? 0;
@@ -392,17 +709,17 @@ export default function HabitDetailScreen() {
       >
         <View style={{ flex: 1 }}>
           <View
-            style={{
-              paddingHorizontal: theme.spacing.marginMobile,
-              paddingTop: theme.spacing.stackSm,
-              paddingBottom: theme.spacing.stackSm,
-              borderBottomWidth: theme.borderWidth.default,
-              borderBottomColor: theme.border.default,
-              backgroundColor: theme.bg.base,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
+            style={[
+              habitHeaderRowBase,
+              {
+                paddingHorizontal: theme.spacing.marginMobile,
+                paddingTop: theme.spacing.stackSm,
+                paddingBottom: theme.spacing.stackSm,
+                borderBottomWidth: theme.borderWidth.default,
+                borderBottomColor: theme.border.default,
+                backgroundColor: theme.bg.base,
+              },
+            ]}
           >
             <Pressable
               onPress={() => setEditing(false)}
@@ -424,33 +741,29 @@ export default function HabitDetailScreen() {
             <View style={{ width: 40 }} />
           </View>
 
-          <ScrollView
-            contentContainerStyle={{
-              paddingHorizontal: theme.spacing.marginMobile,
-              paddingTop: theme.spacing.stackMd,
-              paddingBottom: theme.spacing.stackLg,
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            <HabitForm
-              defaultValues={{
-                name: habit.name,
-                description: habit.description ?? '',
-                category: habit.category as HabitCategoryId,
-                custom_label: habit.custom_label ?? '',
-                custom_emoji: habit.custom_emoji ?? '✨',
-                frequency_days: days,
-              }}
-              onSubmit={handleUpdate}
-              submitLabel={t('habit_detail.save_changes')}
-              loading={saving}
-            />
-            <Button
-              label={t('common.cancel')}
-              variant="ghost"
-              onPress={() => setEditing(false)}
-              style={{ marginTop: theme.spacing.stackSm }}
-            />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={{ paddingHorizontal: theme.spacing.marginMobile, paddingTop: theme.spacing.stackMd }}>
+              <HabitForm
+                defaultValues={{
+                  name: habit.name,
+                  description: habit.description ?? '',
+                  category: habit.category as HabitCategoryId,
+                  custom_label: habit.custom_label ?? '',
+                  custom_emoji: habit.custom_emoji ?? '✨',
+                  frequency_days: days,
+                }}
+                onSubmit={handleUpdate}
+                submitLabel={t('habit_detail.save_changes')}
+                loading={saving}
+              />
+              <Button
+                label={t('common.cancel')}
+                variant="ghost"
+                onPress={() => setEditing(false)}
+                style={{ marginTop: theme.spacing.stackSm }}
+              />
+            </View>
+            <View style={{ height: theme.spacing.stackLg }} />
           </ScrollView>
         </View>
       </Screen>
@@ -467,69 +780,133 @@ export default function HabitDetailScreen() {
       }}
     >
       <View style={{ flex: 1 }}>
-        <View
-          style={{
-            paddingHorizontal: theme.spacing.marginMobile,
-            paddingTop: theme.spacing.stackSm,
-            paddingBottom: theme.spacing.stackSm,
-            borderBottomWidth: theme.borderWidth.default,
-            borderBottomColor: theme.border.default,
-            backgroundColor: theme.bg.base,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: theme.spacing.stackSm,
-          }}
-        >
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
-          >
-            <MaterialIcons name="arrow-back" size={22} color={theme.text.primary} />
-          </Pressable>
+        <HabitDetailHeader
+          title={habit.name}
+          onBack={() => router.back()}
+          onActions={() => setActionsOpen(true)}
+        />
 
-          <Text
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              color: theme.text.primary,
-              fontSize: theme.typography.scale.labelCaps.fontSize,
-              fontFamily: 'Lexend_600SemiBold',
-              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-              textTransform: 'uppercase',
-            }}
-          >
-            {habit.name}
-          </Text>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={{ paddingHorizontal: theme.spacing.marginMobile, paddingTop: theme.spacing.stackMd }}>
+              <Card style={{ marginBottom: theme.spacing.stackMd }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    gap: theme.spacing.stackMd,
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        color: theme.text.secondary,
+                        fontSize: theme.typography.scale.labelCaps.fontSize,
+                        fontFamily: 'Lexend_600SemiBold',
+                        letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                        textTransform: 'uppercase',
+                        marginBottom: theme.spacing.stackSm,
+                      }}
+                    >
+                      {t('habit_detail.current_momentum')}
+                    </Text>
 
-          <Pressable
-            accessibilityLabel={t('habit_detail.open_actions')}
-            onPress={() => setActionsOpen(true)}
-            style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
-          >
-            <MaterialIcons name="more-horiz" size={22} color={theme.text.primary} />
-          </Pressable>
-        </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+                      <Text
+                        style={{
+                          color: theme.text.primary,
+                          fontSize: theme.typography.scale.displaySm.fontSize,
+                          lineHeight: theme.typography.scale.displaySm.lineHeight,
+                          fontFamily: 'Anton_400Regular',
+                          letterSpacing: theme.typography.scale.displaySm.letterSpacing,
+                          fontVariant: ['tabular-nums'],
+                        }}
+                      >
+                        {streak.current}
+                      </Text>
+                      <Text
+                        style={{
+                          color: theme.text.primary,
+                          fontSize: theme.typography.scale.titleSm.fontSize,
+                          fontFamily: 'Anton_400Regular',
+                          letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+                        }}
+                      >
+                        {t('stats.days')}
+                      </Text>
+                    </View>
 
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: theme.spacing.marginMobile,
-            paddingTop: theme.spacing.stackMd,
-            paddingBottom: 180 + bottomBarPadding,
-          }}
-          showsVerticalScrollIndicator={false}
-        >
-          <Card style={{ marginBottom: theme.spacing.stackMd }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                gap: theme.spacing.stackMd,
-              }}
-            >
-              <View style={{ flex: 1 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        gap: theme.spacing.stackSm,
+                        marginTop: theme.spacing.stackSm,
+                        marginBottom: theme.spacing.stackSm,
+                      }}
+                    >
+                      <CategoryBadge habit={habit} size="md" showLabel />
+                      <MasteryBadge score={score} />
+                    </View>
+
+                    {habit.description ? (
+                      <Text
+                        style={{
+                          color: theme.text.secondary,
+                          fontSize: theme.typography.scale.bodyMain.fontSize,
+                          lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                          fontFamily: 'Lexend_400Regular',
+                        }}
+                      >
+                        {habit.description}
+                      </Text>
+                    ) : null}
+                  </View>
+
+                  <CompletionRing
+                    percent={monthlyCompletion.percent}
+                    label={t('habit_detail.monthly_completion')}
+                  />
+                </View>
+
+                {habit.category === 'custom' && habit.custom_label === 'Sin categorizar' ? (
+                  <View
+                    style={{
+                      marginTop: theme.spacing.stackMd,
+                      padding: theme.spacing.stackSm,
+                      borderLeftWidth: 3,
+                      borderLeftColor: theme.text.secondary,
+                      backgroundColor: theme.bg.base,
+                      borderRadius: theme.radius.sm,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: theme.text.secondary,
+                        fontSize: theme.typography.scale.microBold.fontSize,
+                        fontFamily: 'Lexend_500Medium',
+                      }}
+                    >
+                      💡 {t('custom_category.uncategorized_banner')}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <View style={{ marginTop: theme.spacing.stackMd }}>
+                  <LevelProgress score={score} />
+                </View>
+              </Card>
+
+              <WeeklyRhythmSection
+                weeklyRhythm={weeklyRhythm}
+                weekStart={weekStart}
+                weekEnd={weekEnd}
+                days={days}
+                dayLabels={DAY_LABELS}
+              />
+
+              <Card style={{ marginBottom: theme.spacing.stackMd }}>
                 <Text
                   style={{
                     color: theme.text.secondary,
@@ -537,365 +914,110 @@ export default function HabitDetailScreen() {
                     fontFamily: 'Lexend_600SemiBold',
                     letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
                     textTransform: 'uppercase',
-                    marginBottom: theme.spacing.stackSm,
+                    marginBottom: theme.spacing.stackMd,
                   }}
                 >
-                  {t('habit_detail.current_momentum')}
+                  {t('habit_detail.stats_section')}
                 </Text>
-
-                <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
-                  <Text
-                    style={{
-                      color: theme.text.primary,
-                      fontSize: theme.typography.scale.displaySm.fontSize,
-                      lineHeight: theme.typography.scale.displaySm.lineHeight,
-                      fontFamily: 'Anton_400Regular',
-                      letterSpacing: theme.typography.scale.displaySm.letterSpacing,
-                      fontVariant: ['tabular-nums'],
-                    }}
-                  >
-                    {streak.current}
-                  </Text>
-                  <Text
-                    style={{
-                      color: theme.text.primary,
-                      fontSize: theme.typography.scale.titleSm.fontSize,
-                      fontFamily: 'Anton_400Regular',
-                      letterSpacing: theme.typography.scale.titleSm.letterSpacing,
-                    }}
-                  >
-                    {t('stats.days')}
-                  </Text>
-                </View>
 
                 <View
                   style={{
                     flexDirection: 'row',
                     flexWrap: 'wrap',
-                    alignItems: 'center',
-                    gap: theme.spacing.stackSm,
-                    marginTop: theme.spacing.stackSm,
-                    marginBottom: theme.spacing.stackSm,
+                    justifyContent: 'space-between',
+                    rowGap: theme.spacing.stackSm,
                   }}
                 >
-                  <CategoryBadge habit={habit} size="md" showLabel />
-                  <MasteryBadge score={score} />
+                  <MetricCard
+                    label={t('habit_detail.commitment_score')}
+                    value={score.toFixed(1)}
+                    helper={getLocalizedLevelLabel(level.key as LevelKey, t)}
+                  />
+                  <MetricCard
+                    label={t('habit_detail.best_streak')}
+                    value={`${streak.best}`}
+                    helper={t('stats.days')}
+                  />
+                  <MetricCard
+                    label={t('habit_detail.completion_rate')}
+                    value={`${monthlyCompletion.percent}%`}
+                    helper={`${monthlyCompletion.completed}/${monthlyCompletion.planned}`}
+                  />
+                  <MetricCard
+                    label={t('habit_detail.avg_per_week')}
+                    value={`${avgPerWeek}`}
+                    helper={`${weeklyCompletions}/${days.length} ${t('habit_detail.this_week').toLowerCase()}`}
+                  />
                 </View>
+              </Card>
 
-                {habit.description ? (
-                  <Text
-                    style={{
-                      color: theme.text.secondary,
-                      fontSize: theme.typography.scale.bodyMain.fontSize,
-                      lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                      fontFamily: 'Lexend_400Regular',
-                    }}
-                  >
-                    {habit.description}
-                  </Text>
-                ) : null}
-              </View>
-
-              <CompletionRing
-                percent={monthlyCompletion.percent}
-                label={t('habit_detail.monthly_completion')}
-              />
-            </View>
-
-            {habit.category === 'custom' && habit.custom_label === 'Sin categorizar' ? (
-              <View
-                style={{
-                  marginTop: theme.spacing.stackMd,
-                  padding: theme.spacing.stackSm,
-                  borderLeftWidth: 3,
-                  borderLeftColor: theme.text.secondary,
-                  backgroundColor: theme.bg.base,
-                  borderRadius: theme.radius.sm,
-                }}
-              >
+              <Card>
                 <Text
                   style={{
                     color: theme.text.secondary,
-                    fontSize: theme.typography.scale.microBold.fontSize,
-                    fontFamily: 'Lexend_500Medium',
+                    fontSize: theme.typography.scale.labelCaps.fontSize,
+                    fontFamily: 'Lexend_600SemiBold',
+                    letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                    textTransform: 'uppercase',
+                    marginBottom: theme.spacing.stackMd,
                   }}
                 >
-                  💡 {t('custom_category.uncategorized_banner')}
+                  {t('habit_detail.history_section')}
                 </Text>
-              </View>
-            ) : null}
 
-            <View style={{ marginTop: theme.spacing.stackMd }}>
-              <LevelProgress score={score} />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: theme.spacing.stackSm,
+                    marginBottom: theme.spacing.stackSm,
+                  }}
+                >
+                  <LegendItem color={theme.text.primary} label={t('habit_detail.legend_completed')} />
+                  <LegendItem color={theme.text.secondary} label={t('habit_detail.legend_skip')} outlined />
+                  <LegendItem color={theme.status.danger} label={t('habit_detail.legend_missed')} />
+                </View>
+
+                <HistoryGrid checkIns={last30Days} />
+              </Card>
+
+              <Card style={{ marginTop: theme.spacing.stackMd }}>
+                <Text
+                  style={{
+                    color: theme.text.secondary,
+                    fontSize: theme.typography.scale.labelCaps.fontSize,
+                    fontFamily: 'Lexend_600SemiBold',
+                    letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                    textTransform: 'uppercase',
+                    marginBottom: theme.spacing.stackMd,
+                  }}
+                >
+                  {t('tasks.title')}
+                </Text>
+                <TaskComposer habitId={id} onCreated={refreshTasks} />
+                <View style={{ marginTop: theme.spacing.stackSm }}>
+                  <TaskList
+                    tasks={habitTasks}
+                    onToggle={handleToggleTask}
+                    onDelete={handleDeleteTask}
+                  />
+                </View>
+              </Card>
             </View>
-          </Card>
+            <View style={{ height: 180 + bottomBarPadding }} />
+          </ScrollView>
 
-          <Card style={{ marginBottom: theme.spacing.stackMd }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: theme.spacing.stackMd,
-              }}
-            >
-              <Text
-                style={{
-                  color: theme.text.primary,
-                  fontSize: theme.typography.scale.titleSm.fontSize,
-                  lineHeight: theme.typography.scale.titleSm.lineHeight,
-                  fontFamily: 'Anton_400Regular',
-                  letterSpacing: theme.typography.scale.titleSm.letterSpacing,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('habit_detail.weekly_rhythm')}
-              </Text>
-              <Text
-                style={{
-                  color: theme.text.secondary,
-                  fontSize: theme.typography.scale.microBold.fontSize,
-                  fontFamily: 'Lexend_600SemiBold',
-                  letterSpacing: theme.typography.scale.microBold.letterSpacing,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {weekStart && weekEnd
-                  ? `${format(weekStart, 'MMM d')} — ${format(weekEnd, 'MMM d')}`
-                  : t('habit_detail.this_week')}
-              </Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.unit * 2 }}>
-              {weeklyRhythm.map((day) => {
-                const rhythmStyle = getRhythmColors(day.status, day.isToday, theme);
-                const label = DAY_LABELS[day.isoDay] ?? '';
-
-                return (
-                  <View
-                    key={day.dateKey}
-                    style={{ flex: 1, alignItems: 'center', gap: theme.spacing.stackSm }}
-                  >
-                    <Text
-                      style={{
-                        color: day.isToday ? theme.text.primary : theme.text.secondary,
-                        fontSize: theme.typography.scale.microBold.fontSize,
-                        fontFamily: 'Lexend_600SemiBold',
-                        letterSpacing: theme.typography.scale.microBold.letterSpacing,
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {label.slice(0, 1)}
-                    </Text>
-                    <View
-                      style={{
-                        width: '100%',
-                        aspectRatio: 1,
-                        borderRadius: theme.radius.md,
-                        borderWidth: theme.borderWidth.default,
-                        borderColor: rhythmStyle.borderColor,
-                        backgroundColor: rhythmStyle.backgroundColor,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {rhythmStyle.icon ? (
-                        <MaterialIcons
-                          name={rhythmStyle.icon}
-                          size={16}
-                          color={rhythmStyle.iconColor}
-                        />
-                      ) : null}
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                gap: theme.spacing.stackSm,
-                marginTop: theme.spacing.stackMd,
-                marginBottom: theme.spacing.stackSm,
-              }}
-            >
-              <LegendItem color={theme.text.primary} label={t('habit_detail.legend_completed')} />
-              <LegendItem color={theme.text.secondary} label={t('habit_detail.legend_skip')} outlined />
-              <LegendItem color={theme.status.danger} label={t('habit_detail.legend_missed')} />
-              <LegendItem color={theme.border.strong} label={t('habit_detail.legend_pending')} outlined />
-            </View>
-
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.bodyMain.fontSize,
-                lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                fontFamily: 'Lexend_400Regular',
-              }}
-            >
-              {t('habit_detail.frequency_section')}: {days.map((day) => DAY_LABELS[day]).join(' · ')}
-            </Text>
-          </Card>
-
-          <Card style={{ marginBottom: theme.spacing.stackMd }}>
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: 'uppercase',
-                marginBottom: theme.spacing.stackMd,
-              }}
-            >
-              {t('habit_detail.stats_section')}
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-                rowGap: theme.spacing.stackSm,
-              }}
-            >
-              <MetricCard
-                label={t('habit_detail.commitment_score')}
-                value={score.toFixed(1)}
-                helper={getLocalizedLevelLabel(level.key as LevelKey, t)}
-              />
-              <MetricCard
-                label={t('habit_detail.best_streak')}
-                value={`${streak.best}`}
-                helper={t('stats.days')}
-              />
-              <MetricCard
-                label={t('habit_detail.completion_rate')}
-                value={`${monthlyCompletion.percent}%`}
-                helper={`${monthlyCompletion.completed}/${monthlyCompletion.planned}`}
-              />
-              <MetricCard
-                label={t('habit_detail.avg_per_week')}
-                value={`${avgPerWeek}`}
-                helper={`${weeklyCompletions}/${days.length} ${t('habit_detail.this_week').toLowerCase()}`}
-              />
-            </View>
-          </Card>
-
-          <Card>
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: 'uppercase',
-                marginBottom: theme.spacing.stackMd,
-              }}
-            >
-              {t('habit_detail.history_section')}
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                gap: theme.spacing.stackSm,
-                marginBottom: theme.spacing.stackSm,
-              }}
-            >
-              <LegendItem color={theme.text.primary} label={t('habit_detail.legend_completed')} />
-              <LegendItem color={theme.text.secondary} label={t('habit_detail.legend_skip')} outlined />
-              <LegendItem color={theme.status.danger} label={t('habit_detail.legend_missed')} />
-            </View>
-
-            <HistoryGrid checkIns={last30Days} />
-          </Card>
-
-          <Card style={{ marginTop: theme.spacing.stackMd }}>
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: 'uppercase',
-                marginBottom: theme.spacing.stackMd,
-              }}
-            >
-              {t('tasks.title')}
-            </Text>
-            <TaskComposer habitId={id} onCreated={refreshTasks} />
-            <View style={{ marginTop: theme.spacing.stackSm }}>
-              <TaskList
-                tasks={habitTasks}
-                onToggle={handleToggleTask}
-                onDelete={handleDeleteTask}
-              />
-            </View>
-          </Card>
-        </ScrollView>
-
-        <View
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            paddingHorizontal: theme.spacing.marginMobile,
-            paddingTop: theme.spacing.stackSm,
-            paddingBottom: bottomBarPadding + theme.spacing.stackSm,
-            backgroundColor: theme.bg.base,
-            borderTopWidth: theme.borderWidth.default,
-            borderTopColor: theme.border.default,
-            gap: theme.spacing.stackSm,
-          }}
-        >
-          <Text
-            style={{
-              color: theme.text.secondary,
-              fontSize: theme.typography.scale.labelCaps.fontSize,
-              fontFamily: 'Lexend_600SemiBold',
-              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('habit_detail.today_section')}
-          </Text>
-
-          <CheckInButton
-            canCheckIn={canCheckInToday}
-            alreadyCheckedIn={alreadyCheckedIn}
-            todayCheckIn={todayCheckIn}
-            skipAvailable={skipAvailable}
-            loading={checkInLoading}
-            onComplete={markCompleted}
-            onSkip={markSkipped}
-            style={{ width: '100%' }}
-          />
-
-          {checkInErrorCode ? (
-            <Text
-              style={{
-                color: theme.status.danger,
-                fontSize: theme.typography.scale.microBold.fontSize,
-                fontFamily: 'Lexend_500Medium',
-              }}
-            >
-              {checkInErrorCode === 'cannot_recover_missed_day'
-                ? t('habit_detail.checkin_error_missed')
-                : checkInErrorCode === 'checkin_too_old'
-                ? t('habit_detail.checkin_error_too_old')
-                : checkInErrorCode === 'weekly_skip_already_used'
-                ? t('checkin.skip_used')
-                : checkInErrorCode === 'checkin_in_future'
-                ? t('habit_detail.checkin_error_future')
-                : t('habit_detail.checkin_error')}
-            </Text>
-          ) : null}
-        </View>
+        <BottomCheckInBar
+          bottomBarPadding={bottomBarPadding}
+          canCheckInToday={canCheckInToday}
+          alreadyCheckedIn={alreadyCheckedIn}
+          todayCheckIn={todayCheckIn}
+          skipAvailable={skipAvailable}
+          checkInLoading={checkInLoading}
+          checkInErrorCode={checkInErrorCode}
+          onComplete={markCompleted}
+          onSkip={markSkipped}
+        />
 
         <Modal
           visible={actionsOpen}

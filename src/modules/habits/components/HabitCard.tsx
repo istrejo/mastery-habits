@@ -1,12 +1,24 @@
 /* stitch: habit-card */
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { ProgressBar } from '@core/components';
 import type { HabitWithScore } from '../types';
 import { CategoryBadge } from './CategoryBadge';
 import { resolveCategory } from '../utils/resolveCategory';
+
+const habitCardBase = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+};
+
+const checkboxBase = {
+  width: 22,
+  height: 22,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
 
 interface HabitCardProps {
   habit: HabitWithScore;
@@ -20,33 +32,32 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed 
   const { label } = resolveCategory(habit);
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
-      activeOpacity={0.82}
-      style={{
-        backgroundColor: t.bg.surface,
-        borderColor: t.border.default,
-        borderWidth: t.borderWidth.default,
-        borderRadius: t.radius.lg,
-        padding: t.spacing.marginMobile,
-        marginBottom: t.spacing.stackSm,
-        gap: t.spacing.stackMd,
-        opacity: completed ? 0.58 : 1,
-        position: 'relative',
-        overflow: 'hidden',
-      }}
+      style={({ pressed }) => [
+        habitCardBase,
+        {
+          backgroundColor: t.bg.surface,
+          borderColor: t.border.default,
+          borderWidth: t.borderWidth.default,
+          borderRadius: t.radius.lg,
+          padding: t.spacing.marginMobile,
+          marginBottom: t.spacing.stackSm,
+          gap: t.spacing.stackMd,
+        },
+        { opacity: pressed ? 0.82 : (completed ? 0.58 : 1) },
+      ]}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: t.spacing.stackSm }}>
-        <View style={{
-          width: 22,
-          height: 22,
-          borderRadius: t.radius.pill,
-          borderWidth: t.borderWidth.default,
-          borderColor: completed ? t.accent.primary : t.border.default,
-          backgroundColor: completed ? t.accent.primary : 'transparent',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        <View style={[
+          checkboxBase,
+          {
+            borderRadius: t.radius.pill,
+            borderWidth: t.borderWidth.default,
+            borderColor: completed ? t.accent.primary : t.border.default,
+            backgroundColor: completed ? t.accent.primary : 'transparent',
+          },
+        ]}>
           {completed && <MaterialIcons name="check" size={14} color={t.accent.onPrimary} />}
         </View>
 
@@ -110,6 +121,6 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, completed 
           pointerEvents: 'none',
         }} />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };

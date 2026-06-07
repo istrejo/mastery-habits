@@ -183,7 +183,7 @@ describe('StatsScreen', () => {
       tree = create(React.createElement(StatsScreen));
     });
 
-    const buttons = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    const buttons = tree.root.findAll((node: any) => node.type === 'Pressable');
     const firstHabitRow = buttons[1];
 
     act(() => {

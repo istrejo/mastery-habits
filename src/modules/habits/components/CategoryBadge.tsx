@@ -30,18 +30,18 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ habit, size = 'md'
 
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'flex-start',
-        backgroundColor: theme.accent.muted,
-        borderColor: theme.border.default,
-        borderWidth: theme.borderWidth.default,
-        borderRadius: showLabel ? theme.radius.sm : theme.radius.pill,
-        paddingHorizontal: s.paddingH,
-        paddingVertical: s.paddingV,
-        gap: showLabel ? 4 : 0,
-      }}
+      style={[
+        badgeRowBase,
+        {
+          backgroundColor: theme.accent.muted,
+          borderColor: theme.border.default,
+          borderWidth: theme.borderWidth.default,
+          borderRadius: showLabel ? theme.radius.sm : theme.radius.pill,
+          paddingHorizontal: s.paddingH,
+          paddingVertical: s.paddingV,
+          gap: showLabel ? 4 : 0,
+        },
+      ]}
     >
       <Text style={{ fontSize: s.emojiSize }}>{emoji}</Text>
       {showLabel && (

@@ -1,6 +1,6 @@
 /* stitch: stats-dashboard */
 import { Fragment } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -10,6 +10,12 @@ import { resolveCategory } from '@habits/index';
 import { useStatsMetrics, type ActivityGridCell } from '@commitment/index';
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'] as const;
+
+const statsHeaderRowBase = {
+  flexDirection: 'row' as const,
+  justifyContent: 'space-between' as const,
+  alignItems: 'center' as const,
+};
 
 function chunkCells(cells: ActivityGridCell[]) {
   const rows = Math.ceil(cells.length / 7);
@@ -142,6 +148,273 @@ function formatCompletionDelta(delta: number | null) {
   return `${delta > 0 ? '+' : ''}${delta} pts vs prev 7d`;
 }
 
+function StreakStatCard({
+  currentStreak,
+  bestStreak,
+  loading,
+}: {
+  currentStreak: number;
+  bestStreak: number;
+  loading: boolean;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <Card>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: theme.spacing.stackLg,
+        }}
+      >
+        <Text
+          style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.labelCaps.fontSize,
+            fontFamily: 'Lexend_600SemiBold',
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('stats.current_streak')}
+        </Text>
+        <MaterialIcons
+          name='local-fire-department'
+          size={18}
+          color={theme.text.primary}
+        />
+      </View>
+
+      <Text
+        style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.displayXl.fontSize,
+          lineHeight: theme.typography.scale.displayXl.lineHeight,
+          fontFamily: 'Anton_400Regular',
+          letterSpacing: theme.typography.scale.displayXl.letterSpacing,
+          textTransform: 'uppercase',
+          fontVariant: ['tabular-nums'],
+        }}
+      >
+        {loading ? '--' : `${currentStreak} ${t('stats.days')}`}
+      </Text>
+
+      <Text
+        style={{
+          color: theme.text.secondary,
+          fontSize: theme.typography.scale.bodyMain.fontSize,
+          lineHeight: theme.typography.scale.bodyMain.lineHeight,
+          fontFamily: 'Lexend_400Regular',
+          marginTop: theme.spacing.unit * 2,
+        }}
+      >
+        {t('stats.best_streak', { count: bestStreak })}
+      </Text>
+    </Card>
+  );
+}
+
+function CompletionStatCard({
+  percent,
+  deltaLabel,
+  fallbackLabel,
+  loading,
+}: {
+  percent: number;
+  deltaLabel: string | null;
+  fallbackLabel: string;
+  loading: boolean;
+}) {
+  const theme = useTheme();
+
+  return (
+    <Card>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: theme.spacing.stackMd,
+        }}
+      >
+        <Text
+          style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.labelCaps.fontSize,
+            fontFamily: 'Lexend_600SemiBold',
+            letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+            textTransform: 'uppercase',
+          }}
+        >
+          Completion
+        </Text>
+        <MaterialIcons name='check-circle' size={18} color={theme.text.primary} />
+      </View>
+
+      <View style={{ gap: theme.spacing.stackSm }}>
+        <Text
+          style={{
+            color: theme.text.primary,
+            fontSize: theme.typography.scale.titleLg.fontSize,
+            lineHeight: theme.typography.scale.titleLg.lineHeight,
+            fontFamily: 'Anton_400Regular',
+            fontVariant: ['tabular-nums'],
+          }}
+        >
+          {loading ? '--%' : `${percent}%`}
+        </Text>
+        <ProgressBar value={loading ? 0 : percent} />
+        <Text
+          style={{
+            color: theme.text.secondary,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            lineHeight: theme.typography.scale.microBold.lineHeight,
+            fontFamily: 'Lexend_400Regular',
+          }}
+        >
+          {loading ? 'Loading completion trend...' : deltaLabel ?? fallbackLabel}
+        </Text>
+      </View>
+    </Card>
+  );
+}
+
+function TopHabitsList({
+  entries,
+}: {
+  entries: Array<{
+    habit: { id: string; name: string; category: string; custom_emoji?: string | null; custom_label?: string | null };
+    currentStreak: number;
+  }>;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const router = useRouter();
+
+  if (entries.length === 0) return null;
+
+  return (
+    <View style={{ gap: theme.spacing.stackSm }}>
+      <Text
+        style={{
+          color: theme.text.primary,
+          fontSize: theme.typography.scale.titleSm.fontSize,
+          lineHeight: theme.typography.scale.titleSm.lineHeight,
+          fontFamily: 'Anton_400Regular',
+          letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+          textTransform: 'uppercase',
+        }}
+      >
+        {t('stats.top_habits')}
+      </Text>
+
+      <View
+        style={{
+          backgroundColor: theme.bg.surface,
+          borderColor: theme.border.default,
+          borderWidth: theme.borderWidth.default,
+          borderRadius: theme.radius.lg,
+          overflow: 'hidden',
+        }}
+      >
+        {entries.map((entry, index) => {
+          const { habit, currentStreak } = entry;
+          const category = resolveCategory(habit as any);
+          const isLast = index === entries.length - 1;
+
+          return (
+            <Fragment key={habit.id}>
+              <Pressable
+                onPress={() => router.push(`/habit/${habit.id}`)}
+                style={({ pressed }) => [{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: theme.spacing.stackMd,
+                  paddingVertical: theme.spacing.stackSm + theme.spacing.unit,
+                }, { opacity: pressed ? 0.82 : 1 }]}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.stackMd, flex: 1 }}>
+                  <Text
+                    style={{
+                      width: 28,
+                      color: theme.text.secondary,
+                      fontSize: theme.typography.scale.titleSm.fontSize,
+                      lineHeight: theme.typography.scale.titleSm.lineHeight,
+                      fontFamily: 'Anton_400Regular',
+                    }}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: theme.text.primary,
+                        fontSize: theme.typography.scale.labelCaps.fontSize,
+                        lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                        fontFamily: 'Lexend_600SemiBold',
+                      }}
+                    >
+                      {habit.name}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: theme.text.secondary,
+                        fontSize: theme.typography.scale.microBold.fontSize,
+                        lineHeight: theme.typography.scale.microBold.lineHeight,
+                        fontFamily: 'Lexend_400Regular',
+                      }}
+                    >
+                      {category.label}
+                    </Text>
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: theme.spacing.unit,
+                    backgroundColor: theme.bg.surfaceAlt,
+                    paddingHorizontal: theme.spacing.stackSm,
+                    paddingVertical: theme.spacing.unit,
+                    borderRadius: theme.radius.pill,
+                  }}
+                >
+                  <MaterialIcons name='repeat' size={16} color={theme.text.primary} />
+                  <Text
+                    style={{
+                      color: theme.text.primary,
+                      fontSize: theme.typography.scale.microBold.fontSize,
+                      lineHeight: theme.typography.scale.microBold.lineHeight,
+                      fontFamily: 'Lexend_600SemiBold',
+                    }}
+                  >
+                    {`${currentStreak} ${t('stats.days')}`}
+                  </Text>
+                </View>
+              </Pressable>
+              {!isLast && (
+                <View
+                  style={{
+                    height: theme.borderWidth.default,
+                    backgroundColor: theme.border.subtle,
+                  }}
+                />
+              )}
+            </Fragment>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 export default function StatsScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -165,17 +438,17 @@ export default function StatsScreen() {
   return (
     <Screen scrollable>
       <View
-        style={{
-          marginHorizontal: -theme.spacing.marginMobile,
-          paddingHorizontal: theme.spacing.marginMobile,
-          paddingBottom: theme.spacing.stackSm,
-          marginBottom: theme.spacing.stackMd,
-          borderBottomWidth: theme.borderWidth.default,
-          borderBottomColor: theme.border.subtle,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
+        style={[
+          statsHeaderRowBase,
+          {
+            marginHorizontal: -theme.spacing.marginMobile,
+            paddingHorizontal: theme.spacing.marginMobile,
+            paddingBottom: theme.spacing.stackSm,
+            marginBottom: theme.spacing.stackMd,
+            borderBottomWidth: theme.borderWidth.default,
+            borderBottomColor: theme.border.subtle,
+          },
+        ]}
       >
         <Text
           style={{
@@ -188,7 +461,7 @@ export default function StatsScreen() {
         >
           {t('dashboard.app_name')}
         </Text>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.push('/habit/new')}
           hitSlop={12}
           style={{
@@ -200,7 +473,7 @@ export default function StatsScreen() {
           }}
         >
           <MaterialIcons name='add' size={22} color={theme.text.primary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <View style={{ marginBottom: theme.spacing.stackMd, gap: theme.spacing.unit * 2 }}>
@@ -229,108 +502,18 @@ export default function StatsScreen() {
       </View>
 
       <View style={{ gap: theme.spacing.stackMd }}>
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: theme.spacing.stackLg,
-            }}
-          >
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: 'uppercase',
-              }}
-            >
-              {t('stats.current_streak')}
-            </Text>
-            <MaterialIcons
-              name='local-fire-department'
-              size={18}
-              color={theme.text.primary}
-            />
-          </View>
+        <StreakStatCard
+          currentStreak={globalCurrentStreak}
+          bestStreak={globalBestStreak}
+          loading={loading}
+        />
 
-          <Text
-            style={{
-              color: theme.text.primary,
-              fontSize: theme.typography.scale.displayXl.fontSize,
-              lineHeight: theme.typography.scale.displayXl.lineHeight,
-              fontFamily: 'Anton_400Regular',
-              letterSpacing: theme.typography.scale.displayXl.letterSpacing,
-              textTransform: 'uppercase',
-              fontVariant: ['tabular-nums'],
-            }}
-          >
-            {loading ? '--' : `${globalCurrentStreak} ${t('stats.days')}`}
-          </Text>
-
-          <Text
-            style={{
-              color: theme.text.secondary,
-              fontSize: theme.typography.scale.bodyMain.fontSize,
-              lineHeight: theme.typography.scale.bodyMain.lineHeight,
-              fontFamily: 'Lexend_400Regular',
-              marginTop: theme.spacing.unit * 2,
-            }}
-          >
-            {t('stats.best_streak', { count: globalBestStreak })}
-          </Text>
-        </Card>
-
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: theme.spacing.stackMd,
-            }}
-          >
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: 'uppercase',
-              }}
-            >
-              Completion
-            </Text>
-            <MaterialIcons name='check-circle' size={18} color={theme.text.primary} />
-          </View>
-
-          <View style={{ gap: theme.spacing.stackSm }}>
-            <Text
-              style={{
-                color: theme.text.primary,
-                fontSize: theme.typography.scale.titleLg.fontSize,
-                lineHeight: theme.typography.scale.titleLg.lineHeight,
-                fontFamily: 'Anton_400Regular',
-                fontVariant: ['tabular-nums'],
-              }}
-            >
-              {loading ? '--%' : `${completion30d.percent}%`}
-            </Text>
-            <ProgressBar value={loading ? 0 : completion30d.percent} />
-            <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.microBold.fontSize,
-                lineHeight: theme.typography.scale.microBold.lineHeight,
-                fontFamily: 'Lexend_400Regular',
-              }}
-            >
-              {loading ? 'Loading completion trend...' : completionDeltaLabel ?? completionFallbackLabel}
-            </Text>
-          </View>
-        </Card>
+        <CompletionStatCard
+          percent={completion30d.percent}
+          deltaLabel={completionDeltaLabel}
+          fallbackLabel={completionFallbackLabel}
+          loading={loading}
+        />
 
         <Card>
           <View
@@ -378,124 +561,7 @@ export default function StatsScreen() {
           <ActivityGrid cells={activity30dCells} />
         </Card>
 
-        {topHabitsByCurrentStreak.length > 0 && (
-          <View style={{ gap: theme.spacing.stackSm }}>
-            <Text
-              style={{
-                color: theme.text.primary,
-                fontSize: theme.typography.scale.titleSm.fontSize,
-                lineHeight: theme.typography.scale.titleSm.lineHeight,
-                fontFamily: 'Anton_400Regular',
-                letterSpacing: theme.typography.scale.titleSm.letterSpacing,
-                textTransform: 'uppercase',
-              }}
-            >
-              {t('stats.top_habits')}
-            </Text>
-
-            <View
-              style={{
-                backgroundColor: theme.bg.surface,
-                borderColor: theme.border.default,
-                borderWidth: theme.borderWidth.default,
-                borderRadius: theme.radius.lg,
-                overflow: 'hidden',
-              }}
-            >
-              {topHabitsByCurrentStreak.map((entry, index) => {
-                const { habit, currentStreak } = entry;
-                const category = resolveCategory(habit);
-                const isLast = index === topHabitsByCurrentStreak.length - 1;
-
-                return (
-                  <Fragment key={habit.id}>
-                    <TouchableOpacity
-                      onPress={() => router.push(`/habit/${habit.id}`)}
-                      activeOpacity={0.82}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: theme.spacing.stackMd,
-                        paddingVertical: theme.spacing.stackSm + theme.spacing.unit,
-                      }}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.stackMd, flex: 1 }}>
-                        <Text
-                          style={{
-                            width: 28,
-                            color: theme.text.secondary,
-                            fontSize: theme.typography.scale.titleSm.fontSize,
-                            lineHeight: theme.typography.scale.titleSm.lineHeight,
-                            fontFamily: 'Anton_400Regular',
-                          }}
-                        >
-                          {String(index + 1).padStart(2, '0')}
-                        </Text>
-                        <View style={{ flex: 1 }}>
-                          <Text
-                            numberOfLines={1}
-                            style={{
-                              color: theme.text.primary,
-                              fontSize: theme.typography.scale.labelCaps.fontSize,
-                              lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                              fontFamily: 'Lexend_600SemiBold',
-                            }}
-                          >
-                            {habit.name}
-                          </Text>
-                          <Text
-                            numberOfLines={1}
-                            style={{
-                              color: theme.text.secondary,
-                              fontSize: theme.typography.scale.microBold.fontSize,
-                              lineHeight: theme.typography.scale.microBold.lineHeight,
-                              fontFamily: 'Lexend_400Regular',
-                            }}
-                          >
-                            {category.label}
-                          </Text>
-                        </View>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: theme.spacing.unit,
-                          backgroundColor: theme.bg.surfaceAlt,
-                          paddingHorizontal: theme.spacing.stackSm,
-                          paddingVertical: theme.spacing.unit,
-                          borderRadius: theme.radius.pill,
-                        }}
-                      >
-                        <MaterialIcons name='repeat' size={16} color={theme.text.primary} />
-                        <Text
-                          style={{
-                            color: theme.text.primary,
-                            fontSize: theme.typography.scale.microBold.fontSize,
-                            lineHeight: theme.typography.scale.microBold.lineHeight,
-                            fontFamily: 'Lexend_600SemiBold',
-                          }}
-                        >
-                          {`${currentStreak} ${t('stats.days')}`}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                    {!isLast && (
-                      <View
-                        style={{
-                          height: theme.borderWidth.default,
-                          backgroundColor: theme.border.subtle,
-                        }}
-                      />
-                    )}
-                  </Fragment>
-                );
-              })}
-            </View>
-          </View>
-        )}
+        <TopHabitsList entries={topHabitsByCurrentStreak} />
       </View>
     </Screen>
   );

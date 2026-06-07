@@ -10,6 +10,17 @@ import { getLevel, getLocalizedLevelLabel, MasteryLevelIcon, type LevelKey } fro
 
 const LEVEL_SCORE: Record<LevelKey, number> = { ancient: 100, forest: 80, tree: 58, sprout: 33, seed: 10 };
 
+const profileSectionLabelBase = {
+  fontFamily: "Lexend_600SemiBold" as const,
+  textTransform: "uppercase" as const,
+};
+
+const levelRowBase = {
+  flexDirection: "row" as const,
+  justifyContent: "space-between" as const,
+  alignItems: "center" as const,
+};
+
 export default function ProfileScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -24,12 +35,14 @@ export default function ProfileScreen() {
   const email = user?.email ?? "";
   const initials = displayName ? displayName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase() : email.slice(0, 2).toUpperCase();
   const levelRows = (["seed", "sprout", "tree", "forest", "ancient"] as const satisfies readonly LevelKey[])
-    .map((key) => {
+    .reduce<{ key: LevelKey; count: number; label: string; level: ReturnType<typeof getLevel> }[]>((acc, key) => {
       const count = habits.filter((h) => (h.mastery_scores?.level ?? "seed") === key).length;
-      const level = getLevel(LEVEL_SCORE[key]!);
-      return { key, count, label: getLocalizedLevelLabel(key, t), level };
-    })
-    .filter(({ count }) => count > 0);
+      if (count > 0) {
+        const level = getLevel(LEVEL_SCORE[key]!);
+        acc.push({ key, count, label: getLocalizedLevelLabel(key, t), level });
+      }
+      return acc;
+    }, []);
 
   return (
     <Screen
@@ -133,16 +146,17 @@ export default function ProfileScreen() {
         {!loading && levelRows.length > 0 && (
           <View style={{ gap: theme.spacing.stackMd }}>
             <Text
-              style={{
-                color: theme.text.secondary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: "Lexend_600SemiBold",
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: "uppercase",
-                paddingBottom: theme.spacing.stackSm,
-                borderBottomWidth: theme.borderWidth.default,
-                borderBottomColor: theme.border.default,
-              }}
+              style={[
+                profileSectionLabelBase,
+                {
+                  color: theme.text.secondary,
+                  fontSize: theme.typography.scale.labelCaps.fontSize,
+                  letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                  paddingBottom: theme.spacing.stackSm,
+                  borderBottomWidth: theme.borderWidth.default,
+                  borderBottomColor: theme.border.default,
+                },
+              ]}
             >
               {t("profile.levels_section")}
             </Text>
@@ -152,16 +166,16 @@ export default function ProfileScreen() {
                 return (
                   <View
                     key={key}
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      paddingVertical: theme.spacing.stackMd,
-                      paddingHorizontal: theme.spacing.stackSm,
-                      marginHorizontal: -theme.spacing.stackSm,
-                      borderBottomWidth: index === levelRows.length - 1 ? 0 : theme.borderWidth.default,
-                      borderBottomColor: theme.border.default,
-                    }}
+                    style={[
+                      levelRowBase,
+                      {
+                        paddingVertical: theme.spacing.stackMd,
+                        paddingHorizontal: theme.spacing.stackSm,
+                        marginHorizontal: -theme.spacing.stackSm,
+                        borderBottomWidth: index === levelRows.length - 1 ? 0 : theme.borderWidth.default,
+                        borderBottomColor: theme.border.default,
+                      },
+                    ]}
                   >
                     <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.stackMd }}>
                       <MasteryLevelIcon level={key} size={20} />

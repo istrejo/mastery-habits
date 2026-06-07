@@ -1,5 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Text, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  runOnJS,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { useTheme } from '@core/theming';
 
 export type ToastVariant = 'error' | 'success' | 'info';
@@ -11,6 +18,12 @@ interface ToastProps {
   duration?: number;
 }
 
+const toastAnimatedBase = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  boxShadow: [{ offsetX: 0, offsetY: 4, blurRadius: 8, color: 'rgba(0, 0, 0, 0.15)' }] as const,
+};
+
 export const Toast: React.FC<ToastProps> = ({
   message,
   variant = 'error',
@@ -19,73 +32,46 @@ export const Toast: React.FC<ToastProps> = ({
 }) => {
   const theme = useTheme();
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
-  const opacityRef = useRef<Animated.Value | null>(null);
-  if (opacityRef.current === null) opacityRef.current = new Animated.Value(0);
-  const opacity = opacityRef.current;
-  const translateYRef = useRef<Animated.Value | null>(null);
-  if (translateYRef.current === null) translateYRef.current = new Animated.Value(-40);
-  const translateY = translateYRef.current;
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(-40);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fadeOutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const hideAndNotify = useCallback(() => {
+    setCurrentMessage(null);
+    onHide?.();
+  }, [onHide]);
+
+  const hideSilently = useCallback(() => {
+    setCurrentMessage(null);
+  }, []);
 
   useEffect(() => {
     if (hideTimer.current !== null) {
       clearTimeout(hideTimer.current);
       hideTimer.current = null;
     }
-    if (fadeOutTimer.current !== null) {
-      clearTimeout(fadeOutTimer.current);
-      fadeOutTimer.current = null;
-    }
 
     if (message) {
       setCurrentMessage(message);
-      opacity.setValue(0);
-      translateY.setValue(-40);
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 220,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      opacity.value = 0;
+      translateY.value = -40;
+      opacity.value = withTiming(1, { duration: 180 });
+      translateY.value = withTiming(0, { duration: 220 });
 
       hideTimer.current = setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: 180,
-            useNativeDriver: true,
-          }),
-          Animated.timing(translateY, {
-            toValue: -40,
-            duration: 220,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          setCurrentMessage(null);
-          onHide?.();
+        opacity.value = withTiming(0, { duration: 180 });
+        translateY.value = withTiming(-40, { duration: 220 }, (finished) => {
+          if (finished) {
+            runOnJS(hideAndNotify)();
+          }
         });
       }, duration);
     } else {
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateY, {
-          toValue: -40,
-          duration: 220,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setCurrentMessage(null);
+      opacity.value = withTiming(0, { duration: 180 });
+      translateY.value = withTiming(-40, { duration: 220 }, (finished) => {
+        if (finished) {
+          runOnJS(hideSilently)();
+        }
       });
     }
 
@@ -94,12 +80,13 @@ export const Toast: React.FC<ToastProps> = ({
         clearTimeout(hideTimer.current);
         hideTimer.current = null;
       }
-      if (fadeOutTimer.current !== null) {
-        clearTimeout(fadeOutTimer.current);
-        fadeOutTimer.current = null;
-      }
     };
-  }, [message, duration, onHide, opacity, translateY]);
+  }, [message, duration, hideAndNotify, hideSilently, opacity, translateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   if (!currentMessage) return null;
 
@@ -135,20 +122,20 @@ export const Toast: React.FC<ToastProps> = ({
       }}
     >
       <Animated.View
-        style={{
-          opacity,
-          transform: [{ translateY }],
-          backgroundColor: palette.bg,
-          borderRadius: theme.radius.md,
-          paddingVertical: theme.spacing.stackSm + 2,
-          paddingHorizontal: theme.spacing.stackMd,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: theme.spacing.stackSm,
-          borderWidth: theme.borderWidth.default,
-          borderColor: palette.bg,
-          boxShadow: [{ offsetX: 0, offsetY: 4, blurRadius: 8, color: 'rgba(0, 0, 0, 0.15)' }],
-        }}
+        style={[
+          toastAnimatedBase,
+          {
+            opacity,
+            transform: [{ translateY }],
+            backgroundColor: palette.bg,
+            borderRadius: theme.radius.md,
+            paddingVertical: theme.spacing.stackSm + 2,
+            paddingHorizontal: theme.spacing.stackMd,
+            gap: theme.spacing.stackSm,
+            borderWidth: theme.borderWidth.default,
+            borderColor: palette.bg,
+          },
+        ]}
       >
         <Text
           style={{

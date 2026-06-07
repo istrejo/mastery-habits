@@ -49,7 +49,7 @@ function SignupForm({ onSubmit, loading, error }: SignupFormProps) {
 
   const schema = useMemo(() => z.object({
     displayName: z.string().min(2, t("signup.error_name_min")).max(40),
-    email: z.string().email(t("signup.error_email")),
+    email: z.email({ error: t("signup.error_email") }),
     password: z.string().min(6, t("signup.error_password_min")),
     confirmPassword: z.string(),
   }).refine((d) => d.password === d.confirmPassword, { message: t("signup.error_passwords_match"), path: ["confirmPassword"] }), [t]);

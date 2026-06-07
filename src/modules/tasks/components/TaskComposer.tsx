@@ -5,6 +5,11 @@ import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
 import { useTaskActions } from '../hooks/useTaskActions';
 
+const composerContainerBase = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+};
+
 interface TaskComposerProps {
   habitId?: string;
   onCreated?: () => void;
@@ -30,17 +35,18 @@ export const TaskComposer: React.FC<TaskComposerProps> = ({ habitId, onCreated }
 
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: t.spacing.stackSm,
-        backgroundColor: t.bg.surfaceAlt,
-        borderRadius: t.radius.md,
-        borderWidth: t.borderWidth.hairline,
-        borderColor: t.border.subtle,
-        paddingHorizontal: t.spacing.stackMd,
-        paddingVertical: t.spacing.stackSm,
-      }}
+      style={[
+        composerContainerBase,
+        {
+          gap: t.spacing.stackSm,
+          backgroundColor: t.bg.surfaceAlt,
+          borderRadius: t.radius.md,
+          borderWidth: t.borderWidth.hairline,
+          borderColor: t.border.subtle,
+          paddingHorizontal: t.spacing.stackMd,
+          paddingVertical: t.spacing.stackSm,
+        },
+      ]}
     >
       <TextInput
         value={title}

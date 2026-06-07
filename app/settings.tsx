@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Alert, TouchableOpacity } from "react-native";
+import { View, Text, Alert, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -34,12 +34,12 @@ export default function SettingsScreen() {
   return (
     <Screen scrollable>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: theme.spacing.stackLg }}>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.unit }}>
+        <Pressable onPress={() => router.back()} hitSlop={12} style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.unit }}>
           <MaterialIcons name="arrow-back" size={18} color={theme.text.primary} />
           <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: theme.typography.scale.microBold.letterSpacing, textTransform: "uppercase" }}>
             {t("common.back")}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={{ color: theme.text.primary, fontSize: theme.typography.scale.labelCaps.fontSize, fontFamily: "Anton_400Regular", textTransform: "uppercase" }}>
           {t("settings.title")}
         </Text>

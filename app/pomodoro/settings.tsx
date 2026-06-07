@@ -1,10 +1,16 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@core/components';
 import { useTheme } from '@core/theming';
 import { usePomodoroSettings } from '@pomodoro/index';
+
+const settingsHeaderBase = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  justifyContent: 'space-between' as const,
+};
 
 export default function PomodoroSettingsScreen() {
   const theme = useTheme();
@@ -47,24 +53,24 @@ export default function PomodoroSettingsScreen() {
     >
       <View style={{ flex: 1 }}>
         <View
-          style={{
-            paddingHorizontal: theme.spacing.marginMobile,
-            paddingTop: theme.spacing.stackSm,
-            paddingBottom: theme.spacing.stackSm,
-            borderBottomWidth: theme.borderWidth.default,
-            borderBottomColor: theme.border.default,
-            backgroundColor: theme.bg.base,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
+          style={[
+            settingsHeaderBase,
+            {
+              paddingHorizontal: theme.spacing.marginMobile,
+              paddingTop: theme.spacing.stackSm,
+              paddingBottom: theme.spacing.stackSm,
+              borderBottomWidth: theme.borderWidth.default,
+              borderBottomColor: theme.border.default,
+              backgroundColor: theme.bg.base,
+            },
+          ]}
         >
-          <TouchableOpacity
+          <Pressable
             onPress={() => router.back()}
             style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
           >
             <MaterialIcons name="arrow-back" size={22} color={theme.text.primary} />
-          </TouchableOpacity>
+          </Pressable>
           <Text
             style={{
               color: theme.text.primary,

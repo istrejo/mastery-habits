@@ -150,7 +150,7 @@ describe('DashboardHabitRow', () => {
     expect(tree.root.findAll((node: any) => node.type === 'ProgressBar')).toHaveLength(1);
     expect(
       tree.root.findAll(
-        (node: any) => node.type === 'TouchableOpacity' && node.props?.testID === 'dashboard-habit-row-chevron-habit-1',
+        (node: any) => node.type === 'Pressable' && node.props?.testID === 'dashboard-habit-row-chevron-habit-1',
       ),
     ).toHaveLength(1);
   });

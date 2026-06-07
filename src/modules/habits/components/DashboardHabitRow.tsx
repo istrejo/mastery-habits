@@ -1,10 +1,25 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ProgressBar } from '@core/components';
 import { useTheme } from '@core/theming';
 import type { HabitWithScore } from '../types';
 import { resolveCategory } from '../utils/resolveCategory';
+
+const dashboardHabitRowBase = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+  paddingVertical: 16,
+  paddingLeft: 12,
+  paddingRight: 4,
+};
+
+const habitCheckCircleBase = {
+  width: 28,
+  height: 28,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
 
 export type DashboardHabitStatus = 'completed' | 'active' | 'pending';
 
@@ -39,16 +54,14 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
 
   return (
     <View
-      style={{
-        position: 'relative',
-        overflow: 'hidden',
-        paddingVertical: 16,
-        paddingLeft: 12,
-        paddingRight: 4,
-        borderBottomWidth: theme.borderWidth.default,
-        borderBottomColor: theme.border.default,
-        opacity: isCompleted ? 0.72 : 1,
-      }}
+      style={[
+        dashboardHabitRowBase,
+        {
+          borderBottomWidth: theme.borderWidth.default,
+          borderBottomColor: theme.border.default,
+          opacity: isCompleted ? 0.72 : 1,
+        },
+      ]}
       testID={`dashboard-habit-row-${habit.id}`}
     >
       {isActive ? (
@@ -65,21 +78,20 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
       ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <TouchableOpacity
+        <Pressable
           onPress={onPressCheck}
           disabled={checkDisabled || submitting}
-          activeOpacity={0.82}
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: theme.radius.pill,
-            borderWidth: isCompleted ? 0 : 2,
-            borderColor: isActive ? theme.text.primary : theme.border.default,
-            backgroundColor: isCompleted ? theme.text.primary : 'transparent',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: theme.spacing.stackSm,
-          }}
+          style={({ pressed }) => [
+            habitCheckCircleBase,
+            {
+              borderRadius: theme.radius.pill,
+              borderWidth: isCompleted ? 0 : 2,
+              borderColor: isActive ? theme.text.primary : theme.border.default,
+              backgroundColor: isCompleted ? theme.text.primary : 'transparent',
+              marginRight: theme.spacing.stackSm,
+            },
+            { opacity: pressed ? 0.82 : 1 },
+          ]}
           testID={`dashboard-habit-row-check-${habit.id}`}
         >
           {submitting ? (
@@ -87,12 +99,11 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
           ) : isCompleted ? (
             <MaterialIcons name="check" size={16} color={theme.text.inverse} />
           ) : null}
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           onPress={onPressRow}
-          activeOpacity={0.82}
-          style={{ flex: 1, paddingRight: theme.spacing.stackSm }}
+          style={({ pressed }) => [{ flex: 1, paddingRight: theme.spacing.stackSm }, { opacity: pressed ? 0.82 : 1 }]}
           testID={`dashboard-habit-row-body-${habit.id}`}
         >
           <View>
@@ -143,7 +154,7 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
               </View>
             ) : null}
           </View>
-        </TouchableOpacity>
+          </Pressable>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -164,13 +175,13 @@ export const DashboardHabitRow: React.FC<DashboardHabitRowProps> = ({
             </Text>
           </View>
 
-          <TouchableOpacity
+          <Pressable
             onPress={onPressRow}
-            activeOpacity={0.82}
+            style={({ pressed }) => ({ opacity: pressed ? 0.82 : 1 })}
             testID={`dashboard-habit-row-chevron-${habit.id}`}
           >
             <MaterialIcons name="chevron-right" size={20} color={theme.text.tertiary} />
-          </TouchableOpacity>
+        </Pressable>
         </View>
       </View>
     </View>

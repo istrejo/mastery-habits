@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@core/components';
@@ -12,6 +12,12 @@ import {
   TaskList,
 } from '@tasks/index';
 import type { Task } from '@tasks/index';
+
+const tasksHeaderBase = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  justifyContent: 'space-between' as const,
+};
 
 export default function TasksIndexScreen() {
   const theme = useTheme();
@@ -61,19 +67,19 @@ export default function TasksIndexScreen() {
     >
       <View style={{ flex: 1 }}>
         <View
-          style={{
-            paddingHorizontal: theme.spacing.marginMobile,
-            paddingTop: theme.spacing.stackSm,
-            paddingBottom: theme.spacing.stackSm,
-            borderBottomWidth: theme.borderWidth.default,
-            borderBottomColor: theme.border.default,
-            backgroundColor: theme.bg.base,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
+          style={[
+            tasksHeaderBase,
+            {
+              paddingHorizontal: theme.spacing.marginMobile,
+              paddingTop: theme.spacing.stackSm,
+              paddingBottom: theme.spacing.stackSm,
+              borderBottomWidth: theme.borderWidth.default,
+              borderBottomColor: theme.border.default,
+              backgroundColor: theme.bg.base,
+            },
+          ]}
         >
-          <TouchableOpacity
+          <Pressable
             onPress={() => router.back()}
             style={{
               width: 40,
@@ -87,7 +93,7 @@ export default function TasksIndexScreen() {
               size={22}
               color={theme.text.primary}
             />
-          </TouchableOpacity>
+          </Pressable>
           <Text
             style={{
               color: theme.text.primary,
@@ -99,7 +105,7 @@ export default function TasksIndexScreen() {
           >
             {t('tasks.title')}
           </Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() => setCreateSheetVisible(true)}
             style={{
               width: 40,
@@ -109,7 +115,7 @@ export default function TasksIndexScreen() {
             }}
           >
             <MaterialIcons name='add' size={22} color={theme.text.primary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <ScrollView

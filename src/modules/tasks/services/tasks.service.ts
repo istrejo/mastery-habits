@@ -167,9 +167,14 @@ export const tasksService = {
   ): Promise<TaskWithHabit> {
     const userId = requireUserId();
     const title = input.title.trim();
-    const subtasks = (input.subtasks ?? [])
-      .map((item) => ({ title: item.title.trim(), completed: item.completed }))
-      .filter((item) => item.title);
+    const subtasks = (input.subtasks ?? []).reduce<{ title: string; completed: boolean }[]>(
+      (acc, item) => {
+        const title = item.title.trim();
+        if (title) acc.push({ title, completed: item.completed });
+        return acc;
+      },
+      []
+    );
     const today = format(new Date(), 'yyyy-MM-dd');
 
     const task = await tasksService.create({
@@ -308,9 +313,14 @@ export const tasksService = {
   ): Promise<TaskWithHabit> {
     const userId = requireUserId();
     const title = input.title.trim();
-    const newSubtasks = (input.subtasks ?? [])
-      .map((item) => ({ title: item.title.trim(), completed: item.completed }))
-      .filter((item) => item.title);
+    const newSubtasks = (input.subtasks ?? []).reduce<{ title: string; completed: boolean }[]>(
+      (acc, item) => {
+        const title = item.title.trim();
+        if (title) acc.push({ title, completed: item.completed });
+        return acc;
+      },
+      []
+    );
 
     const [task, { error: deleteError }] = await Promise.all([
       tasksService.update(id, {

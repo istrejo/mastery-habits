@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, use, useMemo } from 'react';
 import { useThemeStore } from './theme.store';
 import {
   DEFAULT_THEME_ID,
@@ -18,9 +18,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useTheme = (): ThemeTokens => useContext(ThemeContext);
+export const useTheme = (): ThemeTokens => use(ThemeContext);
 
 export const useCurrentMode = (): 'light' | 'dark' => {
-  const theme = useContext(ThemeContext);
+  const theme = use(ThemeContext);
   return theme.meta.mode;
 };

@@ -1,15 +1,41 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   Pressable,
   ActivityIndicator,
-  Animated,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  withTiming,
+  withSequence,
+  useAnimatedStyle,
+  useAnimatedProps,
+  interpolate,
+  interpolateColor,
+} from 'react-native-reanimated';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '@core/theming';
 import type { TaskSubtask, TaskWithHabit } from '../types';
+
+const dashboardTaskRowBase = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+  paddingVertical: 16,
+  paddingLeft: 12,
+  paddingRight: 4,
+};
+
+const progressCircleBase = {
+  width: 44,
+  height: 44,
+  borderWidth: 2,
+  lineHeight: 40,
+  fontFamily: 'Lexend_600SemiBold' as const,
+  textAlign: 'center' as const,
+  overflow: 'hidden' as const,
+};
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -25,48 +51,39 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
   theme,
 }) => {
   const subtaskDone = subtask.status === 'completed';
-  const colorAnimRef = useRef<Animated.Value | null>(null);
-  if (colorAnimRef.current === null) colorAnimRef.current = new Animated.Value(subtaskDone ? 1 : 0);
-  const colorAnim = colorAnimRef.current;
-  const scaleAnimRef = useRef<Animated.Value | null>(null);
-  if (scaleAnimRef.current === null) scaleAnimRef.current = new Animated.Value(1);
-  const scaleAnim = scaleAnimRef.current;
+  const colorAnim = useSharedValue(subtaskDone ? 1 : 0);
+  const scaleAnim = useSharedValue(1);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(colorAnim, {
-        toValue: subtaskDone ? 1 : 0,
-        duration: 250,
-        useNativeDriver: false,
-      }),
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 0.95,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
+    colorAnim.value = withTiming(subtaskDone ? 1 : 0, { duration: 250 });
+    scaleAnim.value = withSequence(
+      withTiming(0.95, { duration: 100 }),
+      withTiming(1, { duration: 100 }),
+    );
   }, [subtaskDone, colorAnim, scaleAnim]);
 
-  const textColor = colorAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [theme.text.secondary, theme.text.tertiary],
-  });
+  const textAnimatedStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      colorAnim.value,
+      [0, 1],
+      [theme.text.secondary, theme.text.tertiary],
+    ),
+  }));
+
+  const viewAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }],
+  }));
 
   return (
     <Animated.View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        transform: [{ scale: scaleAnim }],
-      }}
+      style={[
+        viewAnimatedStyle,
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+        },
+      ]}
     >
       <Pressable
         testID={`dashboard-subtask-check-${subtask.id}`}
@@ -88,14 +105,16 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
       </Pressable>
       <Animated.Text
         numberOfLines={1}
-        style={{
-          flex: 1,
-          color: textColor,
-          fontSize: theme.typography.scale.microBold.fontSize,
-          lineHeight: theme.typography.scale.microBold.lineHeight,
-          fontFamily: 'Lexend_400Regular',
-          textDecorationLine: subtaskDone ? 'line-through' : 'none',
-        }}
+        style={[
+          textAnimatedStyle,
+          {
+            flex: 1,
+            fontSize: theme.typography.scale.microBold.fontSize,
+            lineHeight: theme.typography.scale.microBold.lineHeight,
+            fontFamily: 'Lexend_400Regular',
+            textDecorationLine: subtaskDone ? 'line-through' : 'none',
+          },
+        ]}
       >
         {subtask.title}
       </Animated.Text>
@@ -143,62 +162,50 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
   const metaText =
     task.description || (habitName ? `Habit: ${habitName}` : 'Standalone task');
 
-  const scaleAnimRef = useRef<Animated.Value | null>(null);
-  if (scaleAnimRef.current === null) scaleAnimRef.current = new Animated.Value(1);
-  const scaleAnim = scaleAnimRef.current;
-  const checkOpacityRef = useRef<Animated.Value | null>(null);
-  if (checkOpacityRef.current === null) checkOpacityRef.current = new Animated.Value(0);
-  const checkOpacity = checkOpacityRef.current;
-  const progressAnimRef = useRef<Animated.Value | null>(null);
-  if (progressAnimRef.current === null) progressAnimRef.current = new Animated.Value(progressPercent);
-  const progressAnim = progressAnimRef.current;
+  const scaleAnim = useSharedValue(1);
+  const checkOpacity = useSharedValue(0);
+  const progressAnim = useSharedValue(progressPercent);
 
   useEffect(() => {
-    Animated.timing(progressAnim, {
-      toValue: progressPercent,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
+    progressAnim.value = withTiming(progressPercent, { duration: 300 });
   }, [progressPercent, progressAnim]);
 
   useEffect(() => {
     if (isCompleted && hasSubtasks) {
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.2,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      Animated.timing(checkOpacity, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
+      scaleAnim.value = withSequence(
+        withTiming(1.2, { duration: 150 }),
+        withTiming(1, { duration: 150 }),
+      );
+      checkOpacity.value = withTiming(1, { duration: 200 });
     } else {
-      checkOpacity.setValue(0);
-      scaleAnim.setValue(1);
+      checkOpacity.value = 0;
+      scaleAnim.value = 1;
     }
   }, [isCompleted, hasSubtasks, scaleAnim, checkOpacity]);
 
+  const checkIconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }],
+    opacity: hasSubtasks ? checkOpacity.value : 1,
+  }));
+
+  const circleAnimatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: interpolate(
+      progressAnim.value,
+      [0, 100],
+      [75.4, 0],
+    ),
+  }));
+
   return (
     <View
-      style={{
-        position: 'relative',
-        overflow: 'hidden',
-        paddingVertical: 16,
-        paddingLeft: 12,
-        paddingRight: 4,
-        borderBottomWidth: theme.borderWidth.default,
-        borderBottomColor: theme.border.default,
-        opacity: isCompleted ? 0.72 : 1,
-      }}
+      style={[
+        dashboardTaskRowBase,
+        {
+          borderBottomWidth: theme.borderWidth.default,
+          borderBottomColor: theme.border.default,
+          opacity: isCompleted ? 0.72 : 1,
+        },
+      ]}
       testID={`dashboard-task-row-${task.id}`}
     >
       {isActive ? (
@@ -256,20 +263,12 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
                 strokeWidth={2}
                 fill='none'
                 strokeDasharray={75.4}
-                strokeDashoffset={progressAnim.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [75.4, 0],
-                })}
+                animatedProps={circleAnimatedProps}
                 strokeLinecap='round'
               />
             </Svg>
           ) : isCompleted ? (
-            <Animated.View
-              style={{
-                transform: [{ scale: scaleAnim }],
-                opacity: hasSubtasks ? checkOpacity : 1,
-              }}
-            >
+            <Animated.View style={checkIconAnimatedStyle}>
               <MaterialIcons
                 name='check'
                 size={16}
@@ -325,22 +324,18 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
               {subtasks.length > 0 ? (
                 <Text
                   testID={`dashboard-task-progress-${task.id}`}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: theme.radius.pill,
-                    borderWidth: 2,
-                    borderColor:
-                      progressPercent === 100
-                        ? theme.text.primary
-                        : theme.border.default,
-                    color: theme.text.primary,
-                    fontSize: theme.typography.scale.microBold.fontSize,
-                    lineHeight: 40,
-                    fontFamily: 'Lexend_600SemiBold',
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                  }}
+                  style={[
+                    progressCircleBase,
+                    {
+                      borderRadius: theme.radius.pill,
+                      borderColor:
+                        progressPercent === 100
+                          ? theme.text.primary
+                          : theme.border.default,
+                      color: theme.text.primary,
+                      fontSize: theme.typography.scale.microBold.fontSize,
+                    },
+                  ]}
                 >
                   {`${progressPercent}%`}
                 </Text>

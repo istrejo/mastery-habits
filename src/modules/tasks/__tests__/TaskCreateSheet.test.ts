@@ -159,20 +159,26 @@ describe('TaskCreateSheet', () => {
       testID: 'task-sheet-notes-input',
     });
 
-    expect(titleInput.props.style).toEqual(
+    // Flatten style — reanimated may cause RN to split style into an array
+    const flatten = (s: any) =>
+      Array.isArray(s) ? Object.assign({}, ...s) : s;
+    const titleStyle = flatten(titleInput.props.style);
+    const notesStyle = flatten(notesInput.props.style);
+
+    expect(titleStyle).toEqual(
       expect.objectContaining({
         backgroundColor: 'transparent',
         borderWidth: 0,
         paddingHorizontal: 0,
       })
     );
-    expect(titleInput.props.style).toEqual(
+    expect(titleStyle).toEqual(
       expect.objectContaining({ minHeight: 44, paddingVertical: 4 })
     );
-    expect(notesInput.props.style).toEqual(
+    expect(notesStyle).toEqual(
       expect.objectContaining({ height: 56, paddingVertical: 8 })
     );
-    expect(notesInput.props.style).toEqual(
+    expect(notesStyle).toEqual(
       expect.objectContaining({ borderWidth: mockTheme.borderWidth.hairline })
     );
 

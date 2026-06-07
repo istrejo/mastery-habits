@@ -12,6 +12,11 @@ import { FrequencySelector } from './FrequencySelector';
 import { CategoryPicker } from './CategoryPicker';
 import type { HabitInsert } from '../types';
 import type { HabitCategoryId } from '../constants/categories';
+
+const formSectionLabelBase = {
+  fontFamily: 'Lexend_500Medium' as const,
+  textTransform: 'uppercase' as const,
+};
 import {
   DEFAULT_CREATE_HABIT_CATEGORY,
   DEFAULT_CREATE_HABIT_DAYS,
@@ -72,6 +77,169 @@ const SectionLabel: React.FC<{ label: string }> = ({ label }) => (
     {label}
   </Text>
 );
+
+function StitchCategoryGrid({
+  options,
+  selectedId,
+  onSelect,
+}: {
+  options: CreateHabitCategoryOption[];
+  selectedId: HabitCategoryId;
+  onSelect: (option: CreateHabitCategoryOption) => void;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.stackSm }}>
+      {options.map((option) => {
+        const isSelected = selectedId === option.categoryId;
+        return (
+          <Pressable
+            key={option.categoryId}
+            onPress={() => onSelect(option)}
+            style={({ pressed }) => [{
+              width: '31%',
+              minHeight: 78,
+              backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
+              borderWidth: theme.borderWidth.default,
+              borderColor: isSelected ? theme.text.primary : theme.border.default,
+              borderRadius: theme.radius.md,
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }, { opacity: pressed ? 0.82 : 1 }]}
+          >
+            <MaterialIcons
+              name={option.iconName as keyof typeof MaterialIcons.glyphMap}
+              size={18}
+              color={isSelected ? theme.text.inverse : theme.text.primary}
+            />
+            <Text
+              style={{
+                color: isSelected ? theme.text.inverse : theme.text.primary,
+                textAlign: 'center',
+                fontSize: theme.typography.scale.microBold.fontSize,
+                fontFamily: 'Lexend_600SemiBold',
+                letterSpacing: 0.6,
+                textTransform: 'uppercase',
+              }}
+            >
+              {t(option.labelKey as any)}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function StitchFrequencyPresets({
+  selectedPreset,
+  onSelect,
+}: {
+  selectedPreset: CreateHabitFrequencyPreset;
+  onSelect: (preset: CreateHabitFrequencyPreset) => void;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
+      {FREQUENCY_PRESET_CONFIG.map((preset) => {
+        const isSelected = selectedPreset === preset.id;
+        return (
+          <Pressable
+            key={preset.id}
+            onPress={() => onSelect(preset.id)}
+            style={({ pressed }) => [{
+              flex: 1,
+              backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
+              borderWidth: theme.borderWidth.default,
+              borderColor: isSelected ? theme.text.primary : theme.border.default,
+              borderRadius: theme.radius.md,
+              paddingVertical: 12,
+              paddingHorizontal: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }, { opacity: pressed ? 0.82 : 1 }]}
+          >
+            <MaterialIcons
+              name={preset.iconName}
+              size={18}
+              color={isSelected ? theme.text.inverse : theme.text.secondary}
+            />
+            <Text
+              style={{
+                color: isSelected ? theme.text.inverse : theme.text.primary,
+                fontSize: theme.typography.scale.microBold.fontSize,
+                fontFamily: 'Lexend_600SemiBold',
+                textTransform: 'uppercase',
+                letterSpacing: 0.6,
+                textAlign: 'center',
+              }}
+            >
+              {t(preset.labelKey as any)}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function StitchDayPicker({
+  selectedDays,
+  active,
+  onToggle,
+}: {
+  selectedDays: number[];
+  active: boolean;
+  onToggle: (iso: number) => void;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm, opacity: active ? 1 : 0.42 }}>
+      {DAY_LABELS.map(({ iso, key }) => {
+        const isSelected = selectedDays.includes(iso);
+        return (
+          <Pressable
+            key={iso}
+            onPress={() => {
+              if (active) onToggle(iso);
+            }}
+            style={({ pressed }) => [{
+              width: 36,
+              height: 36,
+              borderRadius: theme.radius.pill,
+              borderWidth: theme.borderWidth.default,
+              borderColor: isSelected ? theme.text.primary : theme.border.default,
+              backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }, active ? { opacity: pressed ? 0.82 : 1 } : {}]}
+          >
+            <Text
+              style={{
+                color: isSelected ? theme.text.inverse : theme.text.secondary,
+                fontSize: theme.typography.scale.microBold.fontSize,
+                fontFamily: 'Lexend_600SemiBold',
+                textTransform: 'uppercase',
+              }}
+            >
+              {t(key)}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
 
 export const HabitForm: React.FC<HabitFormProps> = ({
   defaultValues,
@@ -278,49 +446,11 @@ export const HabitForm: React.FC<HabitFormProps> = ({
 
       <View>
         <SectionLabel label={t('create_habit.sections.category')} />
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.stackSm }}>
-          {categoryOptions.map((option) => {
-            const isSelected = selectedCategoryOption.categoryId === option.categoryId;
-
-            return (
-              <Pressable
-                key={option.categoryId}
-                onPress={() => applyCategory(option)}
-                style={({ pressed }) => [{
-                  width: '31%',
-                  minHeight: 78,
-                  backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
-                  borderWidth: theme.borderWidth.default,
-                  borderColor: isSelected ? theme.text.primary : theme.border.default,
-                  borderRadius: theme.radius.md,
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                }, { opacity: pressed ? 0.82 : 1 }]}
-              >
-                <MaterialIcons
-                  name={option.iconName as keyof typeof MaterialIcons.glyphMap}
-                  size={18}
-                  color={isSelected ? theme.text.inverse : theme.text.primary}
-                />
-                <Text
-                  style={{
-                    color: isSelected ? theme.text.inverse : theme.text.primary,
-                    textAlign: 'center',
-                    fontSize: theme.typography.scale.microBold.fontSize,
-                    fontFamily: 'Lexend_600SemiBold',
-                    letterSpacing: 0.6,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t(option.labelKey as any)}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <StitchCategoryGrid
+          options={categoryOptions}
+          selectedId={selectedCategoryOption.categoryId}
+          onSelect={applyCategory}
+        />
 
         {selectedCategoryId === 'custom' ? (
           <View style={{ marginTop: theme.spacing.stackMd }}>
@@ -343,101 +473,32 @@ export const HabitForm: React.FC<HabitFormProps> = ({
 
       <View>
         <SectionLabel label={t('create_habit.sections.frequency')} />
-        <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
-          {FREQUENCY_PRESET_CONFIG.map((preset) => {
-            const isSelected = frequencyPreset === preset.id;
-
-            return (
-              <Pressable
-                key={preset.id}
-                onPress={() => applyFrequencyPreset(preset.id)}
-                style={({ pressed }) => [{
-                  flex: 1,
-                  backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
-                  borderWidth: theme.borderWidth.default,
-                  borderColor: isSelected ? theme.text.primary : theme.border.default,
-                  borderRadius: theme.radius.md,
-                  paddingVertical: 12,
-                  paddingHorizontal: 10,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                }, { opacity: pressed ? 0.82 : 1 }]}
-              >
-                <MaterialIcons
-                  name={preset.iconName}
-                  size={18}
-                  color={isSelected ? theme.text.inverse : theme.text.secondary}
-                />
-                <Text
-                  style={{
-                    color: isSelected ? theme.text.inverse : theme.text.primary,
-                    fontSize: theme.typography.scale.microBold.fontSize,
-                    fontFamily: 'Lexend_600SemiBold',
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.6,
-                    textAlign: 'center',
-                  }}
-                >
-                  {t(preset.labelKey as any)}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <StitchFrequencyPresets
+          selectedPreset={frequencyPreset}
+          onSelect={applyFrequencyPreset}
+        />
 
         <Text
-          style={{
-            color: theme.text.secondary,
-            fontSize: theme.typography.scale.microBold.fontSize,
-            fontFamily: 'Lexend_500Medium',
-            letterSpacing: theme.typography.scale.microBold.letterSpacing,
-            textTransform: 'uppercase',
-            marginTop: theme.spacing.stackMd,
-            marginBottom: theme.spacing.stackSm,
-            opacity: frequencyPreset === 'custom' ? 1 : 0.7,
-          }}
+          style={[
+            formSectionLabelBase,
+            {
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              letterSpacing: theme.typography.scale.microBold.letterSpacing,
+              marginTop: theme.spacing.stackMd,
+              marginBottom: theme.spacing.stackSm,
+              opacity: frequencyPreset === 'custom' ? 1 : 0.7,
+            },
+          ]}
         >
           {t('create_habit.select_days')}
         </Text>
 
-        <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm, opacity: frequencyPreset === 'custom' ? 1 : 0.42 }}>
-          {DAY_LABELS.map(({ iso, key }) => {
-            const active = watchedFrequencyDays.includes(iso);
-
-            return (
-              <Pressable
-                key={iso}
-                onPress={() => {
-                  if (frequencyPreset === 'custom') {
-                    toggleCustomDay(iso);
-                  }
-                }}
-                style={({ pressed }) => [{
-                  width: 36,
-                  height: 36,
-                  borderRadius: theme.radius.pill,
-                  borderWidth: theme.borderWidth.default,
-                  borderColor: active ? theme.text.primary : theme.border.default,
-                  backgroundColor: active ? theme.text.primary : theme.bg.surface,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }, frequencyPreset === 'custom' ? { opacity: pressed ? 0.82 : 1 } : {}]}
-              >
-                <Text
-                  style={{
-                    color: active ? theme.text.inverse : theme.text.secondary,
-                    fontSize: theme.typography.scale.microBold.fontSize,
-                    fontFamily: 'Lexend_600SemiBold',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t(key)}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <StitchDayPicker
+          selectedDays={watchedFrequencyDays}
+          active={frequencyPreset === 'custom'}
+          onToggle={toggleCustomDay}
+        />
 
         {errors.frequency_days ? (
           <Text style={{ color: theme.status.danger, fontSize: 12, marginTop: 6, fontFamily: 'Lexend_500Medium' }}>

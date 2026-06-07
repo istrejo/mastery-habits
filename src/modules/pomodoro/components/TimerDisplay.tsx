@@ -12,6 +12,14 @@ interface TimerDisplayProps {
   cyclesPerRound: number;
 }
 
+const timerCircleBase = {
+  width: 220,
+  height: 220,
+  borderWidth: 6,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
 const PHASE_COLORS: Record<PomodoroPhase, 'accent' | 'success' | 'info'> = {
   work: 'accent',
   short_break: 'success',
@@ -33,16 +41,14 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
   return (
     <View style={{ alignItems: 'center', gap: t.spacing.stackMd }}>
       <View
-        style={{
-          width: 220,
-          height: 220,
-          borderRadius: t.radius.pill,
-          borderWidth: 6,
-          borderColor: ringColor,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: t.bg.surface,
-        }}
+        style={[
+          timerCircleBase,
+          {
+            borderRadius: t.radius.pill,
+            borderColor: ringColor,
+            backgroundColor: t.bg.surface,
+          },
+        ]}
       >
         <Text
           style={{

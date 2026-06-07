@@ -59,7 +59,7 @@ const ErrorFallback: React.FC<{ error: Error | null; onRetry: () => void }> = ({
         paddingTop: theme.spacing.stackLg,
       }}
     >
-      <ScrollView contentContainerStyle={{ paddingBottom: theme.spacing.stackLg }}>
+      <ScrollView>
         <Text
           style={{
             color: theme.status.danger,
@@ -109,6 +109,7 @@ const ErrorFallback: React.FC<{ error: Error | null; onRetry: () => void }> = ({
         ) : null}
 
         <Button label={t('errors.boundary_reload')} onPress={onRetry} />
+        <View style={{ height: theme.spacing.stackLg }} />
       </ScrollView>
     </View>
   );

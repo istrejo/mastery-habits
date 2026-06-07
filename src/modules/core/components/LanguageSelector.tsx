@@ -17,6 +17,26 @@ const OPTIONS: LanguageOption[] = [
   { value: null, flag: '📱', titleKey: 'language_picker.lang_system', labelKey: 'settings.lang_system_subtitle' },
 ];
 
+const pressableBase = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  paddingVertical: 14,
+  paddingHorizontal: 16,
+};
+
+const checkCircleBase = {
+  width: 20,
+  height: 20,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
+const activeDotBase = {
+  width: 8,
+  height: 8,
+  borderRadius: 9999,
+};
+
 export const LanguageSelector: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -35,16 +55,15 @@ export const LanguageSelector: React.FC = () => {
           <Pressable
             key={String(option.value)}
             onPress={() => handleSelect(option.value)}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-              backgroundColor: pressed ? theme.bg.surfaceAlt : theme.bg.surface,
-              borderWidth: isActive ? theme.borderWidth.bold : theme.borderWidth.default,
-              borderColor: isActive ? theme.border.strong : theme.border.default,
-              borderRadius: theme.radius.md,
-            })}
+            style={({ pressed }) => [
+              pressableBase,
+              {
+                backgroundColor: pressed ? theme.bg.surfaceAlt : theme.bg.surface,
+                borderWidth: isActive ? theme.borderWidth.bold : theme.borderWidth.default,
+                borderColor: isActive ? theme.border.strong : theme.border.default,
+                borderRadius: theme.radius.md,
+              },
+            ]}
           >
             <Text style={{ fontSize: 22, marginRight: 14 }}>{option.flag}</Text>
             <View style={{ flex: 1 }}>
@@ -56,19 +75,18 @@ export const LanguageSelector: React.FC = () => {
               </Text>
             </View>
             <View
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: theme.radius.pill,
-                borderWidth: theme.borderWidth.default,
-                borderColor: isActive ? theme.accent.primary : theme.border.default,
-                backgroundColor: isActive ? theme.accent.primary : 'transparent',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              style={[
+                checkCircleBase,
+                {
+                  borderRadius: theme.radius.pill,
+                  borderWidth: theme.borderWidth.default,
+                  borderColor: isActive ? theme.accent.primary : theme.border.default,
+                  backgroundColor: isActive ? theme.accent.primary : 'transparent',
+                },
+              ]}
             >
               {isActive && (
-                <View style={{ width: 8, height: 8, borderRadius: theme.radius.pill, backgroundColor: theme.accent.onPrimary }} />
+                <View style={[activeDotBase, { backgroundColor: theme.accent.onPrimary }]} />
               )}
             </View>
           </Pressable>

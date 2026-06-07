@@ -9,6 +9,16 @@ const LOCALES: { id: LocaleId; flag: string; labelKey: 'language_picker.lang_es'
   { id: 'en', flag: '🇺🇸', labelKey: 'language_picker.lang_en' },
 ];
 
+const activeIndicatorBase = {
+  position: 'absolute' as const,
+  top: 6,
+  right: 6,
+  width: 16,
+  height: 16,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
 export const LanguagePicker: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -40,19 +50,15 @@ export const LanguagePicker: React.FC = () => {
             </Text>
             {isActive && (
               <View
-                style={{
-                  position: 'absolute',
-                  top: 6,
-                  right: 6,
-                  width: 16,
-                  height: 16,
-                  borderRadius: theme.radius.pill,
-                  backgroundColor: theme.accent.primary,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                style={[
+                  activeIndicatorBase,
+                  {
+                    borderRadius: theme.radius.pill,
+                    backgroundColor: theme.accent.primary,
+                  },
+                ]}
               >
-                <Text style={{ fontSize: 10, color: theme.accent.onPrimary, fontWeight: '800' }}>✓</Text>
+                <Text style={{ fontSize: 12, color: theme.accent.onPrimary, fontWeight: '800' }}>✓</Text>
               </View>
             )}
           </Pressable>

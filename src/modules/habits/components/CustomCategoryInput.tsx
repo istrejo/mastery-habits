@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@core/components';
@@ -37,7 +37,7 @@ export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {QUICK_ICONS.map((e) => (
-            <TouchableOpacity
+            <Pressable
               key={e}
               onPress={() => onChange({ label, emoji: e })}
               style={{
@@ -58,7 +58,7 @@ export const CustomCategoryInput: React.FC<CustomCategoryInputProps> = ({
               >
                 {e}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       </View>

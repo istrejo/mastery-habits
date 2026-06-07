@@ -15,6 +15,13 @@ import { useCheckIn } from '@checkin/index';
 import { useTaskActions } from '@tasks/index';
 import { useHabits } from '@habits/index';
 
+const pomodoroSectionBase = {
+  width: '100%' as const,
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  justifyContent: 'space-between' as const,
+};
+
 export default function PomodoroScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -121,17 +128,16 @@ export default function PomodoroScreen() {
 
         {localHabitId && (
           <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              backgroundColor: theme.bg.surface,
-              borderRadius: theme.radius.md,
-              borderWidth: theme.borderWidth.default,
-              borderColor: theme.border.default,
-              padding: theme.spacing.stackMd,
-            }}
+            style={[
+              pomodoroSectionBase,
+              {
+                backgroundColor: theme.bg.surface,
+                borderRadius: theme.radius.md,
+                borderWidth: theme.borderWidth.default,
+                borderColor: theme.border.default,
+                padding: theme.spacing.stackMd,
+              },
+            ]}
           >
             <Text
               style={{

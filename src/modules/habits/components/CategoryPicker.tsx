@@ -1,9 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
 import { HABIT_CATEGORIES, type HabitCategoryId } from '../constants/categories';
 import { CustomCategoryInput } from './CustomCategoryInput';
+
+const categoryItemBase = {
+  flex: 1,
+  padding: 10,
+  alignItems: 'center' as const,
+  gap: 5,
+};
 
 interface CategoryPickerProps {
   value: HabitCategoryId;
@@ -32,20 +39,19 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
           {row.map((cat) => {
             const isSelected = value === cat.id;
             return (
-              <TouchableOpacity
+              <Pressable
                 key={cat.id}
                 onPress={() => onChange(cat.id)}
-                activeOpacity={0.78}
-                style={{
-                  flex: 1,
-                  backgroundColor: theme.bg.surface,
-                  borderColor: isSelected ? theme.border.strong : theme.border.default,
-                  borderWidth: isSelected ? theme.borderWidth.bold : theme.borderWidth.default,
-                  borderRadius: theme.radius.md,
-                  padding: 10,
-                  alignItems: 'center',
-                  gap: 5,
-                }}
+                style={({ pressed }) => [
+                  categoryItemBase,
+                  {
+                    backgroundColor: theme.bg.surface,
+                    borderColor: isSelected ? theme.border.strong : theme.border.default,
+                    borderWidth: isSelected ? theme.borderWidth.bold : theme.borderWidth.default,
+                    borderRadius: theme.radius.md,
+                  },
+                  { opacity: pressed ? 0.78 : 1 },
+                ]}
               >
                 <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
                 <Text
@@ -59,7 +65,7 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 >
                   {t(`categories.${cat.id}.label` as any)}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>

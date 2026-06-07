@@ -11,6 +11,8 @@ module.exports = {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@tasks/(.*)$': '<rootDir>/src/modules/tasks/$1',
     '^@pomodoro/(.*)$': '<rootDir>/src/modules/pomodoro/$1',
+    '^react-native-reanimated$': '<rootDir>/__mocks__/react-native-reanimated.js',
+    '^react-native-gesture-handler$': '<rootDir>/__mocks__/react-native-gesture-handler.js',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.test.tsx', '**/*.test.ts', '**/*.test.tsx'],

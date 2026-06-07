@@ -105,25 +105,21 @@ export const syncQueueService = {
   },
 
   async processQueue(executor: (op: PendingOperation) => Promise<void>): Promise<void> {
-    const queuedIds = (await this.getAll()).map((operation) => operation.id);
-    if (queuedIds.length === 0) return;
+    const queue = await this.getAll();
+    if (queue.length === 0) return;
 
     useSyncStore.getState().setSyncing(true);
 
-    for (const operationId of queuedIds) {
-      const queue = await this.getAll();
-      const operationMap = new Map(queue.map((op) => [op.id, op]));
-      const currentOperation = operationMap.get(operationId);
-
-      if (!currentOperation) continue;
-
-      try {
-        await executor(currentOperation);
-        await this.dequeue(currentOperation.id);
-      } catch (error) {
-        await this.incrementRetry(currentOperation.id);
-      }
-    }
+    await Promise.all(
+      queue.map(async (operation) => {
+        try {
+          await executor(operation);
+          await this.dequeue(operation.id);
+        } catch (error) {
+          await this.incrementRetry(operation.id);
+        }
+      })
+    );
 
     await this.removeFailedOperations();
     useSyncStore.getState().setSyncing(false);

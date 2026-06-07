@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, Pressable, FlatList } from 'react-native';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,74 @@ type ChipItem =
   | { kind: 'habit'; habit: Habit }
   | { kind: 'task'; task: Task };
 
+type RowItemProps = {
+  item: ChipItem;
+  selected?: boolean;
+  noneLabel: string;
+  onPressNone: () => void;
+  onPressHabit: (habitId: string) => void;
+  onPressTask: (taskId: string) => void;
+};
+
+const RowItem = React.memo(function RowItem({
+  item,
+  selected = false,
+  noneLabel,
+  onPressNone,
+  onPressHabit,
+  onPressTask,
+}: RowItemProps) {
+  const t = useTheme();
+
+  const chipDynamic = {
+    paddingHorizontal: t.spacing.stackMd,
+    paddingVertical: t.spacing.stackSm,
+    borderRadius: t.radius.pill,
+    borderWidth: t.borderWidth.default,
+    borderColor: selected ? t.accent.primary : t.border.default,
+    backgroundColor: selected ? t.accent.muted : 'transparent',
+  };
+
+  const textDynamic = {
+    color: selected ? t.accent.primary : t.text.secondary,
+    fontSize: t.typography.scale.microBold.fontSize,
+    fontFamily: 'Lexend_500Medium',
+  };
+
+  if (item.kind === 'none') {
+    return (
+      <Pressable
+        onPress={onPressNone}
+        style={({ pressed }) => [chipDynamic, { opacity: pressed ? 0.7 : 1 }]}
+      >
+        <Text style={textDynamic}>{noneLabel}</Text>
+      </Pressable>
+    );
+  }
+  if (item.kind === 'habit') {
+    return (
+      <Pressable
+        onPress={() => onPressHabit(item.habit.id)}
+        style={({ pressed }) => [chipDynamic, { opacity: pressed ? 0.7 : 1 }]}
+      >
+        <Text style={textDynamic} numberOfLines={1}>
+          {item.habit.name}
+        </Text>
+      </Pressable>
+    );
+  }
+  return (
+    <Pressable
+      onPress={() => onPressTask(item.task.id)}
+      style={({ pressed }) => [chipDynamic, { opacity: pressed ? 0.7 : 1 }]}
+    >
+      <Text style={textDynamic} numberOfLines={1}>
+        {item.task.title}
+      </Text>
+    </Pressable>
+  );
+});
+
 export const PomodoroTargetPicker: React.FC<PomodoroTargetPickerProps> = ({
   selectedHabitId,
   selectedTaskId,
@@ -31,27 +99,29 @@ export const PomodoroTargetPicker: React.FC<PomodoroTargetPickerProps> = ({
   const { tasks } = useTasks();
   const pendingTasks = tasks.filter((task) => task.status === 'pending');
 
-  const chipStyle = (selected: boolean) => ({
-    paddingHorizontal: t.spacing.stackMd,
-    paddingVertical: t.spacing.stackSm,
-    borderRadius: t.radius.pill,
-    borderWidth: t.borderWidth.default,
-    borderColor: selected ? t.accent.primary : t.border.default,
-    backgroundColor: selected ? t.accent.muted : 'transparent',
-  });
-
-  const chipTextStyle = (selected: boolean) => ({
-    color: selected ? t.accent.primary : t.text.secondary,
-    fontSize: t.typography.scale.microBold.fontSize,
-    fontFamily: 'Lexend_500Medium',
-  });
-
   const items: ChipItem[] = useMemo(() => {
     const list: ChipItem[] = [{ kind: 'none' }];
     for (const habit of habits) list.push({ kind: 'habit', habit });
     for (const task of pendingTasks) list.push({ kind: 'task', task });
     return list;
   }, [habits, pendingTasks]);
+
+  const handleSelectNone = useCallback(() => {
+    onSelectHabit(null);
+    onSelectTask(null);
+  }, [onSelectHabit, onSelectTask]);
+
+  const handleSelectHabit = useCallback((habitId: string) => {
+    onSelectHabit(habitId);
+    onSelectTask(null);
+  }, [onSelectHabit, onSelectTask]);
+
+  const handleSelectTask = useCallback((taskId: string) => {
+    onSelectTask(taskId);
+    onSelectHabit(null);
+  }, [onSelectHabit, onSelectTask]);
+
+  const noneLabelMemo = useMemo(() => i18n('pomodoro.target.none'), [i18n]);
 
   return (
     <View style={{ gap: t.spacing.stackSm }}>
@@ -75,45 +145,28 @@ export const PomodoroTargetPicker: React.FC<PomodoroTargetPickerProps> = ({
         }
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: t.spacing.stackSm }}
-        renderItem={({ item }) => {
-          if (item.kind === 'none') {
-            const selected = !selectedHabitId && !selectedTaskId;
+        renderItem={useCallback(
+          ({ item }: { item: ChipItem }) => {
+            const isSelected =
+              item.kind === 'none'
+                ? !selectedHabitId && !selectedTaskId
+                : item.kind === 'habit'
+                ? selectedHabitId === item.habit.id
+                : selectedTaskId === item.task.id;
+
             return (
-              <Pressable
-                onPress={() => { onSelectHabit(null); onSelectTask(null); }}
-                style={({ pressed }) => [chipStyle(selected), { opacity: pressed ? 0.7 : 1 }]}
-              >
-                <Text style={chipTextStyle(selected)}>
-                  {i18n('pomodoro.target.none')}
-                </Text>
-              </Pressable>
+              <RowItem
+                item={item}
+                selected={isSelected}
+                noneLabel={noneLabelMemo}
+                onPressNone={handleSelectNone}
+                onPressHabit={handleSelectHabit}
+                onPressTask={handleSelectTask}
+              />
             );
-          }
-          if (item.kind === 'habit') {
-            const selected = selectedHabitId === item.habit.id;
-            return (
-              <Pressable
-                onPress={() => { onSelectHabit(item.habit.id); onSelectTask(null); }}
-                style={({ pressed }) => [chipStyle(selected), { opacity: pressed ? 0.7 : 1 }]}
-              >
-                <Text style={chipTextStyle(selected)} numberOfLines={1}>
-                  {item.habit.name}
-                </Text>
-              </Pressable>
-            );
-          }
-          const selected = selectedTaskId === item.task.id;
-          return (
-            <Pressable
-              onPress={() => { onSelectTask(item.task.id); onSelectHabit(null); }}
-              style={({ pressed }) => [chipStyle(selected), { opacity: pressed ? 0.7 : 1 }]}
-            >
-              <Text style={chipTextStyle(selected)} numberOfLines={1}>
-                {item.task.title}
-              </Text>
-            </Pressable>
-          );
-        }}
+          },
+          [selectedHabitId, selectedTaskId, noneLabelMemo, handleSelectNone, handleSelectHabit, handleSelectTask]
+        )}
       />
     </View>
   );
