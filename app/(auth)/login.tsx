@@ -12,6 +12,7 @@ import { GoogleSignInButton } from '../../src/features/auth/components/GoogleSig
 import { EyeToggle } from '../../src/features/auth/components/EyeToggle';
 import { Button } from '../../src/shared/ui';
 import { authService } from '../../src/features/auth/services/authService';
+import { getAuthErrorMessage, isEmailNotConfirmed } from '../../src/features/auth/services/authErrors';
 import { useAuthStore } from '../../src/features/auth/useAuthStore';
 
 export default function LoginScreen() {
@@ -30,12 +31,11 @@ export default function LoginScreen() {
     const { data, error } = await authService.signIn(email, password);
     setLoading(false);
     if (error) {
-      const msg = error.message.toLowerCase();
-      if (msg.includes('email') && (msg.includes('confirm') || msg.includes('verified'))) {
+      if (isEmailNotConfirmed(error)) {
         router.push({ pathname: '/(auth)/confirm', params: { email } });
         return;
       }
-      setServerError(error.message);
+      setServerError(getAuthErrorMessage(error) ?? error.message);
       return;
     }
     setSession(data.session);

@@ -7,6 +7,7 @@ import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { OTPForm } from '../../src/features/auth/components/OTPForm';
 import { Button } from '../../src/shared/ui';
 import { authService } from '../../src/features/auth/services/authService';
+import { getAuthErrorMessage } from '../../src/features/auth/services/authErrors';
 import { useAuthStore } from '../../src/features/auth/useAuthStore';
 
 const RESEND_COOLDOWN = 60;
@@ -35,7 +36,7 @@ export default function ConfirmScreen() {
     const { data, error: verifyError } = await authService.verifyOtp(email, otpCode);
     setLoading(false);
     if (verifyError) {
-      setError(verifyError.message);
+      setError(getAuthErrorMessage(verifyError) ?? verifyError.message);
       return;
     }
     setSession(data.session);
@@ -45,7 +46,7 @@ export default function ConfirmScreen() {
     if (!email || cooldown > 0) return;
     const { error: resendError } = await authService.resendVerification(email);
     if (resendError) {
-      setError(resendError.message);
+      setError(getAuthErrorMessage(resendError) ?? resendError.message);
       return;
     }
     setCooldown(RESEND_COOLDOWN);

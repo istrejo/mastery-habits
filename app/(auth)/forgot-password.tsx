@@ -10,6 +10,7 @@ import { AppLogo } from '../../src/features/auth/components/AppLogo';
 import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { LabeledField } from '../../src/shared/ui/LabeledField';
 import { authService } from '../../src/features/auth/services/authService';
+import { getAuthErrorMessage } from '../../src/features/auth/services/authErrors';
 
 export default function ForgotPasswordScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormData>({
@@ -26,7 +27,7 @@ export default function ForgotPasswordScreen() {
     const { error } = await authService.sendPasswordReset(email);
     setLoading(false);
     if (error) {
-      setServerError(error.message);
+      setServerError(getAuthErrorMessage(error) ?? error.message);
       return;
     }
     setSent(true);

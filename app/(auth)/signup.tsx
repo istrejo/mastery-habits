@@ -12,6 +12,7 @@ import { FormDivider } from '../../src/shared/ui/FormDivider';
 import { GoogleSignInButton } from '../../src/features/auth/components/GoogleSignInButton';
 import { Button } from '../../src/shared/ui';
 import { authService } from '../../src/features/auth/services/authService';
+import { getAuthErrorMessage } from '../../src/features/auth/services/authErrors';
 
 export default function SignupScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
@@ -27,7 +28,7 @@ export default function SignupScreen() {
     const { error } = await authService.signUp(email, password);
     setLoading(false);
     if (error) {
-      setServerError(error.message);
+      setServerError(getAuthErrorMessage(error) ?? error.message);
       return;
     }
     router.replace('/(auth)/confirm');
