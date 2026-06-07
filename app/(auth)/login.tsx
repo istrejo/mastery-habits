@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { View, Text, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, type LoginFormData } from '../../src/features/auth/schemas/auth.schema';
 import { AuthLayout } from '../../src/features/auth/components/AuthLayout';
 import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { FloatingLabelField } from '../../src/shared/ui/FloatingLabelField';
@@ -12,10 +14,10 @@ import { Button } from '../../src/shared/ui';
 import { authService } from '../../src/features/auth/services/authService';
 import { useAuthStore } from '../../src/features/auth/useAuthStore';
 
-type FormData = { email: string; password: string };
-
 export default function LoginScreen() {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -46,10 +48,6 @@ export default function LoginScreen() {
             <Controller
               control={control}
               name="email"
-              rules={{
-                required: 'Email is required',
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' },
-              }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <FloatingLabelField
                   label="Email"
@@ -67,10 +65,6 @@ export default function LoginScreen() {
             <Controller
               control={control}
               name="password"
-              rules={{
-                required: 'Password is required',
-                minLength: { value: 8, message: 'At least 8 characters' },
-              }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <FloatingLabelField
                   label="Password"

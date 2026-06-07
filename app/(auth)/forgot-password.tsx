@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { forgotPasswordSchema, type ForgotPasswordFormData } from '../../src/features/auth/schemas/auth.schema';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppLogo } from '../../src/features/auth/components/AppLogo';
@@ -9,10 +11,10 @@ import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { LabeledField } from '../../src/shared/ui/LabeledField';
 import { authService } from '../../src/features/auth/services/authService';
 
-type FormData = { email: string };
-
 export default function ForgotPasswordScreen() {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+  });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState('');
@@ -82,10 +84,6 @@ export default function ForgotPasswordScreen() {
                   <Controller
                     control={control}
                     name="email"
-                    rules={{
-                      required: 'Email is required',
-                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' },
-                    }}
                     render={({ field: { onChange, value, onBlur } }) => (
                       <LabeledField
                         label="Email Address"
