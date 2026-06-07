@@ -16,6 +16,9 @@ function AuthGuard() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+    }).catch(() => {
+      // ignore errors, just finish loading
+    }).finally(() => {
       setLoading(false);
     });
 
