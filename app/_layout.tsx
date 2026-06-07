@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { supabase } from "../src/core/api/supabase";
 import { useAuthStore } from "../src/features/auth/useAuthStore";
+import { ThemeProvider } from "../src/core/theme/ThemeProvider";
 
 const queryClient = new QueryClient();
 
@@ -41,8 +42,10 @@ function AuthGuard() {
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack />
-      <AuthGuard />
+      <ThemeProvider>
+        <Stack />
+        <AuthGuard />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

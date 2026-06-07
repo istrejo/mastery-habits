@@ -1,0 +1,278 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Verify Email - Pendie</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-secondary": "#ffffff",
+                "on-primary": "#ffffff",
+                "error-container": "#ffdad6",
+                "secondary-fixed": "#6ffbbe",
+                "on-error-container": "#93000a",
+                "surface-container-low": "#eff4ff",
+                "primary-container": "#2563eb",
+                "tertiary": "#784b00",
+                "primary-fixed-dim": "#b4c5ff",
+                "primary-fixed": "#dbe1ff",
+                "tertiary-fixed-dim": "#ffb95f",
+                "surface-variant": "#d3e4fe",
+                "on-secondary-container": "#00714d",
+                "inverse-on-surface": "#eaf1ff",
+                "surface-container-high": "#dce9ff",
+                "background": "#f8f9ff",
+                "on-tertiary-fixed-variant": "#653e00",
+                "on-tertiary-fixed": "#2a1700",
+                "on-secondary-fixed-variant": "#005236",
+                "on-secondary-fixed": "#002113",
+                "tertiary-fixed": "#ffddb8",
+                "secondary-container": "#6cf8bb",
+                "on-primary-container": "#eeefff",
+                "on-primary-fixed": "#00174b",
+                "tertiary-container": "#996100",
+                "inverse-surface": "#213145",
+                "surface-bright": "#f8f9ff",
+                "on-error": "#ffffff",
+                "surface-tint": "#0053db",
+                "secondary-fixed-dim": "#4edea3",
+                "surface-container": "#e5eeff",
+                "secondary": "#006c49",
+                "on-surface": "#0b1c30",
+                "surface-dim": "#cbdbf5",
+                "on-background": "#0b1c30",
+                "on-surface-variant": "#434655",
+                "inverse-primary": "#b4c5ff",
+                "outline-variant": "#c3c6d7",
+                "surface": "#f8f9ff",
+                "outline": "#737686",
+                "surface-container-highest": "#d3e4fe",
+                "primary": "#004ac6",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-container": "#ffeedd",
+                "surface-container-lowest": "#ffffff",
+                "error": "#ba1a1a",
+                "on-primary-fixed-variant": "#003ea8"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "sm": "8px",
+                "gutter": "16px",
+                "lg": "24px",
+                "base": "4px",
+                "md": "16px",
+                "max-width": "1200px",
+                "xs": "4px",
+                "margin-desktop": "48px",
+                "xl": "32px",
+                "margin-mobile": "16px"
+        },
+        "fontFamily": {
+                "headline-md": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "title-lg": [
+                        "Inter"
+                ],
+                "display": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-md": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "title-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "display": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-md": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "22px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom hide number arrows for input[type="number"] */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-[#0b1326] text-white min-h-screen flex items-center justify-center relative overflow-hidden font-body-lg selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Ambient Background Elements -->
+<div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-primary/20 blur-[100px] opacity-60 z-0"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-blue-500/20 blur-[100px] opacity-40 z-0"></div>
+<!-- Main Container -->
+<main class="relative z-10 w-full max-w-[420px] px-margin-mobile md:px-0">
+<!-- Brand Header (Minimal for Transactional Screen) -->
+<div class="flex justify-center items-center mb-xl">
+<span class="material-symbols-outlined text-primary mr-sm text-3xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-display text-display text-primary tracking-tight">Pendie</span>
+</div>
+<!-- Glassmorphic Card -->
+<div class="bg-[#151e32]/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.5)] p-margin-desktop flex flex-col items-center text-center">
+<!-- Illustration -->
+<div class="w-24 h-24 mb-lg rounded-full bg-[#1d273d] flex items-center justify-center p-4 border border-white/5 shadow-sm">
+<img alt="" class="w-full h-full object-cover rounded-full opacity-90 mix-blend-screen" data-alt="A minimalist, modern 3D illustration of an open white envelope with a glowing blue digital document emerging from it. The scene is set against a pristine, soft light-blue background, embodying a clean light-mode aesthetic. The lighting is soft and diffused, creating a calm, secure, and professional mood suitable for a productivity app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkzZQBMsHbP6SOjVEOA3j8tL1Xw4DmzPOulSKFAdqQDhKtv6QK9lBLFrIbFp5tOcAyI3HdkazaB5z9N2Fjts_YSyCp--UjYc8dze2aS54uNQlrzGiyLe13FD9aqNOQa-AcQHQXbYRwmhDVkjMAtsAWpTeU2_20lgfiQa0LeNHe373yJbZQyxYBvUFL5o8jDMx6HpbesVeg_3OhT-JsNlSfiLMGpljML1fp4OmlJBXuSbyztxuaTau1b6pS99TVXJEY_ZyPK_vMwe4">
+</div>
+<!-- Typography -->
+<h1 class="font-headline-lg text-headline-lg text-white mb-sm">Check your email</h1>
+<p class="font-body-md text-body-md text-slate-300 mb-xl px-4">
+                We've sent a 4-digit code to your inbox. Please enter it below to verify your account.
+            </p>
+<!-- OTP Input Form -->
+<form class="w-full flex flex-col items-center" id="otp-form">
+<div class="flex gap-md justify-center mb-xl w-full" id="otp-container">
+<input aria-label="Digit 1" class="w-14 h-16 text-center font-display text-display text-white bg-[#0b1326] border border-white/20 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all shadow-sm placeholder-white/30" inputmode="numeric" maxlength="1" placeholder="·" type="text">
+<input aria-label="Digit 2" class="w-14 h-16 text-center font-display text-display text-white bg-[#0b1326] border border-white/20 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all shadow-sm placeholder-white/30" inputmode="numeric" maxlength="1" placeholder="·" type="text">
+<input aria-label="Digit 3" class="w-14 h-16 text-center font-display text-display text-white bg-[#0b1326] border border-white/20 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all shadow-sm placeholder-white/30" inputmode="numeric" maxlength="1" placeholder="·" type="text">
+<input aria-label="Digit 4" class="w-14 h-16 text-center font-display text-display text-white bg-[#0b1326] border border-white/20 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all shadow-sm placeholder-white/30" inputmode="numeric" maxlength="1" placeholder="·" type="text">
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 px-lg rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 mb-lg uppercase tracking-wider" type="submit">
+                    Verify
+                </button>
+</form>
+<!-- Secondary Action -->
+<p class="font-body-md text-body-md text-slate-300 mt-sm">
+                Didn't receive a code? 
+                <button class="font-title-lg text-title-lg text-primary hover:text-primary-container focus:outline-none focus:underline transition-colors ml-1" type="button">
+                    Resend
+                </button>
+</p>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('#otp-container input');
+            
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    // Ensure only numbers are entered
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                    
+                    if (e.target.value !== '') {
+                        // Move to next input if available
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && e.target.value === '') {
+                        // Move to previous input on backspace if current is empty
+                        if (index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    }
+                });
+
+                // Auto-select text on focus
+                input.addEventListener('focus', function() {
+                    this.select();
+                });
+            });
+
+            // Prevent form submission for demo purposes
+            document.getElementById('otp-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const code = Array.from(inputs).map(input => input.value).join('');
+                if(code.length === 4) {
+                    console.log('Verifying code:', code);
+                    // Add loading state to button here in real app
+                }
+            });
+        });
+    </script>
+</body></html>
