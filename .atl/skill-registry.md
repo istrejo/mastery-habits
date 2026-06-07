@@ -44,6 +44,7 @@ Last updated: 2026-06-07
 | `skill-creator` | Trigger: new skills, agent instructions, documenting AI usage patterns. Create LLM-first skills with valid frontmatter. | user | `/Users/aletrejo/.config/opencode/skills/skill-creator/SKILL.md` |
 | `skill-improver` | Trigger: improve skills, audit skills, refactor skills, skill quality. Audit and upgrade existing LLM-first skills. | user | `/Users/aletrejo/.config/opencode/skills/skill-improver/SKILL.md` |
 | `skill-installer` | Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos). | user | `/Users/aletrejo/.codex/skills/.system/skill-installer/SKILL.md` |
+| `supabase-postgres-best-practices` | Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations. | user | `/Users/aletrejo/.agents/skills/supabase-postgres-best-practices/SKILL.md` |
 | `work-unit-commits` | Plan commits as reviewable work units. Trigger: implementation, commit splitting, chained PRs, or keeping tests and docs with code. | user | `/Users/aletrejo/.config/opencode/skills/work-unit-commits/SKILL.md` |
 
 ## Loading protocol
