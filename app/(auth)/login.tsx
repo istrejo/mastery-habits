@@ -30,6 +30,11 @@ export default function LoginScreen() {
     const { data, error } = await authService.signIn(email, password);
     setLoading(false);
     if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes('email') && (msg.includes('confirm') || msg.includes('verified'))) {
+        router.push({ pathname: '/(auth)/confirm', params: { email } });
+        return;
+      }
       setServerError(error.message);
       return;
     }

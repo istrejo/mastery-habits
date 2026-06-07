@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthLayout } from '../../src/features/auth/components/AuthLayout';
 import { AuthCard } from '../../src/features/auth/components/AuthCard';
@@ -19,6 +19,8 @@ export default function ConfirmScreen() {
   const user = useAuthStore((s) => s.user);
   const setSession = useAuthStore((s) => s.setSession);
   const router = useRouter();
+  const params = useLocalSearchParams<{ email?: string }>();
+  const email = user?.email ?? params.email ?? '';
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -27,10 +29,10 @@ export default function ConfirmScreen() {
   }, [cooldown]);
 
   const handleVerify = async () => {
-    if (!user?.email || otpCode.length < 4) return;
+    if (!email || otpCode.length < 4) return;
     setLoading(true);
     setError('');
-    const { data, error: verifyError } = await authService.verifyOtp(user.email, otpCode);
+    const { data, error: verifyError } = await authService.verifyOtp(email, otpCode);
     setLoading(false);
     if (verifyError) {
       setError(verifyError.message);
@@ -40,8 +42,8 @@ export default function ConfirmScreen() {
   };
 
   const handleResend = async () => {
-    if (!user?.email || cooldown > 0) return;
-    const { error: resendError } = await authService.resendVerification(user.email);
+    if (!email || cooldown > 0) return;
+    const { error: resendError } = await authService.resendVerification(email);
     if (resendError) {
       setError(resendError.message);
       return;
@@ -63,8 +65,8 @@ export default function ConfirmScreen() {
             </Text>
             <Text className="text-body-md text-on-surface-variant text-center px-4">
               We've sent a 4-digit code to{' '}
-              {user?.email ? (
-                <Text className="text-on-surface font-semibold">{user.email}</Text>
+              {email ? (
+                <Text className="text-on-surface font-semibold">{email}</Text>
               ) : 'your inbox'}
               . Enter it below to verify your account.
             </Text>
