@@ -39,12 +39,8 @@ export const useAuth = () => {
     setResendSent(false);
     try {
       const { data, error: err } = await authService.signUp(email, password, displayName);
-      // eslint-disable-next-line no-console
-      console.error('[signup] Supabase raw response:', JSON.stringify({ data, error: err?.message ?? null }, null, 2));
 
       if (err) {
-        // eslint-disable-next-line no-console
-        console.error('[signup] Supabase error raw:', err.message);
         setError(err.message);
         return;
       }
@@ -53,8 +49,6 @@ export const useAuth = () => {
       // Supabase returns { user: { identities: [] } } when email already exists (no error for security)
       const hasIdentities = Array.isArray(user?.identities) && user.identities.length > 0;
       if (!user || !hasIdentities) {
-        // eslint-disable-next-line no-console
-        console.error('[signup] No user or empty identities — treating as already registered');
         setError('already registered');
         return;
       }
@@ -62,8 +56,6 @@ export const useAuth = () => {
       setSignupEmail(email);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'unknown_error';
-      // eslint-disable-next-line no-console
-      console.error('[signup] Exception:', msg);
       setError(msg);
     } finally {
       setLoading(false);

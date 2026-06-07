@@ -8,7 +8,7 @@ import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { useAuth, CheckEmailView } from "@auth/index";
-import { Screen, Input, Button, Card, Toast } from "@core/components";
+import { Screen, Input, Button, Card } from "@core/components";
 import { useTheme } from "@core/theming";
 
 function mapSignupError(
@@ -63,7 +63,6 @@ function SignupForm({ onSubmit, loading, error }: SignupFormProps) {
 
   return (
     <Screen scrollable contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
-      <Toast message={mappedError} variant="error" />
       <View style={{ width: "100%", maxWidth: 440, alignSelf: "center" }}>
         <View style={{ marginBottom: theme.spacing.stackLg }}>
           <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: theme.spacing.stackSm }}>
