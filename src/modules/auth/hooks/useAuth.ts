@@ -38,14 +38,33 @@ export const useAuth = () => {
     setSignupEmail(null);
     setResendSent(false);
     try {
-      const { error: err } = await authService.signUp(email, password, displayName);
+      const { data, error: err } = await authService.signUp(email, password, displayName);
+      // eslint-disable-next-line no-console
+      console.error('[signup] Supabase raw response:', JSON.stringify({ data, error: err?.message ?? null }, null, 2));
+
       if (err) {
+        // eslint-disable-next-line no-console
+        console.error('[signup] Supabase error raw:', err.message);
         setError(err.message);
-      } else {
-        setSignupEmail(email);
+        return;
       }
+
+      const user = data?.user;
+      // Supabase returns { user: { identities: [] } } when email already exists (no error for security)
+      const hasIdentities = Array.isArray(user?.identities) && user.identities.length > 0;
+      if (!user || !hasIdentities) {
+        // eslint-disable-next-line no-console
+        console.error('[signup] No user or empty identities — treating as already registered');
+        setError('already registered');
+        return;
+      }
+
+      setSignupEmail(email);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'unknown_error');
+      const msg = err instanceof Error ? err.message : 'unknown_error';
+      // eslint-disable-next-line no-console
+      console.error('[signup] Exception:', msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }

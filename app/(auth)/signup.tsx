@@ -17,13 +17,18 @@ function mapSignupError(
 ): string | null {
   if (!message) return null;
   const lower = message.toLowerCase();
-  if (lower.includes("already registered") || lower.includes("already been registered")) {
+  if (
+    lower.includes("already registered") ||
+    lower.includes("already been registered") ||
+    lower.includes("user already exists") ||
+    lower.includes("email already")
+  ) {
     return t("signup.error_already_registered");
   }
-  if (lower.includes("password") && (lower.includes("short") || lower.includes("6 character"))) {
+  if (lower.includes("password") && (lower.includes("short") || lower.includes("6 character") || lower.includes("weak"))) {
     return t("signup.error_weak_password");
   }
-  if (lower.includes("invalid email") || lower.includes("email address is invalid")) {
+  if (lower.includes("invalid email") || lower.includes("email address is invalid") || lower.includes("unable to validate")) {
     return t("signup.error_invalid_email");
   }
   if (lower.includes("network") || lower.includes("fetch") || lower.includes("timeout")) {
@@ -32,10 +37,15 @@ function mapSignupError(
   return t("signup.error_generic");
 }
 
-function SignupForm() {
+interface SignupFormProps {
+  onSubmit: (email: string, password: string, displayName?: string) => void;
+  loading: boolean;
+  error: string | null;
+}
+
+function SignupForm({ onSubmit, loading, error }: SignupFormProps) {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { signUp, loading, error } = useAuth();
 
   const schema = useMemo(() => z.object({
     displayName: z.string().min(2, t("signup.error_name_min")).max(40),
@@ -46,15 +56,14 @@ function SignupForm() {
 
   type FormData = z.infer<typeof schema>;
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
-  const onSubmit = (data: FormData) => signUp(data.email, data.password, data.displayName);
+  const handleFormSubmit = (data: FormData) => onSubmit(data.email, data.password, data.displayName);
 
-  const toastMessage = useMemo(() => mapSignupError(error, t), [error, t]);
-  const inlineError = error && !error.endsWith("_timeout") ? error : null;
+  const mappedError = useMemo(() => mapSignupError(error, t), [error, t]);
   const timeoutMessage = error && error.endsWith("_timeout") ? t("login.error_oauth_timeout") : null;
 
   return (
     <Screen scrollable contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
-      <Toast message={toastMessage} variant="error" />
+      <Toast message={mappedError} variant="error" />
       <View style={{ width: "100%", maxWidth: 440, alignSelf: "center" }}>
         <View style={{ marginBottom: theme.spacing.stackLg }}>
           <Text style={{ color: theme.text.secondary, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_600SemiBold", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: theme.spacing.stackSm }}>
@@ -73,13 +82,17 @@ function SignupForm() {
           <Controller control={control} name="email" render={({ field: { onChange, value } }) => <Input label={t("signup.email_label")} onChangeText={onChange} value={value} keyboardType="email-address" autoCapitalize="none" autoComplete="email" error={errors.email?.message} />} />
           <Controller control={control} name="password" render={({ field: { onChange, value } }) => <Input label={t("signup.password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="new-password" error={errors.password?.message} />} />
           <Controller control={control} name="confirmPassword" render={({ field: { onChange, value } }) => <Input label={t("signup.confirm_password_label")} onChangeText={onChange} value={value} secureTextEntry autoComplete="new-password" error={errors.confirmPassword?.message} />} />
-          {inlineError && !toastMessage ? (
-            <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{inlineError}</Text>
+          {mappedError ? (
+            <View style={{ backgroundColor: theme.status.danger + '15', borderRadius: theme.radius.md, padding: theme.spacing.stackMd }}>
+              <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium", textAlign: 'center' }}>
+                {mappedError}
+              </Text>
+            </View>
           ) : null}
           {timeoutMessage ? (
             <Text style={{ color: theme.status.danger, fontSize: theme.typography.scale.microBold.fontSize, fontFamily: "Lexend_500Medium" }}>{timeoutMessage}</Text>
           ) : null}
-          <Button label={t("signup.submit")} onPress={handleSubmit(onSubmit)} loading={loading} iconRight="arrow-forward" />
+          <Button label={t("signup.submit")} onPress={handleSubmit(handleFormSubmit)} loading={loading} iconRight="arrow-forward" />
         </Card>
 
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: theme.spacing.unit, marginTop: theme.spacing.stackLg }}>
@@ -96,7 +109,7 @@ function SignupForm() {
 }
 
 export default function SignupScreen() {
-  const { signupEmail, clearSignupSuccess } = useAuth();
+  const { signUp, loading, error, signupEmail, clearSignupSuccess } = useAuth();
 
   if (signupEmail) {
     return (
@@ -109,5 +122,5 @@ export default function SignupScreen() {
     );
   }
 
-  return <SignupForm />;
+  return <SignupForm onSubmit={signUp} loading={loading} error={error} />;
 }
