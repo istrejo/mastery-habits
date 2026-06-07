@@ -11,7 +11,9 @@ export const authService = {
     supabase.auth.resend({ type: 'signup', email }),
 
   sendPasswordReset: (email: string) =>
-    supabase.auth.resetPasswordForEmail(email),
+    supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'masteryhabits://(auth)/reset-password',
+    }),
 
   verifyOtp: (email: string, token: string) =>
     supabase.auth.verifyOtp({ email, token, type: 'signup' }),
