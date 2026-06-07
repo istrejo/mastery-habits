@@ -65,6 +65,7 @@ jest.mock('react-native', () => {
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
+    Pressable: mock('Pressable'),
     ScrollView: mock('ScrollView'),
     ActivityIndicator: mock('ActivityIndicator'),
   };
@@ -225,7 +226,7 @@ describe('TodayScreen', () => {
       tree = create(React.createElement(TodayScreen));
     });
 
-    const addButtons = tree.root.findAll((node: any) => node.type === 'TouchableOpacity' && node.props.testID === 'today-add-task');
+    const addButtons = tree.root.findAll((node: any) => node.type === 'Pressable' && node.props.testID === 'today-add-task');
     expect(addButtons).toHaveLength(2);
 
     expect(taskCreateSheetMock).toHaveBeenLastCalledWith(expect.objectContaining({ visible: false }));

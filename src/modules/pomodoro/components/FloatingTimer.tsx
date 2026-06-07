@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@core/theming';
@@ -35,11 +35,10 @@ export const FloatingTimer: React.FC = () => {
         alignItems: 'center',
       }}
     >
-      <TouchableOpacity
-        activeOpacity={0.9}
+      <Pressable
         onPress={() => router.push('/(tabs)/pomodoro')}
         accessibilityLabel={i18n('pomodoro.floating.a11y_label')}
-        style={{
+        style={({ pressed }) => [{
           flexDirection: 'row',
           alignItems: 'center',
           gap: t.spacing.stackSm,
@@ -49,12 +48,8 @@ export const FloatingTimer: React.FC = () => {
           borderRadius: t.radius.pill,
           paddingHorizontal: t.spacing.stackMd,
           paddingVertical: t.spacing.stackSm,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.18,
-          shadowRadius: 6,
-          elevation: 6,
-        }}
+          boxShadow: [{ offsetX: 0, offsetY: 2, blurRadius: 6, color: 'rgba(0, 0, 0, 0.18)' }],
+        }, { opacity: pressed ? 0.9 : 1 }]}
       >
         <View
           style={{
@@ -86,7 +81,7 @@ export const FloatingTimer: React.FC = () => {
         >
           {i18n(`pomodoro.phases.${phase}`)}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

@@ -3,7 +3,7 @@ import {
   Modal as RNModal,
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   type ViewStyle,
 } from 'react-native';
 import { useTheme } from '@core/theming';
@@ -31,13 +31,11 @@ export const Modal: React.FC<ModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <TouchableOpacity
+      <Pressable
         style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' }}
-        activeOpacity={1}
         onPress={onClose}
       >
-        <TouchableOpacity
-          activeOpacity={1}
+        <Pressable
           style={[
             {
               backgroundColor: t.bg.elevated,
@@ -67,8 +65,8 @@ export const Modal: React.FC<ModalProps> = ({
             </Text>
           ) : null}
           {children}
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </Pressable>
+      </Pressable>
     </RNModal>
   );
 };

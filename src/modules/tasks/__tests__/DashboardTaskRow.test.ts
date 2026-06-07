@@ -36,6 +36,7 @@ jest.mock('react-native', () => {
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
+    Pressable: mock('Pressable'),
     ActivityIndicator: mock('ActivityIndicator'),
     Animated: {
       View: mock('AnimatedView'),
@@ -104,7 +105,7 @@ describe('DashboardTaskRow', () => {
       tree = create(React.createElement(DashboardTaskRow, { task: task(), status: 'active' }));
     });
 
-    const subtaskChecks = tree.root.findAll((node: any) => node.type === 'TouchableOpacity' && String(node.props.testID ?? '').startsWith('dashboard-subtask-check-'));
+    const subtaskChecks = tree.root.findAll((node: any) => node.type === 'Pressable' && String(node.props.testID ?? '').startsWith('dashboard-subtask-check-'));
     const progress = tree.root.findByProps({ testID: 'dashboard-task-progress-task-1' });
 
     expect(subtaskChecks).toHaveLength(2);

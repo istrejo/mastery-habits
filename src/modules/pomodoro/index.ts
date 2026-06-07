@@ -2,7 +2,6 @@ export { pomodoroService } from './services/pomodoro.service';
 export { usePomodoroStore } from './states/pomodoro.store';
 export { usePomodoroTimer } from './hooks/usePomodoroTimer';
 export { usePomodoroSettings } from './hooks/usePomodoroSettings';
-export { usePomodoroHistory } from './hooks/usePomodoroHistory';
 export { useTimerTick } from './hooks/useTimerTick';
 export { TimerDisplay } from './components/TimerDisplay';
 export { TimerControls } from './components/TimerControls';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, Pressable, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
@@ -48,41 +48,41 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
   if (status === 'idle' || status === 'finished') {
     return (
       <View style={{ alignItems: 'center' }}>
-        <TouchableOpacity onPress={onStart} activeOpacity={0.8} style={primaryBtnStyle}>
+        <Pressable onPress={onStart} style={({ pressed }) => [primaryBtnStyle, { opacity: pressed ? 0.8 : 1 }]}>
           <MaterialIcons name="play-arrow" size={22} color={t.accent.onPrimary} />
           <Text style={{ color: t.accent.onPrimary, fontFamily: 'Lexend_600SemiBold', fontSize: 15 }}>
             {i18n('pomodoro.controls.start')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
 
   return (
     <View style={{ flexDirection: 'row', gap: t.spacing.stackMd, alignItems: 'center', justifyContent: 'center' }}>
-      <TouchableOpacity onPress={onReset} activeOpacity={0.8} style={ghostBtnStyle}>
+      <Pressable onPress={onReset} style={({ pressed }) => [ghostBtnStyle, { opacity: pressed ? 0.8 : 1 }]}>
         <MaterialIcons name="stop" size={22} color={t.text.secondary} />
-      </TouchableOpacity>
+      </Pressable>
 
       {status === 'running' ? (
-        <TouchableOpacity onPress={onPause} activeOpacity={0.8} style={primaryBtnStyle}>
+        <Pressable onPress={onPause} style={({ pressed }) => [primaryBtnStyle, { opacity: pressed ? 0.8 : 1 }]}>
           <MaterialIcons name="pause" size={22} color={t.accent.onPrimary} />
           <Text style={{ color: t.accent.onPrimary, fontFamily: 'Lexend_600SemiBold', fontSize: 15 }}>
             {i18n('pomodoro.controls.pause')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       ) : (
-        <TouchableOpacity onPress={onResume} activeOpacity={0.8} style={primaryBtnStyle}>
+        <Pressable onPress={onResume} style={({ pressed }) => [primaryBtnStyle, { opacity: pressed ? 0.8 : 1 }]}>
           <MaterialIcons name="play-arrow" size={22} color={t.accent.onPrimary} />
           <Text style={{ color: t.accent.onPrimary, fontFamily: 'Lexend_600SemiBold', fontSize: 15 }}>
             {i18n('pomodoro.controls.resume')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
 
-      <TouchableOpacity onPress={onSkip} activeOpacity={0.8} style={ghostBtnStyle}>
+      <Pressable onPress={onSkip} style={({ pressed }) => [ghostBtnStyle, { opacity: pressed ? 0.8 : 1 }]}>
         <MaterialIcons name="skip-next" size={22} color={t.text.secondary} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

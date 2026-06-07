@@ -72,6 +72,7 @@ jest.mock('react-native', () => {
     Text: mock('Text'),
     TextInput: mock('TextInput'),
     TouchableOpacity: mock('TouchableOpacity'),
+    Pressable: mock('Pressable'),
     View: mock('View'),
   };
 });
@@ -205,7 +206,7 @@ describe('TaskCreateSheet', () => {
 
     const submitButtons = tree.root.findAll(
       (node: any) =>
-        node.type === 'TouchableOpacity' &&
+        node.type === 'Pressable' &&
         node.props.testID === 'task-sheet-submit'
     );
     expect(submitButtons).toHaveLength(1);
@@ -327,7 +328,9 @@ describe('TaskCreateSheet', () => {
     const checkbox = tree.root.findByProps({
       testID: 'task-sheet-subtask-checkbox-0',
     });
-    expect(checkbox.props.style).toEqual(
+    const styleFn = checkbox.props.style;
+    const [baseStyle] = styleFn({ pressed: false });
+    expect(baseStyle).toEqual(
       expect.objectContaining({ backgroundColor: 'transparent' })
     );
 
@@ -336,7 +339,9 @@ describe('TaskCreateSheet', () => {
     const updatedCheckbox = tree.root.findByProps({
       testID: 'task-sheet-subtask-checkbox-0',
     });
-    expect(updatedCheckbox.props.style).toEqual(
+    const updatedStyleFn = updatedCheckbox.props.style;
+    const [updatedBaseStyle] = updatedStyleFn({ pressed: false });
+    expect(updatedBaseStyle).toEqual(
       expect.objectContaining({ backgroundColor: mockTheme.accent.primary })
     );
 

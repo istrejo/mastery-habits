@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { View, Text, Pressable } from 'react-native';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -88,7 +88,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
   const initialFrequencyPreset = inferFrequencyPreset(initialFrequencyDays);
   const [stitchCategory, setStitchCategory] = useState<HabitCategoryId>(initialCategory);
   const [stitchFrequencyPreset, setStitchFrequencyPreset] = useState<CreateHabitFrequencyPreset>(initialFrequencyPreset);
-  const [lastCustomDays, setLastCustomDays] = useState<number[]>(
+  const lastCustomDaysRef = useRef<number[]>(
     initialFrequencyPreset === 'custom' ? [...initialFrequencyDays].sort((a, b) => a - b) : [1, 2, 3, 4, 5],
   );
 
@@ -151,24 +151,24 @@ export const HabitForm: React.FC<HabitFormProps> = ({
 
   const applyFrequencyPreset = (preset: CreateHabitFrequencyPreset) => {
     setStitchFrequencyPreset(preset);
-    const nextDays = getDaysForFrequencyPreset(preset, lastCustomDays);
+    const nextDays = getDaysForFrequencyPreset(preset, lastCustomDaysRef.current);
     setValue('frequency_days', nextDays, { shouldValidate: true });
 
     if (preset === 'custom') {
-      setLastCustomDays(nextDays);
+      lastCustomDaysRef.current = nextDays;
     }
   };
 
   const toggleCustomDay = (iso: number) => {
     setStitchFrequencyPreset('custom');
-    const sourceDays = frequencyPreset === 'custom' ? watchedFrequencyDays : lastCustomDays;
+    const sourceDays = frequencyPreset === 'custom' ? watchedFrequencyDays : lastCustomDaysRef.current;
     const nextDays = sourceDays.includes(iso)
       ? sourceDays.length === 1
         ? sourceDays
         : sourceDays.filter((day) => day !== iso)
       : [...sourceDays, iso].sort((a, b) => a - b);
 
-    setLastCustomDays(nextDays);
+    lastCustomDaysRef.current = nextDays;
     setValue('frequency_days', nextDays, { shouldValidate: true });
   };
 
@@ -283,11 +283,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({
             const isSelected = selectedCategoryOption.categoryId === option.categoryId;
 
             return (
-              <TouchableOpacity
+              <Pressable
                 key={option.categoryId}
                 onPress={() => applyCategory(option)}
-                activeOpacity={0.82}
-                style={{
+                style={({ pressed }) => [{
                   width: '31%',
                   minHeight: 78,
                   backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
@@ -299,7 +298,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
-                }}
+                }, { opacity: pressed ? 0.82 : 1 }]}
               >
                 <MaterialIcons
                   name={option.iconName as keyof typeof MaterialIcons.glyphMap}
@@ -318,7 +317,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
                 >
                   {t(option.labelKey as any)}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>
@@ -349,11 +348,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({
             const isSelected = frequencyPreset === preset.id;
 
             return (
-              <TouchableOpacity
+              <Pressable
                 key={preset.id}
                 onPress={() => applyFrequencyPreset(preset.id)}
-                activeOpacity={0.82}
-                style={{
+                style={({ pressed }) => [{
                   flex: 1,
                   backgroundColor: isSelected ? theme.text.primary : theme.bg.surface,
                   borderWidth: theme.borderWidth.default,
@@ -364,7 +362,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
-                }}
+                }, { opacity: pressed ? 0.82 : 1 }]}
               >
                 <MaterialIcons
                   name={preset.iconName}
@@ -383,7 +381,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
                 >
                   {t(preset.labelKey as any)}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>
@@ -408,15 +406,14 @@ export const HabitForm: React.FC<HabitFormProps> = ({
             const active = watchedFrequencyDays.includes(iso);
 
             return (
-              <TouchableOpacity
+              <Pressable
                 key={iso}
                 onPress={() => {
                   if (frequencyPreset === 'custom') {
                     toggleCustomDay(iso);
                   }
                 }}
-                activeOpacity={frequencyPreset === 'custom' ? 0.82 : 1}
-                style={{
+                style={({ pressed }) => [{
                   width: 36,
                   height: 36,
                   borderRadius: theme.radius.pill,
@@ -425,7 +422,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
                   backgroundColor: active ? theme.text.primary : theme.bg.surface,
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}
+                }, frequencyPreset === 'custom' ? { opacity: pressed ? 0.82 : 1 } : {}]}
               >
                 <Text
                   style={{
@@ -437,7 +434,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({
                 >
                   {t(key)}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>

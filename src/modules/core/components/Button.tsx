@@ -1,7 +1,7 @@
 /* stitch: button */
 import React from 'react';
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   ActivityIndicator,
   View,
@@ -12,6 +12,14 @@ import { useTheme } from '@core/theming';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
+
+const iconSizeMap: Record<ButtonSize, number> = { sm: 16, md: 18, lg: 20 };
+const paddingMap: Record<ButtonSize, { v: number; h: number }> = {
+  sm: { v: 9,  h: 14 },
+  md: { v: 13, h: 20 },
+  lg: { v: 16, h: 24 },
+};
+const fontSizeMap: Record<ButtonSize, number> = { sm: 12, md: 14, lg: 16 };
 
 interface ButtonProps {
   label: string;
@@ -38,14 +46,6 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const t = useTheme();
 
-  const iconSizeMap: Record<ButtonSize, number> = { sm: 16, md: 18, lg: 20 };
-  const paddingMap: Record<ButtonSize, { v: number; h: number }> = {
-    sm: { v: 9,  h: 14 },
-    md: { v: 13, h: 20 },
-    lg: { v: 16, h: 24 },
-  };
-  const fontSizeMap: Record<ButtonSize, number> = { sm: 12, md: 14, lg: 16 };
-
   const pad = paddingMap[size];
 
   const bgColor = {
@@ -70,11 +70,10 @@ export const Button: React.FC<ButtonProps> = ({
         : {};
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={disabled || loading}
-      activeOpacity={0.78}
-      style={[
+      style={({ pressed }) => [
         {
           backgroundColor: bgColor,
           borderRadius: t.radius.md,
@@ -82,7 +81,7 @@ export const Button: React.FC<ButtonProps> = ({
           paddingHorizontal: pad.h,
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: disabled ? 0.45 : 1,
+          opacity: disabled ? 0.45 : pressed ? 0.78 : 1,
         },
         borderProps,
         style,
@@ -106,6 +105,6 @@ export const Button: React.FC<ButtonProps> = ({
           {iconRight && <MaterialIcons name={iconRight} size={iconSizeMap[size]} color={textColor} />}
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };

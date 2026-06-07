@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from '../theming';
+import { useTheme } from '../theming/ThemeProvider';
 import { useSyncStore } from '../states/sync.store';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 

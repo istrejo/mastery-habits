@@ -1,5 +1,5 @@
 /* stitch: login */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Text, View, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,13 +15,13 @@ export default function LoginScreen() {
   const { t } = useTranslation();
   const { signIn, resendVerification, loading, error, resendSent } = useAuth();
   const [resending, setResending] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const pendingEmailRef = useRef<string | null>(null);
 
   const schema = useMemo(() => z.object({ email: z.string().email(t("login.error_email")), password: z.string().min(6, t("login.error_password_min")) }), [t]);
   type FormData = z.infer<typeof schema>;
   const { control, handleSubmit, formState: { errors }, getValues } = useForm<FormData>({ resolver: zodResolver(schema) });
   const onSubmit = (data: FormData) => {
-    setPendingEmail(data.email);
+    pendingEmailRef.current = data.email;
     void signIn(data.email, data.password);
   };
 
@@ -34,7 +34,7 @@ export default function LoginScreen() {
   }, [error, resendSent, t]);
 
   const onResend = () => {
-    const email = pendingEmail ?? getValues('email');
+    const email = pendingEmailRef.current ?? getValues('email');
     if (!email) return;
     setResending(true);
     void resendVerification(email).finally(() => setResending(false));

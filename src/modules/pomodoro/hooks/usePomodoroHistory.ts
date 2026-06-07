@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { pomodoroService } from '../services/pomodoro.service';
 import type { PomodoroSession } from '../types';
 
-export const usePomodoroHistory = () => {
+const usePomodoroHistory = () => {
   const [sessions, setSessions] = useState<PomodoroSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

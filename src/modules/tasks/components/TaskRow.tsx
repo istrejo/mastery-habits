@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,9 @@ export const TaskRow: React.FC<TaskRowProps> = ({ task, onToggle, onDelete }) =>
         borderBottomWidth: t.borderWidth.hairline,
       }}
     >
-      <TouchableOpacity
+      <Pressable
         onPress={() => onToggle?.(task)}
-        activeOpacity={0.7}
-        style={{
+        style={({ pressed }) => [{
           width: 22,
           height: 22,
           borderRadius: t.radius.sm,
@@ -41,10 +40,10 @@ export const TaskRow: React.FC<TaskRowProps> = ({ task, onToggle, onDelete }) =>
           backgroundColor: done ? t.status.success : 'transparent',
           alignItems: 'center',
           justifyContent: 'center',
-        }}
+        }, { opacity: pressed ? 0.7 : 1 }]}
       >
         {done && <MaterialIcons name="check" size={14} color={t.text.inverse} />}
-      </TouchableOpacity>
+      </Pressable>
 
       <View style={{ flex: 1, gap: 2 }}>
         <Text
@@ -73,9 +72,9 @@ export const TaskRow: React.FC<TaskRowProps> = ({ task, onToggle, onDelete }) =>
       </View>
 
       {onDelete && (
-        <TouchableOpacity onPress={() => onDelete(task)} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <Pressable onPress={() => onDelete(task)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}>
           <MaterialIcons name="close" size={16} color={t.text.tertiary} />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );

@@ -29,11 +29,11 @@ export const LevelProgress: React.FC<LevelProgressProps> = ({ score, style }) =>
         <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: lv.fg, fontFamily: 'Lexend_600SemiBold', letterSpacing: t.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
           {level.emoji} {levelLabel}
         </Text>
-        {nextLevel && (
+        {nextLevel ? (
           <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: t.text.tertiary, fontFamily: 'Lexend_500Medium', letterSpacing: t.typography.scale.microBold.letterSpacing, textTransform: 'uppercase' }}>
             {nextLevel.emoji} {nextLevelLabel}
           </Text>
-        )}
+        ) : null}
       </View>
       <ProgressBar value={progress} max={1} scoreColor={lv.fg} />
       <Text style={{ fontSize: t.typography.scale.microBold.fontSize, color: t.text.tertiary, marginTop: 6, fontFamily: 'Lexend_400Regular' }}>

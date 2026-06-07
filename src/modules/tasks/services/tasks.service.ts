@@ -312,15 +312,16 @@ export const tasksService = {
       .map((item) => ({ title: item.title.trim(), completed: item.completed }))
       .filter((item) => item.title);
 
-    const task = await tasksService.update(id, {
-      title,
-      description: input.notes?.trim() || null,
-    });
-
-    const { error: deleteError } = await supabase
-      .from('task_subtasks')
-      .delete()
-      .eq('task_id', id);
+    const [task, { error: deleteError }] = await Promise.all([
+      tasksService.update(id, {
+        title,
+        description: input.notes?.trim() || null,
+      }),
+      supabase
+        .from('task_subtasks')
+        .delete()
+        .eq('task_id', id),
+    ]);
 
     if (deleteError) throw new Error(deleteError.message);
 

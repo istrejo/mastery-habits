@@ -4,7 +4,7 @@ import {
   Alert,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Pressable,
   View,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -404,12 +404,12 @@ export default function HabitDetailScreen() {
               justifyContent: 'space-between',
             }}
           >
-            <TouchableOpacity
+            <Pressable
               onPress={() => setEditing(false)}
-              style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+              style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
             >
               <MaterialIcons name="close" size={22} color={theme.text.primary} />
-            </TouchableOpacity>
+            </Pressable>
             <Text
               style={{
                 color: theme.text.primary,
@@ -481,12 +481,12 @@ export default function HabitDetailScreen() {
             gap: theme.spacing.stackSm,
           }}
         >
-          <TouchableOpacity
+          <Pressable
             onPress={() => router.back()}
-            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+            style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
           >
             <MaterialIcons name="arrow-back" size={22} color={theme.text.primary} />
-          </TouchableOpacity>
+          </Pressable>
 
           <Text
             numberOfLines={1}
@@ -503,13 +503,13 @@ export default function HabitDetailScreen() {
             {habit.name}
           </Text>
 
-          <TouchableOpacity
+          <Pressable
             accessibilityLabel={t('habit_detail.open_actions')}
             onPress={() => setActionsOpen(true)}
-            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+            style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
           >
             <MaterialIcons name="more-horiz" size={22} color={theme.text.primary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <ScrollView

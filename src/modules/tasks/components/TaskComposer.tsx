@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { View, TextInput, Pressable, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@core/theming';
 import { useTranslation } from 'react-i18next';
@@ -56,13 +56,13 @@ export const TaskComposer: React.FC<TaskComposerProps> = ({ habitId, onCreated }
           fontFamily: 'Lexend_400Regular',
         }}
       />
-      <TouchableOpacity onPress={handleSubmit} disabled={!title.trim() || submitting} activeOpacity={0.7}>
+      <Pressable onPress={handleSubmit} disabled={!title.trim() || submitting} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}>
         <MaterialIcons
           name="add-circle"
           size={24}
           color={title.trim() ? t.accent.primary : t.border.default}
         />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

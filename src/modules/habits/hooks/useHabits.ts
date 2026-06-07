@@ -4,7 +4,7 @@ import { useHabitsStore } from '../states/habits.store';
 import type { HabitInsert, HabitWithScore } from '../types';
 
 export const useHabits = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { habits, setHabits, upsertHabit, removeHabit } = useHabitsStore();
 
@@ -18,7 +18,7 @@ export const useHabits = () => {
   }, [setHabits]);
 
   useEffect(() => {
-    fetchHabits();
+    void fetchHabits();
   }, [fetchHabits]);
 
   const createHabit = async (data: HabitInsert): Promise<HabitWithScore | null> => {

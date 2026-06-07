@@ -7,7 +7,7 @@ interface UseMasteryLevelResult {
   progress: number;
 }
 
-export function useMasteryLevel(score: number): UseMasteryLevelResult {
+function useMasteryLevel(score: number): UseMasteryLevelResult {
   return useMemo(
     () => ({ level: getLevel(score), progress: getLevelProgress(score) }),
     [score],

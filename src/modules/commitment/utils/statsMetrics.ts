@@ -74,6 +74,7 @@ function getCompletionWindow(
   const checkInMaps = Object.fromEntries(
     habits.map((habit) => [habit.id, getCheckInMap(checkInsByHabit[habit.id] ?? [])]),
   ) as Record<string, Map<string, CheckInRecord['status']>>;
+  const plannedDaysSets = new Map(habits.map((h) => [h.id, new Set(h.frequency_days)]));
   let completed = 0;
   let planned = 0;
 
@@ -83,7 +84,7 @@ function getCompletionWindow(
     const dateKey = formatDateKey(date);
 
     for (const habit of habits) {
-      if (!habit.frequency_days.includes(isoDay)) continue;
+      if (!plannedDaysSets.get(habit.id)!.has(isoDay)) continue;
       planned += 1;
       if (isSuccess(checkInMaps[habit.id]?.get(dateKey))) completed += 1;
     }
@@ -114,6 +115,7 @@ function getActivity30dCells(
   const checkInMaps = Object.fromEntries(
     habits.map((habit) => [habit.id, getCheckInMap(checkInsByHabit[habit.id] ?? [])]),
   ) as Record<string, Map<string, CheckInRecord['status']>>;
+  const plannedDaysSets = new Map(habits.map((h) => [h.id, new Set(h.frequency_days)]));
 
   return Array.from({ length: 30 }, (_, index) => {
     const date = subDays(todayStart, 29 - index);
@@ -123,7 +125,7 @@ function getActivity30dCells(
     let successCount = 0;
 
     for (const habit of habits) {
-      if (!habit.frequency_days.includes(isoDay)) continue;
+      if (!plannedDaysSets.get(habit.id)!.has(isoDay)) continue;
       plannedCount += 1;
       if (isSuccess(checkInMaps[habit.id]?.get(dateKey))) successCount += 1;
     }

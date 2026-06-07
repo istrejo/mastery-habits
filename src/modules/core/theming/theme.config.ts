@@ -23,7 +23,7 @@ export type EnabledThemeId = (typeof ENABLED_THEME_IDS)[number];
 
 export const DEFAULT_THEME_ID: EnabledThemeId = 'minimal-light';
 
-export const isEnabledThemeId = (value: unknown): value is EnabledThemeId =>
+const isEnabledThemeId = (value: unknown): value is EnabledThemeId =>
   typeof value === 'string' &&
   (ENABLED_THEME_IDS as readonly string[]).includes(value);
 

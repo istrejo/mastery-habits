@@ -76,7 +76,15 @@ export const usePomodoroTimer = () => {
     }
 
     prevPhaseRef.current = store.phase;
-  }, [store.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    store.status,
+    store.targetHabitId,
+    store.targetTaskId,
+    store.phase,
+    store.plannedDurationSeconds,
+    store.cycleIndex,
+    store.startedAt,
+  ]);
 
   return {
     status: store.status,

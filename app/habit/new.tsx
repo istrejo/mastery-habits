@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, Pressable } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -42,21 +42,21 @@ export default function NewHabitScreen() {
             marginBottom: theme.spacing.stackMd,
           }}
         >
-          <TouchableOpacity
+          <Pressable
             onPress={() => router.back()}
-            style={{
+            style={({ pressed }) => [{
               width: 40,
               height: 40,
               alignItems: 'center',
               justifyContent: 'center',
-            }}
+            }, { opacity: pressed ? 0.2 : 1 }]}
           >
             <MaterialIcons
               name='arrow-back'
               size={18}
               color={theme.text.primary}
             />
-          </TouchableOpacity>
+          </Pressable>
 
           <Text
             style={{

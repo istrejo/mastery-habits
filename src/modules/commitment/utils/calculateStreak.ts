@@ -78,7 +78,7 @@ export function calculateStreak(
   return { current, best: Math.max(best, current) };
 }
 
-export function calculateGlobalStreak(
+function calculateGlobalStreak(
   habits: Pick<Habit, 'id' | 'frequency_days'>[],
   checkInsByHabit: Record<string, Pick<CheckInRecord, 'check_date' | 'status'>[]>,
   today: Date = new Date(),

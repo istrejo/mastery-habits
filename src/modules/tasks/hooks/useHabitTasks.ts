@@ -23,7 +23,7 @@ export const useHabitTasks = (habitId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [habitId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [habitId, upsertTask]);
 
   useEffect(() => {
     void load();

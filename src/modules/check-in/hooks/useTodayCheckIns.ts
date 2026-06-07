@@ -32,7 +32,7 @@ export function useTodayCheckIns(): UseTodayCheckInsResult {
     } finally {
       setLoading(false);
     }
-  }, [habitIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [habitIds]);
 
   useEffect(() => {
     void load();

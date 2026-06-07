@@ -1,6 +1,9 @@
 /* stitch: today-dashboard */
 import { useState } from 'react';
-import { Alert, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+
+const dayGradient = ['#FFA726', '#FFEB3B'] as const;
+const nightGradient = ['#1A237E', '#4A148C'] as const;
+import { Alert, View, Text, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
@@ -54,20 +57,20 @@ function Header({ onAdd }: { onAdd: () => void }) {
         </Text>
         <SyncIndicator />
       </View>
-      <TouchableOpacity
+      <Pressable
         testID='today-add-task'
         onPress={onAdd}
         hitSlop={12}
-        style={{
+        style={({ pressed }) => [{
           width: 40,
           height: 40,
           borderRadius: theme.radius.pill,
           alignItems: 'center',
           justifyContent: 'center',
-        }}
+        }, { opacity: pressed ? 0.2 : 1 }]}
       >
         <MaterialIcons name='add' size={22} color={theme.text.primary} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -99,11 +102,10 @@ function FloatingAddButton({ onPress }: { onPress: () => void }) {
   const theme = useTheme();
 
   return (
-    <TouchableOpacity
+    <Pressable
       testID='today-add-task'
       onPress={onPress}
-      activeOpacity={0.9}
-      style={{
+      style={({ pressed }) => [{
         position: 'absolute',
         right: 24,
         bottom: -5,
@@ -113,15 +115,11 @@ function FloatingAddButton({ onPress }: { onPress: () => void }) {
         backgroundColor: theme.text.primary,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#000000',
-        shadowOpacity: 0.16,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 8 },
-        elevation: 6,
-      }}
+        boxShadow: [{ offsetX: 0, offsetY: 8, blurRadius: 12, color: 'rgba(0, 0, 0, 0.16)' }],
+      }, { opacity: pressed ? 0.9 : 1 }]}
     >
       <MaterialIcons name='add' size={26} color={theme.text.inverse} />
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -158,10 +156,6 @@ export default function TodayScreen() {
   // Detección simple de día/noche por hora local (6am-6pm = día)
   const currentHour = today.getHours();
   const isDaytime = currentHour >= 6 && currentHour < 18;
-
-  // Gradientes para día/noche
-  const dayGradient = ['#FFA726', '#FFEB3B'] as const;
-  const nightGradient = ['#1A237E', '#4A148C'] as const;
 
   const formatStr =
     i18n.language === 'en' ? 'EEEE, MMMM d' : "EEEE d 'de' MMMM";

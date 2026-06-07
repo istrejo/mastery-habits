@@ -90,6 +90,7 @@ jest.mock('react-native', () => {
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
+    Pressable: mock('Pressable'),
   };
 });
 
@@ -177,7 +178,7 @@ describe('HabitForm', () => {
       );
     });
 
-    const touchables = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    const touchables = tree.root.findAll((node: any) => node.type === 'Pressable');
     const customTrigger = touchables[8];
 
     act(() => {
@@ -202,21 +203,23 @@ describe('HabitForm', () => {
       );
     });
 
-    let touchables = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    let touchables = tree.root.findAll((node: any) => node.type === 'Pressable');
     const customFrequencyTrigger = touchables[11];
 
     act(() => {
       customFrequencyTrigger.props.onPress();
     });
 
-    touchables = tree.root.findAll((node: any) => node.type === 'TouchableOpacity');
+    touchables = tree.root.findAll((node: any) => node.type === 'Pressable');
     const mondayChip = touchables[12];
 
     act(() => {
       mondayChip.props.onPress();
     });
 
-    expect(mondayChip.props.activeOpacity).toBe(0.82);
+    const styleFn = mondayChip.props.style;
+    const [, pressedStyle] = styleFn({ pressed: true });
+    expect(pressedStyle.opacity).toBe(0.82);
   });
 
   it('submits a HabitInsert payload without changing the existing API shape', async () => {

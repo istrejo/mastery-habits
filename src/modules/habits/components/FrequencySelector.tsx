@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@core/theming';
 
@@ -9,19 +9,19 @@ interface FrequencySelectorProps {
   error?: string;
 }
 
+const DAYS: { iso: number; labelKey: `frequency.day_mon` | `frequency.day_tue` | `frequency.day_wed` | `frequency.day_thu` | `frequency.day_fri` | `frequency.day_sat` | `frequency.day_sun` }[] = [
+  { iso: 1, labelKey: 'frequency.day_mon' },
+  { iso: 2, labelKey: 'frequency.day_tue' },
+  { iso: 3, labelKey: 'frequency.day_wed' },
+  { iso: 4, labelKey: 'frequency.day_thu' },
+  { iso: 5, labelKey: 'frequency.day_fri' },
+  { iso: 6, labelKey: 'frequency.day_sat' },
+  { iso: 7, labelKey: 'frequency.day_sun' },
+];
+
 export const FrequencySelector: React.FC<FrequencySelectorProps> = ({ value, onChange, error }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-
-  const DAYS: { iso: number; labelKey: `frequency.day_mon` | `frequency.day_tue` | `frequency.day_wed` | `frequency.day_thu` | `frequency.day_fri` | `frequency.day_sat` | `frequency.day_sun` }[] = [
-    { iso: 1, labelKey: 'frequency.day_mon' },
-    { iso: 2, labelKey: 'frequency.day_tue' },
-    { iso: 3, labelKey: 'frequency.day_wed' },
-    { iso: 4, labelKey: 'frequency.day_thu' },
-    { iso: 5, labelKey: 'frequency.day_fri' },
-    { iso: 6, labelKey: 'frequency.day_sat' },
-    { iso: 7, labelKey: 'frequency.day_sun' },
-  ];
 
   const toggle = (iso: number) => {
     if (value.includes(iso)) {
@@ -46,11 +46,10 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({ value, onC
         {DAYS.map(({ iso, labelKey }) => {
           const active = value.includes(iso);
           return (
-            <TouchableOpacity
+            <Pressable
               key={iso}
               onPress={() => toggle(iso)}
-              activeOpacity={0.78}
-              style={{
+              style={({ pressed }) => [{
                 flex: 1,
                 aspectRatio: 1,
                 alignItems: 'center',
@@ -59,7 +58,7 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({ value, onC
                 borderWidth: active ? theme.borderWidth.bold : theme.borderWidth.default,
                 backgroundColor: active ? theme.accent.primary : theme.bg.surface,
                 borderColor: active ? theme.accent.primary : theme.border.default,
-              }}
+              }, { opacity: pressed ? 0.78 : 1 }]}
             >
               <Text style={{
                 color: active ? theme.accent.onPrimary : theme.text.secondary,
@@ -68,7 +67,7 @@ export const FrequencySelector: React.FC<FrequencySelectorProps> = ({ value, onC
               }}>
                 {t(labelKey)}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </View>

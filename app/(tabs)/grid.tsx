@@ -1,5 +1,5 @@
 /* stitch: power-grid */
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,7 +37,7 @@ function MetricCard({
         <Text
           style={{
             color: theme.text.secondary,
-            fontSize: 10,
+            fontSize: 12,
             fontFamily: 'Lexend_600SemiBold',
             textTransform: 'uppercase',
             letterSpacing: 1,
@@ -99,6 +99,38 @@ function LegendItem({
   );
 }
 
+function CellContent({ cell }: { cell: PowerGridDayCell }) {
+  const theme = useTheme();
+
+  if (cell.state === 'active') {
+    return (
+      <Text style={{ fontSize: 28, textAlign: 'center' }}>{cell.icon ?? '⚡'}</Text>
+    );
+  }
+
+  if (cell.state === 'missed') {
+    return (
+      <MaterialIcons
+        name='close'
+        size={28}
+        color={theme.text.tertiary}
+      />
+    );
+  }
+
+  if (cell.state === 'today') {
+    return (
+      <MaterialIcons
+        name='add-circle-outline'
+        size={28}
+        color={theme.accent.primary}
+      />
+    );
+  }
+
+  return <View style={{ height: 28 }} />;
+}
+
 export default function PowerGridScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -116,36 +148,6 @@ export default function PowerGridScreen() {
     goPrevWindow,
     goNextWindow,
   } = usePowerGridMonth();
-
-  const renderCellContent = (cell: PowerGridDayCell) => {
-    if (cell.state === 'active') {
-      return (
-        <Text style={{ fontSize: 28, textAlign: 'center' }}>{cell.icon ?? '⚡'}</Text>
-      );
-    }
-
-    if (cell.state === 'missed') {
-      return (
-        <MaterialIcons
-          name='close'
-          size={28}
-          color={theme.text.tertiary}
-        />
-      );
-    }
-
-    if (cell.state === 'today') {
-      return (
-        <MaterialIcons
-          name='add-circle-outline'
-          size={28}
-          color={theme.accent.primary}
-        />
-      );
-    }
-
-    return <View style={{ height: 28 }} />;
-  };
 
   const getCellPalette = (cell: PowerGridDayCell) => {
     const previousMonthOpacity = cell.isOutsideReferenceMonth ? 0.48 : 1;
@@ -221,19 +223,19 @@ export default function PowerGridScreen() {
         >
           {t('dashboard.app_name')}
         </Text>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.push('/habit/new')}
           hitSlop={12}
-          style={{
+          style={({ pressed }) => [{
             width: 40,
             height: 40,
             borderRadius: theme.radius.pill,
             alignItems: 'center',
             justifyContent: 'center',
-          }}
+          }, { opacity: pressed ? 0.2 : 1 }]}
         >
           <MaterialIcons name='add' size={22} color={theme.text.primary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <View
@@ -331,10 +333,10 @@ export default function PowerGridScreen() {
               </View>
 
               <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
-                <TouchableOpacity
+                <Pressable
                   onPress={goPrevWindow}
                   hitSlop={8}
-                  style={{
+                  style={({ pressed }) => [{
                     width: 32,
                     height: 32,
                     borderRadius: theme.radius.sm,
@@ -342,20 +344,20 @@ export default function PowerGridScreen() {
                     borderColor: theme.accent.primary,
                     alignItems: 'center',
                     justifyContent: 'center',
-                  }}
+                  }, { opacity: pressed ? 0.2 : 1 }]}
                 >
                   <MaterialIcons
                     name='chevron-left'
                     size={20}
                     color={theme.accent.primary}
                   />
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
+                <Pressable
                   onPress={goNextWindow}
                   disabled={!canGoNext}
                   hitSlop={8}
-                  style={{
+                  style={({ pressed }) => [{
                     width: 32,
                     height: 32,
                     borderRadius: theme.radius.sm,
@@ -364,14 +366,14 @@ export default function PowerGridScreen() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     opacity: canGoNext ? 1 : 0.35,
-                  }}
+                  }, canGoNext ? { opacity: pressed ? 0.2 : 1 } : {}]}
                 >
                   <MaterialIcons
                     name='chevron-right'
                     size={20}
                     color={theme.accent.primary}
                   />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
 
@@ -387,14 +389,13 @@ export default function PowerGridScreen() {
                 const isPressable = cell.state === 'active' && !!cell.habitId;
 
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={cell.date}
                     disabled={!isPressable}
-                    activeOpacity={0.82}
                     onPress={() => {
                       if (cell.habitId) router.push(`/habit/${cell.habitId}`);
                     }}
-                    style={{
+                    style={({ pressed }) => [{
                       width: '48.5%',
                       aspectRatio: 1,
                       backgroundColor: palette.backgroundColor,
@@ -410,7 +411,7 @@ export default function PowerGridScreen() {
                       justifyContent: 'space-between',
                       opacity: palette.opacity,
                       position: 'relative',
-                    }}
+                    }, isPressable ? { opacity: (palette.opacity ?? 1) * (pressed ? 0.82 : 1) } : {}]}
                   >
                     {cell.state === 'today' ? (
                       <View
@@ -438,10 +439,10 @@ export default function PowerGridScreen() {
                       {cell.dayNumber}
                     </Text>
 
-                    {renderCellContent(cell)}
+                    <CellContent cell={cell} />
 
                     <View style={{ height: 12 }} />
-                  </TouchableOpacity>
+                </Pressable>
                 );
               })}
             </View>

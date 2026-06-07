@@ -11,7 +11,9 @@ interface SkeletonProps {
 
 export const Skeleton: React.FC<SkeletonProps> = ({ width = '100%', height = 16, borderRadius, style }) => {
   const t = useTheme();
-  const opacity = useRef(new Animated.Value(0.45)).current;
+  const opacityRef = useRef<Animated.Value | null>(null);
+  if (opacityRef.current === null) opacityRef.current = new Animated.Value(0.45);
+  const opacity = opacityRef.current;
 
   useEffect(() => {
     const anim = Animated.loop(

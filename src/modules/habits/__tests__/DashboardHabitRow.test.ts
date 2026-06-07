@@ -55,6 +55,7 @@ jest.mock('react-native', () => {
     View: mock('View'),
     Text: mock('Text'),
     TouchableOpacity: mock('TouchableOpacity'),
+    Pressable: mock('Pressable'),
   };
 });
 

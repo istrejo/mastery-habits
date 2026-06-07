@@ -6,7 +6,7 @@ import {
 } from './theme.config';
 import type { ThemeTokens } from './types';
 
-export const ThemeContext = createContext<ThemeTokens>(getThemeById(DEFAULT_THEME_ID));
+const ThemeContext = createContext<ThemeTokens>(getThemeById(DEFAULT_THEME_ID));
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

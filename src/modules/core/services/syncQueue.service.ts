@@ -111,9 +111,9 @@ export const syncQueueService = {
     useSyncStore.getState().setSyncing(true);
 
     for (const operationId of queuedIds) {
-      const currentOperation = (await this.getAll()).find(
-        (operation) => operation.id === operationId
-      );
+      const queue = await this.getAll();
+      const operationMap = new Map(queue.map((op) => [op.id, op]));
+      const currentOperation = operationMap.get(operationId);
 
       if (!currentOperation) continue;
 

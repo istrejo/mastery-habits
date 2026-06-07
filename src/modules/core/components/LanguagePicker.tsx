@@ -52,7 +52,7 @@ export const LanguagePicker: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <Text style={{ fontSize: 9, color: theme.accent.onPrimary, fontWeight: '800' }}>✓</Text>
+                <Text style={{ fontSize: 10, color: theme.accent.onPrimary, fontWeight: '800' }}>✓</Text>
               </View>
             )}
           </Pressable>

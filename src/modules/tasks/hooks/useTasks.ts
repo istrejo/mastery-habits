@@ -21,7 +21,7 @@ export const useTasks = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [setTasks]);
 
   useEffect(() => {
     void load();

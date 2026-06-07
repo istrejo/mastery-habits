@@ -51,7 +51,7 @@ function getCheckInMap(checkIns: HabitDetailCheckInLike[]) {
   return map;
 }
 
-export function getWeekStartMonday(today: Date = new Date()): Date {
+function getWeekStartMonday(today: Date = new Date()): Date {
   const start = startOfDay(today);
   const isoDay = ((start.getDay() + 6) % 7) + 1;
   return subDays(start, isoDay - 1);
@@ -106,6 +106,7 @@ export function getMonthlyCompletion(
   windowDays = 30,
 ): CompletionSummary {
   const checkInMap = getCheckInMap(checkIns);
+  const plannedDaysSet = new Set(frequencyDays);
   const todayStart = startOfDay(today);
   let completed = 0;
   let planned = 0;
@@ -114,7 +115,7 @@ export function getMonthlyCompletion(
     const date = subDays(todayStart, windowDays - index - 1);
     const isoDay = ((date.getDay() + 6) % 7) + 1;
 
-    if (!frequencyDays.includes(isoDay)) continue;
+    if (!plannedDaysSet.has(isoDay)) continue;
 
     planned += 1;
     const status = checkInMap.get(formatDateKey(date));

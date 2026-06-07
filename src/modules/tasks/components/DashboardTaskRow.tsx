@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   Animated,
 } from 'react-native';
@@ -25,8 +25,12 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
   theme,
 }) => {
   const subtaskDone = subtask.status === 'completed';
-  const colorAnim = useRef(new Animated.Value(subtaskDone ? 1 : 0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const colorAnimRef = useRef<Animated.Value | null>(null);
+  if (colorAnimRef.current === null) colorAnimRef.current = new Animated.Value(subtaskDone ? 1 : 0);
+  const colorAnim = colorAnimRef.current;
+  const scaleAnimRef = useRef<Animated.Value | null>(null);
+  if (scaleAnimRef.current === null) scaleAnimRef.current = new Animated.Value(1);
+  const scaleAnim = scaleAnimRef.current;
 
   useEffect(() => {
     Animated.parallel([
@@ -64,11 +68,10 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
         transform: [{ scale: scaleAnim }],
       }}
     >
-      <TouchableOpacity
+      <Pressable
         testID={`dashboard-subtask-check-${subtask.id}`}
         onPress={onPress}
-        activeOpacity={0.82}
-        style={{
+        style={({ pressed }) => [{
           width: 20,
           height: 20,
           borderRadius: theme.radius.pill,
@@ -77,12 +80,12 @@ const AnimatedSubtaskRow: React.FC<AnimatedSubtaskRowProps> = ({
           backgroundColor: subtaskDone ? theme.text.primary : 'transparent',
           alignItems: 'center',
           justifyContent: 'center',
-        }}
+        }, { opacity: pressed ? 0.82 : 1 }]}
       >
         {subtaskDone ? (
           <MaterialIcons name='check' size={13} color={theme.text.inverse} />
         ) : null}
-      </TouchableOpacity>
+      </Pressable>
       <Animated.Text
         numberOfLines={1}
         style={{
@@ -140,9 +143,15 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
   const metaText =
     task.description || (habitName ? `Habit: ${habitName}` : 'Standalone task');
 
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const checkOpacity = useRef(new Animated.Value(0)).current;
-  const progressAnim = useRef(new Animated.Value(progressPercent)).current;
+  const scaleAnimRef = useRef<Animated.Value | null>(null);
+  if (scaleAnimRef.current === null) scaleAnimRef.current = new Animated.Value(1);
+  const scaleAnim = scaleAnimRef.current;
+  const checkOpacityRef = useRef<Animated.Value | null>(null);
+  if (checkOpacityRef.current === null) checkOpacityRef.current = new Animated.Value(0);
+  const checkOpacity = checkOpacityRef.current;
+  const progressAnimRef = useRef<Animated.Value | null>(null);
+  if (progressAnimRef.current === null) progressAnimRef.current = new Animated.Value(progressPercent);
+  const progressAnim = progressAnimRef.current;
 
   useEffect(() => {
     Animated.timing(progressAnim, {
@@ -206,11 +215,10 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
       ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-        <TouchableOpacity
+        <Pressable
           onPress={onPressCheck}
           disabled={checkDisabled || submitting}
-          activeOpacity={0.82}
-          style={{
+          style={({ pressed }) => [{
             width: 28,
             height: 28,
             borderRadius: theme.radius.pill,
@@ -221,7 +229,7 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
             justifyContent: 'center',
             marginRight: theme.spacing.stackSm,
             marginTop: 2,
-          }}
+          }, { opacity: pressed ? 0.82 : 1 }]}
           testID={`dashboard-task-row-check-${task.id}`}
         >
           {submitting ? (
@@ -269,12 +277,11 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
               />
             </Animated.View>
           ) : null}
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           onPress={onPressRow}
-          activeOpacity={0.82}
-          style={{ flex: 1, paddingRight: theme.spacing.stackSm }}
+          style={({ pressed }) => [{ flex: 1, paddingRight: theme.spacing.stackSm }, { opacity: pressed ? 0.82 : 1 }]}
           testID={`dashboard-task-row-body-${task.id}`}
         >
           <View>
@@ -381,11 +388,11 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
               </View>
             ) : null}
           </View>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           onPress={onPressRow}
-          activeOpacity={0.82}
+          style={({ pressed }) => [{ opacity: pressed ? 0.82 : 1 }]}
           testID={`dashboard-task-row-chevron-${task.id}`}
         >
           <MaterialIcons
@@ -393,7 +400,7 @@ export const DashboardTaskRow: React.FC<DashboardTaskRowProps> = ({
             size={20}
             color={theme.text.tertiary}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

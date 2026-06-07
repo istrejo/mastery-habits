@@ -19,8 +19,12 @@ export const Toast: React.FC<ToastProps> = ({
 }) => {
   const theme = useTheme();
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(-40)).current;
+  const opacityRef = useRef<Animated.Value | null>(null);
+  if (opacityRef.current === null) opacityRef.current = new Animated.Value(0);
+  const opacity = opacityRef.current;
+  const translateYRef = useRef<Animated.Value | null>(null);
+  if (translateYRef.current === null) translateYRef.current = new Animated.Value(-40);
+  const translateY = translateYRef.current;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fadeOutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -143,11 +147,7 @@ export const Toast: React.FC<ToastProps> = ({
           gap: theme.spacing.stackSm,
           borderWidth: theme.borderWidth.default,
           borderColor: palette.bg,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 6,
+          boxShadow: [{ offsetX: 0, offsetY: 4, blurRadius: 8, color: 'rgba(0, 0, 0, 0.15)' }],
         }}
       >
         <Text

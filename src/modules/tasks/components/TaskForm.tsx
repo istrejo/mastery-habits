@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from '@core/theming';
@@ -19,10 +19,12 @@ interface TaskFormProps {
   submitting?: boolean;
 }
 
+const EMPTY_HABIT_OPTIONS: HabitOption[] = [];
+
 export const TaskForm: React.FC<TaskFormProps> = ({
   defaultValues,
   habitId,
-  habitOptions = [],
+  habitOptions = EMPTY_HABIT_OPTIONS,
   onSubmit,
   submitting = false,
 }) => {
@@ -130,41 +132,39 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             name="habit_id"
             render={({ field: { value, onChange } }) => (
               <View style={{ gap: t.spacing.stackSm }}>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => onChange(null)}
-                  activeOpacity={0.8}
-                  style={{
+                  style={({ pressed }) => [{
                     borderColor: value ? t.border.default : t.text.primary,
                     borderWidth: value ? t.borderWidth.default : t.borderWidth.bold,
                     borderRadius: t.radius.md,
                     padding: t.spacing.stackSm,
                     backgroundColor: value ? 'transparent' : t.bg.surfaceAlt,
-                  }}
+                  }, { opacity: pressed ? 0.8 : 1 }]}
                 >
                   <Text style={{ color: t.text.primary, fontFamily: 'Lexend_500Medium' }}>
                     {i18n('tasks.form.habit_none')}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
 
                 {habitOptions.map((habit) => {
                   const selected = value === habit.id;
                   return (
-                    <TouchableOpacity
+                    <Pressable
                       key={habit.id}
                       onPress={() => onChange(habit.id)}
-                      activeOpacity={0.8}
-                      style={{
+                      style={({ pressed }) => [{
                         borderColor: selected ? t.text.primary : t.border.default,
                         borderWidth: selected ? t.borderWidth.bold : t.borderWidth.default,
                         borderRadius: t.radius.md,
                         padding: t.spacing.stackSm,
                         backgroundColor: selected ? t.bg.surfaceAlt : 'transparent',
-                      }}
+                      }, { opacity: pressed ? 0.8 : 1 }]}
                     >
                       <Text style={{ color: t.text.primary, fontFamily: 'Lexend_500Medium' }}>
                         {habit.name}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -173,23 +173,22 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         </View>
       ) : null}
 
-      <TouchableOpacity
+      <Pressable
         onPress={handleSubmit(onSubmit)}
         disabled={submitting}
-        activeOpacity={0.8}
-        style={{
+        style={({ pressed }) => [{
           backgroundColor: t.accent.primary,
           borderRadius: t.radius.md,
           padding: t.spacing.stackMd,
           alignItems: 'center',
-          opacity: submitting ? 0.6 : 1,
+          opacity: submitting ? 0.6 : pressed ? 0.8 : 1,
           marginTop: t.spacing.stackMd,
-        }}
+        }]}
       >
         <Text style={{ color: t.accent.onPrimary, fontFamily: 'Lexend_600SemiBold', fontSize: 15 }}>
           {i18n('tasks.form.submit_create')}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </ScrollView>
   );
 };

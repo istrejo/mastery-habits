@@ -1,5 +1,5 @@
 import "../global.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
 import { Anton_400Regular } from "@expo-google-fonts/anton";
@@ -22,7 +22,7 @@ function AuthGate() {
   const router = useRouter();
   const segments = useSegments();
   const { session, setSession } = useSessionStore();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useRef(false);
   const [sessionResolved, setSessionResolved] = useState(false);
 
   useEffect(() => {
@@ -54,11 +54,11 @@ function AuthGate() {
   }, [setSession]);
 
   useEffect(() => {
-    setMounted(true);
+    mounted.current = true;
   }, []);
 
   useEffect(() => {
-    if (!mounted || !sessionResolved) return;
+    if (!mounted.current || !sessionResolved) return;
     const inAuthGroup = segments[0] === "(auth)";
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");

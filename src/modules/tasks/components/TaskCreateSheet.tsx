@@ -8,7 +8,7 @@ import {
   ScrollView,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   View,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -39,7 +39,9 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const translateY = useRef(new Animated.Value(600)).current;
+  const translateYRef = useRef<Animated.Value | null>(null);
+  if (translateYRef.current === null) translateYRef.current = new Animated.Value(600);
+  const translateY = translateYRef.current;
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [subtasks, setSubtasks] = useState<
@@ -65,7 +67,12 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
     }
   }, [visible, translateY]);
 
-  useEffect(() => {
+  const prevTaskRef = useRef(task);
+  const prevVisibleRef = useRef(visible);
+
+  if (task !== prevTaskRef.current || visible !== prevVisibleRef.current) {
+    prevTaskRef.current = task;
+    prevVisibleRef.current = visible;
     if (task && visible) {
       setTitle(task.title);
       setNotes(task.description || '');
@@ -82,7 +89,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
       setSubtasks([]);
       setSubtaskDraft('');
     }
-  }, [task, visible]);
+  }
 
   const panResponder = useMemo(
     () =>
@@ -192,8 +199,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
         keyboardVerticalOffset={0}
         style={{ flex: 1, justifyContent: 'flex-end' }}
       >
-        <TouchableOpacity
-          activeOpacity={1}
+        <Pressable
           onPress={onClose}
           style={{
             flex: 1,
@@ -216,7 +222,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
               maxHeight: '86%',
             }}
           >
-            <TouchableOpacity activeOpacity={1} onPress={() => undefined}>
+            <Pressable onPress={() => undefined}>
               <View
                 style={{
                   alignItems: 'center',
@@ -241,12 +247,11 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                   marginBottom: theme.spacing.stackMd,
                 }}
               >
-                <TouchableOpacity
+                <Pressable
                   testID='task-sheet-close-top'
                   onPress={onClose}
                   hitSlop={12}
-                  activeOpacity={0.82}
-                  style={{
+                  style={({ pressed }) => [{
                     width: 52,
                     height: 52,
                     borderRadius: theme.radius.pill,
@@ -255,16 +260,16 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                     backgroundColor: theme.bg.surface,
                     alignItems: 'center',
                     justifyContent: 'center',
-                  }}
+                  }, { opacity: pressed ? 0.82 : 1 }]}
                 >
                   <MaterialIcons
                     name='close'
                     size={30}
                     color={theme.text.primary}
                   />
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
+                <Pressable
                   testID='task-sheet-submit'
                   accessibilityLabel={
                     isEditMode
@@ -273,14 +278,12 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                   }
                   onPress={handleSubmit}
                   disabled={!title.trim() || submitting}
-                  activeOpacity={0.85}
-                  style={{
+                  style={({ pressed }) => [{
                     backgroundColor: theme.accent.primary,
                     borderRadius: theme.radius.lg,
                     paddingHorizontal: theme.spacing.stackMd,
                     paddingVertical: theme.spacing.stackSm,
-                    opacity: !title.trim() || submitting ? 0.5 : 1,
-                  }}
+                  }, { opacity: !title.trim() || submitting ? 0.5 : pressed ? 0.85 : 1 }]}
                 >
                   <Text
                     style={{
@@ -291,7 +294,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                   >
                     {t(isEditMode ? 'tasks.sheet.save' : 'tasks.sheet.create')}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
               <ScrollView
@@ -364,11 +367,10 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                           gap: theme.spacing.stackSm,
                         }}
                       >
-                        <TouchableOpacity
+                        <Pressable
                           testID={`task-sheet-subtask-checkbox-${index}`}
                           onPress={() => toggleSubtaskCompleted(index)}
-                          activeOpacity={0.82}
-                          style={{
+                          style={({ pressed }) => [{
                             width: 24,
                             height: 24,
                             borderRadius: theme.radius.sm,
@@ -379,7 +381,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                               : 'transparent',
                             alignItems: 'center',
                             justifyContent: 'center',
-                          }}
+                          }, { opacity: pressed ? 0.82 : 1 }]}
                         >
                           {subtask.completed && (
                             <MaterialIcons
@@ -388,7 +390,7 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                               color={theme.accent.onPrimary}
                             />
                           )}
-                        </TouchableOpacity>
+                        </Pressable>
                         {isEditing ? (
                           <TextInput
                             testID={`task-sheet-subtask-edit-input-${index}`}
@@ -410,10 +412,9 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                             }}
                           />
                         ) : (
-                          <TouchableOpacity
+                          <Pressable
                             onPress={() => startEditingSubtask(index)}
-                            activeOpacity={0.82}
-                            style={{ flex: 1 }}
+                            style={({ pressed }) => [{ flex: 1 }, { opacity: pressed ? 0.82 : 1 }]}
                           >
                             <Text
                               numberOfLines={1}
@@ -432,28 +433,27 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                             >
                               {subtask.title}
                             </Text>
-                          </TouchableOpacity>
+                          </Pressable>
                         )}
                         {isEditing && (
-                          <TouchableOpacity
+                          <Pressable
                             testID={`task-sheet-subtask-delete-${index}`}
                             onPress={() => {
                               removeSubtask(index);
                               setEditingSubtaskIndex(null);
                               setEditingSubtaskText('');
                             }}
-                            activeOpacity={0.82}
                             hitSlop={8}
-                            style={{
+                            style={({ pressed }) => [{
                               padding: 4,
-                            }}
+                            }, { opacity: pressed ? 0.82 : 1 }]}
                           >
                             <MaterialIcons
                               name='delete-outline'
                               size={20}
                               color={theme.text.tertiary}
                             />
-                          </TouchableOpacity>
+                          </Pressable>
                         )}
                       </View>
                     );
@@ -465,10 +465,9 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                       gap: theme.spacing.stackSm,
                     }}
                   >
-                    <TouchableOpacity
+                    <Pressable
                       onPress={commitSubtaskDraft}
-                      activeOpacity={0.82}
-                      style={{
+                      style={({ pressed }) => [{
                         width: 24,
                         height: 24,
                         borderRadius: theme.radius.sm,
@@ -476,14 +475,14 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                         borderColor: theme.text.tertiary,
                         alignItems: 'center',
                         justifyContent: 'center',
-                      }}
+                      }, { opacity: pressed ? 0.82 : 1 }]}
                     >
                       <MaterialIcons
                         name='add'
                         size={18}
                         color={theme.text.tertiary}
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                     <TextInput
                       testID='task-sheet-add-subtask-input'
                       value={subtaskDraft}
@@ -506,9 +505,9 @@ export const TaskCreateSheet: React.FC<TaskCreateSheetProps> = ({
                   </View>
                 </View>
               </ScrollView>
-            </TouchableOpacity>
+            </Pressable>
           </Animated.View>
-        </TouchableOpacity>
+        </Pressable>
       </KeyboardAvoidingView>
     </Modal>
   );

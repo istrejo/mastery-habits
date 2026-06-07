@@ -134,7 +134,7 @@ function buildPowerGridDays({
               score: habit?.mastery_scores?.score ?? 0,
             };
           })
-          .sort((a, b) => b.score - a.score)[0];
+          .reduce((best, current) => current.score > best.score ? current : best);
 
         if (bestRecord?.habit) {
           icon = resolveCategory(bestRecord.habit).emoji;
