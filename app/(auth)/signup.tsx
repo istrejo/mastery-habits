@@ -89,7 +89,7 @@ export default function SignupScreen() {
               <PasswordField
                 label="Password"
                 placeholder="••••••••"
-                helper="Must be at least 8 characters long."
+                helper="Min 8 chars, uppercase, number, and special character."
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
