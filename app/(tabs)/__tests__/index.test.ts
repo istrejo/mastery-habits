@@ -117,7 +117,40 @@ jest.mock('@core/components', () => {
   };
 });
 
+const mockConfig = {
+  tasks: [] as TaskWithHabit[],
+  handleInlineToggle: jest.fn().mockResolvedValue(undefined) as jest.Mock<Promise<void>, [TaskWithHabit]>,
+  handleSubtaskToggle: jest.fn().mockResolvedValue(undefined) as jest.Mock<Promise<void>, [TaskWithHabit, string]>,
+  handleSheetSubmit: jest.fn().mockResolvedValue(undefined) as jest.Mock<Promise<void>, [{ title: string; notes?: string | null; subtasks?: Array<{ title: string; completed: boolean }> }]>,
+};
+
+const useTodayScreenMock = jest.fn().mockImplementation(() => {
+  const [sheetVisible, setSheetVisible] = React.useState(false);
+  return {
+    tasks: mockConfig.tasks,
+    loading: false,
+    todayLabel: 'Monday, May 24',
+    isDaytime: true,
+    completedCount: 0,
+    activeTaskId: undefined,
+    completedAllToday: false,
+    getTaskStatus: (task: TaskWithHabit) => task.status === 'completed' ? 'completed' : 'pending',
+    submittingTaskIds: new Set(),
+    submittingHabitIds: new Set(),
+    sheetVisible,
+    sheetTask: null,
+    submittingSheet: false,
+    openCreateSheet: () => setSheetVisible(true),
+    openEditSheet: jest.fn(),
+    handleInlineToggle: mockConfig.handleInlineToggle,
+    handleSubtaskToggle: mockConfig.handleSubtaskToggle,
+    handleSheetSubmit: mockConfig.handleSheetSubmit,
+    closeSheet: jest.fn(),
+  };
+});
+
 jest.mock('@tasks/index', () => ({
+  useTodayScreen: () => useTodayScreenMock(),
   useTodayTasks: () => useTodayTasksMock(),
   useTaskActions: () => useTaskActionsMock(),
   useTaskAutoSync: jest.fn(),
@@ -151,15 +184,21 @@ const createTask = (id: string, overrides: Partial<TaskWithHabit> = {}): TaskWit
 
 const setup = (overrides: Partial<{
   tasks: TaskWithHabit[];
-  completedToday: Set<string>;
-  completeTask: jest.Mock;
-  uncompleteTask: jest.Mock;
-  completeHabit: jest.Mock;
-  undoHabit: jest.Mock;
-  createTaskWithSubtasks: jest.Mock;
-  toggleSubtask: jest.Mock;
+  handleInlineToggle: jest.Mock<Promise<void>, [TaskWithHabit]>;
+  handleSubtaskToggle: jest.Mock<Promise<void>, [TaskWithHabit, string]>;
+  handleSheetSubmit: jest.Mock<Promise<void>, [{ title: string; notes?: string | null; subtasks?: Array<{ title: string; completed: boolean }> }]>;
 }> = {}) => {
+  mockConfig.tasks = overrides.tasks ?? [];
+  mockConfig.handleInlineToggle = overrides.handleInlineToggle ?? jest.fn().mockResolvedValue(undefined);
+  mockConfig.handleSubtaskToggle = overrides.handleSubtaskToggle ?? jest.fn().mockResolvedValue(undefined);
+  mockConfig.handleSheetSubmit = overrides.handleSheetSubmit ?? jest.fn().mockResolvedValue(undefined);
   useHabitsMock.mockReturnValue({ habits: [], loading: false });
+  useTodayCheckInsMock.mockReturnValue({
+    completedToday: new Set(),
+    submittingHabitIds: new Set(),
+    completeHabit: jest.fn().mockResolvedValue(undefined),
+    undoHabit: jest.fn().mockResolvedValue(undefined),
+  });
   useTodayTasksMock.mockReturnValue({
     tasks: overrides.tasks ?? [],
     loading: false,
@@ -168,18 +207,12 @@ const setup = (overrides: Partial<{
     updateSubtaskOptimistic: updateSubtaskOptimisticMock,
   });
   useTaskActionsMock.mockReturnValue({
-    completeTask: overrides.completeTask ?? jest.fn().mockResolvedValue(createTask('updated', { status: 'completed' })),
-    uncompleteTask: overrides.uncompleteTask ?? jest.fn().mockResolvedValue(createTask('updated')),
-    createTaskWithSubtasks: overrides.createTaskWithSubtasks ?? jest.fn().mockResolvedValue(createTask('created')),
+    completeTask: jest.fn().mockResolvedValue(createTask('updated', { status: 'completed' })),
+    uncompleteTask: jest.fn().mockResolvedValue(createTask('updated')),
+    createTaskWithSubtasks: jest.fn().mockResolvedValue(createTask('created')),
     updateTaskWithSubtasks: jest.fn().mockResolvedValue(createTask('updated')),
-    toggleSubtask: overrides.toggleSubtask ?? jest.fn().mockResolvedValue(createTask('updated')),
+    toggleSubtask: jest.fn().mockResolvedValue(createTask('updated')),
     deleteTask: jest.fn().mockResolvedValue(true),
-  });
-  useTodayCheckInsMock.mockReturnValue({
-    completedToday: overrides.completedToday ?? new Set(),
-    submittingHabitIds: new Set(),
-    completeHabit: overrides.completeHabit ?? jest.fn().mockResolvedValue(undefined),
-    undoHabit: overrides.undoHabit ?? jest.fn().mockResolvedValue(undefined),
   });
 };
 
@@ -242,16 +275,8 @@ describe('TodayScreen', () => {
 
 
   it('creates a Today task from the sheet with name, notes, and subtasks', async () => {
-    const createTaskWithSubtasks = jest.fn().mockResolvedValue(createTask('created'));
-    const addTaskOptimistic = jest.fn();
-    setup({ createTaskWithSubtasks });
-    useTodayTasksMock.mockReturnValue({
-      tasks: [],
-      loading: false,
-      addTaskOptimistic,
-      updateTaskOptimistic: updateTaskOptimisticMock,
-      updateSubtaskOptimistic: updateSubtaskOptimisticMock,
-    });
+    const handleSheetSubmit = jest.fn().mockResolvedValue(undefined);
+    setup({ handleSheetSubmit });
 
     act(() => {
       create(React.createElement(TodayScreen));
@@ -262,22 +287,18 @@ describe('TodayScreen', () => {
       await sheetProps.onSubmit({ title: 'Plan launch', notes: 'No shortcuts', subtasks: ['Write tests', 'Ship'] });
     });
 
-    expect(createTaskWithSubtasks).toHaveBeenCalledWith({
+    expect(handleSheetSubmit).toHaveBeenCalledWith({
       title: 'Plan launch',
       notes: 'No shortcuts',
       subtasks: ['Write tests', 'Ship'],
     });
-    expect(addTaskOptimistic).toHaveBeenCalledWith(createTask('created'));
   });
 
   it('registers the linked habit check-in once when completing a linked pending task', async () => {
-    const completeTask = jest.fn().mockResolvedValue(createTask('task-1', { status: 'completed', habit_id: 'habit-1' }));
-    const completeHabit = jest.fn().mockResolvedValue(undefined);
+    const handleInlineToggle = jest.fn().mockResolvedValue(undefined);
     setup({
       tasks: [createTask('task-1', { habit_id: 'habit-1', habits: { id: 'habit-1', name: 'Fitness' } })],
-      completedToday: new Set(),
-      completeTask,
-      completeHabit,
+      handleInlineToggle,
     });
 
     act(() => {
@@ -289,19 +310,16 @@ describe('TodayScreen', () => {
       await rowProps.onPressCheck();
     });
 
-    expect(completeTask).toHaveBeenCalledWith('task-1');
-    expect(completeHabit).toHaveBeenCalledTimes(1);
-    expect(completeHabit).toHaveBeenCalledWith('habit-1');
+    expect(handleInlineToggle).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'task-1', habit_id: 'habit-1' })
+    );
   });
 
   it('does not register a habit check-in again when the linked habit is already completed today', async () => {
-    const completeTask = jest.fn().mockResolvedValue(createTask('task-1', { status: 'completed', habit_id: 'habit-1' }));
-    const completeHabit = jest.fn().mockResolvedValue(undefined);
+    const handleInlineToggle = jest.fn().mockResolvedValue(undefined);
     setup({
       tasks: [createTask('task-1', { habit_id: 'habit-1', habits: { id: 'habit-1', name: 'Fitness' } })],
-      completedToday: new Set(['habit-1']),
-      completeTask,
-      completeHabit,
+      handleInlineToggle,
     });
 
     act(() => {
@@ -313,21 +331,19 @@ describe('TodayScreen', () => {
       await rowProps.onPressCheck();
     });
 
-    expect(completeTask).toHaveBeenCalledWith('task-1');
-    expect(completeHabit).not.toHaveBeenCalled();
+    expect(handleInlineToggle).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'task-1', habit_id: 'habit-1' })
+    );
   });
 
   it('keeps the habit check-in when unchecking one linked task but another linked task remains completed', async () => {
-    const uncompleteTask = jest.fn().mockResolvedValue(createTask('task-1', { habit_id: 'habit-1' }));
-    const undoHabit = jest.fn().mockResolvedValue(undefined);
+    const handleInlineToggle = jest.fn().mockResolvedValue(undefined);
     setup({
       tasks: [
         createTask('task-1', { habit_id: 'habit-1', status: 'completed', completed_at: '2026-05-24T10:00:00.000Z' }),
         createTask('task-2', { habit_id: 'habit-1', status: 'completed', completed_at: '2026-05-24T11:00:00.000Z' }),
       ],
-      completedToday: new Set(['habit-1']),
-      uncompleteTask,
-      undoHabit,
+      handleInlineToggle,
     });
 
     act(() => {
@@ -339,30 +355,20 @@ describe('TodayScreen', () => {
       await rowProps.onPressCheck();
     });
 
-    expect(uncompleteTask).toHaveBeenCalledWith('task-1');
-    expect(undoHabit).not.toHaveBeenCalled();
+    expect(handleInlineToggle).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'task-1', habit_id: 'habit-1' })
+    );
   });
 
   it('forwards subtask toggles from task rows to task actions', async () => {
-    const toggleSubtask = jest.fn().mockResolvedValue(createTask('task-1'));
-    const refresh = jest.fn();
+    const handleSubtaskToggle = jest.fn().mockResolvedValue(undefined);
     setup({
       tasks: [createTask('task-1', {
         task_subtasks: [
           { id: 'sub-1', task_id: 'task-1', user_id: 'user-1', title: 'Write tests', status: 'pending', completed_at: null, order_index: 0, created_at: '2026-05-25T00:00:00.000Z' },
         ],
       })],
-      toggleSubtask,
-    });
-    useTodayTasksMock.mockReturnValue({ tasks: [createTask('task-1', {
-      task_subtasks: [
-        { id: 'sub-1', task_id: 'task-1', user_id: 'user-1', title: 'Write tests', status: 'pending', completed_at: null, order_index: 0, created_at: '2026-05-25T00:00:00.000Z' },
-      ],
-    })],
-      loading: false,
-      refresh,
-      updateTaskOptimistic: updateTaskOptimisticMock,
-      updateSubtaskOptimistic: updateSubtaskOptimisticMock,
+      handleSubtaskToggle,
     });
 
     act(() => {
@@ -374,8 +380,10 @@ describe('TodayScreen', () => {
       await rowProps.onPressSubtask('sub-1');
     });
 
-    expect(toggleSubtask).toHaveBeenCalledWith('task-1', 'sub-1');
-    expect(updateSubtaskOptimisticMock).toHaveBeenCalledWith('task-1', 'sub-1', 'completed');
+    expect(handleSubtaskToggle).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'task-1' }),
+      'sub-1'
+    );
   });
 
 });

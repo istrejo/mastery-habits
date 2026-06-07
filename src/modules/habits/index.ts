@@ -1,5 +1,6 @@
 export { useHabits } from './hooks/useHabits';
 export { useHabit } from './hooks/useHabit';
+export { useHabitDetailScreen } from './hooks/useHabitDetailScreen';
 export { habitsService } from './services/habits.service';
 export { useHabitsStore } from './states/habits.store';
 export { HabitCard } from './components/HabitCard';

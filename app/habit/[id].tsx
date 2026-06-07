@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   Text,
   Pressable,
@@ -11,28 +9,19 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { format, subDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, Modal, Screen } from '@core/components';
 import { useTheme } from '@core/theming';
 import {
   CategoryBadge,
   HabitForm,
-  useHabit,
-  useHabits,
+  useHabitDetailScreen,
 } from '@habits/index';
-import type { HabitInsert } from '@habits/index';
 import type { HabitCategoryId } from '@habits/constants/categories';
-import {
-  getAverageSuccessfulCheckInsPerWeek,
-  getMonthlyCompletion,
-  getWeeklyRhythm,
-  type WeeklyRhythmStatus,
-} from '@habits/utils/habitDetailMetrics';
-import { CheckInButton, useCheckIn, type CheckInRecord } from '@checkin/index';
-import { calculateStreak } from '@commitment/index';
-import { getLevel, getLocalizedLevelLabel, LevelProgress, MasteryBadge, type LevelKey } from '@progression/index';
-import { useHabitTasks, useTaskActions, TaskComposer, TaskList } from '@tasks/index';
-import type { Task } from '@tasks/index';
+import type { HabitInsert } from '@habits/index';
+import type { WeeklyRhythmStatus } from '@habits/utils/habitDetailMetrics';
+import { CheckInButton, type CheckInRecord } from '@checkin/index';
+import { getLocalizedLevelLabel, LevelProgress, MasteryBadge, type LevelKey } from '@progression/index';
+import { TaskComposer, TaskList } from '@tasks/index';
 
 const completionRingBase = {
   width: 108,
@@ -587,188 +576,201 @@ function BottomCheckInBar({
   );
 }
 
-export default function HabitDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+function HabitMomentumCard({
+  habit,
+  streak,
+  score,
+  monthlyCompletion,
+}: {
+  habit: NonNullable<ReturnType<typeof useHabitDetailScreen>['habit']>;
+  streak: { current: number; best: number };
+  score: number;
+  monthlyCompletion: { percent: number; completed: number; planned: number };
+}) {
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const router = useRouter();
-  const { habit, loading, error, updateHabit } = useHabit(id);
-  const { archiveHabit } = useHabits();
-  const {
-    todayCheckIn,
-    last30Days,
-    allCheckIns,
-    canCheckInToday,
-    alreadyCheckedIn,
-    skipAvailable,
-    loading: checkInLoading,
-    errorCode: checkInErrorCode,
-    markCompleted,
-    markSkipped,
-  } = useCheckIn(habit ?? null);
 
-  const { tasks: habitTasks, refresh: refreshTasks } = useHabitTasks(id ?? '');
-  const { completeTask, uncompleteTask, deleteTask } = useTaskActions();
-
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [actionsOpen, setActionsOpen] = useState(false);
-
-  const handleToggleTask = async (task: Task) => {
-    if (task.status === 'completed') {
-      await uncompleteTask(task.id);
-    } else {
-      await completeTask(task.id);
-    }
-    await refreshTasks();
-  };
-
-  const handleDeleteTask = async (task: Task) => {
-    await deleteTask(task.id);
-    await refreshTasks();
-  };
-
-  const DAY_LABELS: Record<number, string> = {
-    1: t('habit_detail.day_mon'),
-    2: t('habit_detail.day_tue'),
-    3: t('habit_detail.day_wed'),
-    4: t('habit_detail.day_thu'),
-    5: t('habit_detail.day_fri'),
-    6: t('habit_detail.day_sat'),
-    7: t('habit_detail.day_sun'),
-  };
-
-  const handleUpdate = async (data: HabitInsert) => {
-    setSaving(true);
-    await updateHabit(data);
-    setSaving(false);
-    setEditing(false);
-  };
-
-  const handleArchive = () => {
-    Alert.alert(
-      t('habit_detail.archive_title'),
-      t('habit_detail.archive_body'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('habit_detail.archive_button'),
-          style: 'destructive',
-          onPress: async () => {
-            await archiveHabit(id);
-            router.replace('/(tabs)');
-          },
-        },
-      ],
-    );
-  };
-
-  const openEdit = () => {
-    setActionsOpen(false);
-    setEditing(true);
-  };
-
-  const archiveFromActions = () => {
-    setActionsOpen(false);
-    handleArchive();
-  };
-
-  const bottomBarPadding = Math.max(insets.bottom, theme.spacing.stackSm);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error || !habit) {
-    return <ErrorDisplay message={error ?? t('habit_detail.not_found')} />;
-  }
-
-  const score = habit.mastery_scores?.score ?? 0;
-  const days = habit.frequency_days as number[];
-  const streak = calculateStreak(habit, allCheckIns);
-  const level = getLevel(score);
-  const monthlyCompletion = getMonthlyCompletion(days, last30Days);
-  const avgPerWeek = getAverageSuccessfulCheckInsPerWeek(last30Days);
-  const weeklyRhythm = getWeeklyRhythm(days, last30Days);
-  const weekStart = weeklyRhythm[0]?.date;
-  const weekEnd = weeklyRhythm[6]?.date;
-  const weeklyCompletions = weeklyRhythm.filter(
-    (day) => day.status === 'completed' || day.status === 'skipped',
-  ).length;
-
-  if (editing) {
-    return (
-      <Screen
-        style={{ flex: 1 }}
-        contentStyle={{
-          paddingHorizontal: 0,
-          paddingTop: 0,
-          paddingBottom: 0,
+  return (
+    <Card style={{ marginBottom: theme.spacing.stackMd }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: theme.spacing.stackMd,
         }}
       >
         <View style={{ flex: 1 }}>
-          <View
-            style={[
-              habitHeaderRowBase,
-              {
-                paddingHorizontal: theme.spacing.marginMobile,
-                paddingTop: theme.spacing.stackSm,
-                paddingBottom: theme.spacing.stackSm,
-                borderBottomWidth: theme.borderWidth.default,
-                borderBottomColor: theme.border.default,
-                backgroundColor: theme.bg.base,
-              },
-            ]}
+          <Text
+            style={{
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: 'Lexend_600SemiBold',
+              letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+              textTransform: 'uppercase',
+              marginBottom: theme.spacing.stackSm,
+            }}
           >
-            <Pressable
-              onPress={() => setEditing(false)}
-              style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
-            >
-              <MaterialIcons name="close" size={22} color={theme.text.primary} />
-            </Pressable>
+            {t('habit_detail.current_momentum')}
+          </Text>
+
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
             <Text
               style={{
                 color: theme.text.primary,
-                fontSize: theme.typography.scale.labelCaps.fontSize,
-                fontFamily: 'Lexend_600SemiBold',
-                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                textTransform: 'uppercase',
+                fontSize: theme.typography.scale.displaySm.fontSize,
+                lineHeight: theme.typography.scale.displaySm.lineHeight,
+                fontFamily: 'Anton_400Regular',
+                letterSpacing: theme.typography.scale.displaySm.letterSpacing,
+                fontVariant: ['tabular-nums'],
               }}
             >
-              {t('habit_detail.edit_title')}
+              {streak.current}
             </Text>
-            <View style={{ width: 40 }} />
+            <Text
+              style={{
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.titleSm.fontSize,
+                fontFamily: 'Anton_400Regular',
+                letterSpacing: theme.typography.scale.titleSm.letterSpacing,
+              }}
+            >
+              {t('stats.days')}
+            </Text>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={{ paddingHorizontal: theme.spacing.marginMobile, paddingTop: theme.spacing.stackMd }}>
-              <HabitForm
-                defaultValues={{
-                  name: habit.name,
-                  description: habit.description ?? '',
-                  category: habit.category as HabitCategoryId,
-                  custom_label: habit.custom_label ?? '',
-                  custom_emoji: habit.custom_emoji ?? '✨',
-                  frequency_days: days,
-                }}
-                onSubmit={handleUpdate}
-                submitLabel={t('habit_detail.save_changes')}
-                loading={saving}
-              />
-              <Button
-                label={t('common.cancel')}
-                variant="ghost"
-                onPress={() => setEditing(false)}
-                style={{ marginTop: theme.spacing.stackSm }}
-              />
-            </View>
-            <View style={{ height: theme.spacing.stackLg }} />
-          </ScrollView>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: theme.spacing.stackSm,
+              marginTop: theme.spacing.stackSm,
+              marginBottom: theme.spacing.stackSm,
+            }}
+          >
+            <CategoryBadge habit={habit} size="md" showLabel />
+            <MasteryBadge score={score} />
+          </View>
+
+          {habit.description ? (
+            <Text
+              style={{
+                color: theme.text.secondary,
+                fontSize: theme.typography.scale.bodyMain.fontSize,
+                lineHeight: theme.typography.scale.bodyMain.lineHeight,
+                fontFamily: 'Lexend_400Regular',
+              }}
+            >
+              {habit.description}
+            </Text>
+          ) : null}
         </View>
-      </Screen>
-    );
-  }
+
+        <CompletionRing
+          percent={monthlyCompletion.percent}
+          label={t('habit_detail.monthly_completion')}
+        />
+      </View>
+
+      {habit.category === 'custom' && habit.custom_label === 'Sin categorizar' ? (
+        <View
+          style={{
+            marginTop: theme.spacing.stackMd,
+            padding: theme.spacing.stackSm,
+            borderLeftWidth: 3,
+            borderLeftColor: theme.text.secondary,
+            backgroundColor: theme.bg.base,
+            borderRadius: theme.radius.sm,
+          }}
+        >
+          <Text
+            style={{
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              fontFamily: 'Lexend_500Medium',
+            }}
+          >
+            💡 {t('custom_category.uncategorized_banner')}
+          </Text>
+        </View>
+      ) : null}
+
+      <View style={{ marginTop: theme.spacing.stackMd }}>
+        <LevelProgress score={score} />
+      </View>
+    </Card>
+  );
+}
+
+function HabitMainView({
+  habit,
+  id,
+  todayCheckIn,
+  last30Days,
+  canCheckInToday,
+  alreadyCheckedIn,
+  skipAvailable,
+  checkInLoading,
+  checkInErrorCode,
+  markCompleted,
+  markSkipped,
+  habitTasks,
+  refreshTasks,
+  actionsOpen,
+  setActionsOpen,
+  handleToggleTask,
+  handleDeleteTask,
+  DAY_LABELS,
+  openEdit,
+  archiveFromActions,
+  bottomBarPadding,
+  score,
+  days,
+  streak,
+  level,
+  monthlyCompletion,
+  avgPerWeek,
+  weeklyRhythm,
+  weekStart,
+  weekEnd,
+  weeklyCompletions,
+}: {
+  habit: NonNullable<ReturnType<typeof useHabitDetailScreen>['habit']>;
+  id: string | undefined;
+  todayCheckIn: ReturnType<typeof useHabitDetailScreen>['todayCheckIn'];
+  last30Days: ReturnType<typeof useHabitDetailScreen>['last30Days'];
+  canCheckInToday: boolean;
+  alreadyCheckedIn: boolean;
+  skipAvailable: boolean;
+  checkInLoading: boolean;
+  checkInErrorCode: string | null;
+  markCompleted: () => Promise<void>;
+  markSkipped: () => Promise<void>;
+  habitTasks: ReturnType<typeof useHabitDetailScreen>['habitTasks'];
+  refreshTasks: () => Promise<void>;
+  actionsOpen: boolean;
+  setActionsOpen: (open: boolean) => void;
+  handleToggleTask: (task: Task) => Promise<void>;
+  handleDeleteTask: (task: Task) => Promise<void>;
+  DAY_LABELS: Record<number, string>;
+  openEdit: () => void;
+  archiveFromActions: () => void;
+  bottomBarPadding: number;
+  score: number;
+  days: number[];
+  streak: { current: number; best: number };
+  level: ReturnType<typeof useHabitDetailScreen>['level'];
+  monthlyCompletion: ReturnType<typeof useHabitDetailScreen>['monthlyCompletion'];
+  avgPerWeek: number;
+  weeklyRhythm: ReturnType<typeof useHabitDetailScreen>['weeklyRhythm'];
+  weekStart: Date | undefined;
+  weekEnd: Date | undefined;
+  weeklyCompletions: number;
+}) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <Screen
@@ -788,115 +790,12 @@ export default function HabitDetailScreen() {
 
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={{ paddingHorizontal: theme.spacing.marginMobile, paddingTop: theme.spacing.stackMd }}>
-              <Card style={{ marginBottom: theme.spacing.stackMd }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    gap: theme.spacing.stackMd,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        color: theme.text.secondary,
-                        fontSize: theme.typography.scale.labelCaps.fontSize,
-                        fontFamily: 'Lexend_600SemiBold',
-                        letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
-                        textTransform: 'uppercase',
-                        marginBottom: theme.spacing.stackSm,
-                      }}
-                    >
-                      {t('habit_detail.current_momentum')}
-                    </Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
-                      <Text
-                        style={{
-                          color: theme.text.primary,
-                          fontSize: theme.typography.scale.displaySm.fontSize,
-                          lineHeight: theme.typography.scale.displaySm.lineHeight,
-                          fontFamily: 'Anton_400Regular',
-                          letterSpacing: theme.typography.scale.displaySm.letterSpacing,
-                          fontVariant: ['tabular-nums'],
-                        }}
-                      >
-                        {streak.current}
-                      </Text>
-                      <Text
-                        style={{
-                          color: theme.text.primary,
-                          fontSize: theme.typography.scale.titleSm.fontSize,
-                          fontFamily: 'Anton_400Regular',
-                          letterSpacing: theme.typography.scale.titleSm.letterSpacing,
-                        }}
-                      >
-                        {t('stats.days')}
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        alignItems: 'center',
-                        gap: theme.spacing.stackSm,
-                        marginTop: theme.spacing.stackSm,
-                        marginBottom: theme.spacing.stackSm,
-                      }}
-                    >
-                      <CategoryBadge habit={habit} size="md" showLabel />
-                      <MasteryBadge score={score} />
-                    </View>
-
-                    {habit.description ? (
-                      <Text
-                        style={{
-                          color: theme.text.secondary,
-                          fontSize: theme.typography.scale.bodyMain.fontSize,
-                          lineHeight: theme.typography.scale.bodyMain.lineHeight,
-                          fontFamily: 'Lexend_400Regular',
-                        }}
-                      >
-                        {habit.description}
-                      </Text>
-                    ) : null}
-                  </View>
-
-                  <CompletionRing
-                    percent={monthlyCompletion.percent}
-                    label={t('habit_detail.monthly_completion')}
-                  />
-                </View>
-
-                {habit.category === 'custom' && habit.custom_label === 'Sin categorizar' ? (
-                  <View
-                    style={{
-                      marginTop: theme.spacing.stackMd,
-                      padding: theme.spacing.stackSm,
-                      borderLeftWidth: 3,
-                      borderLeftColor: theme.text.secondary,
-                      backgroundColor: theme.bg.base,
-                      borderRadius: theme.radius.sm,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: theme.text.secondary,
-                        fontSize: theme.typography.scale.microBold.fontSize,
-                        fontFamily: 'Lexend_500Medium',
-                      }}
-                    >
-                      💡 {t('custom_category.uncategorized_banner')}
-                    </Text>
-                  </View>
-                ) : null}
-
-                <View style={{ marginTop: theme.spacing.stackMd }}>
-                  <LevelProgress score={score} />
-                </View>
-              </Card>
+              <HabitMomentumCard
+                habit={habit}
+                streak={streak}
+                score={score}
+                monthlyCompletion={monthlyCompletion}
+              />
 
               <WeeklyRhythmSection
                 weeklyRhythm={weeklyRhythm}
@@ -1044,5 +943,168 @@ export default function HabitDetailScreen() {
         </Modal>
       </View>
     </Screen>
+  );
+}
+
+export default function HabitDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const router = useRouter();
+
+  const {
+    habit,
+    loading,
+    error,
+    todayCheckIn,
+    last30Days,
+    canCheckInToday,
+    alreadyCheckedIn,
+    skipAvailable,
+    checkInLoading,
+    checkInErrorCode,
+    markCompleted,
+    markSkipped,
+    habitTasks,
+    refreshTasks,
+    editing,
+    setEditing,
+    saving,
+    actionsOpen,
+    setActionsOpen,
+    handleToggleTask,
+    handleDeleteTask,
+    DAY_LABELS,
+    handleUpdate,
+    openEdit,
+    archiveFromActions,
+    bottomBarPadding,
+    score,
+    days,
+    streak,
+    level,
+    monthlyCompletion,
+    avgPerWeek,
+    weeklyRhythm,
+    weekStart,
+    weekEnd,
+    weeklyCompletions,
+  } = useHabitDetailScreen(id);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error || !habit) {
+    return <ErrorDisplay message={error ?? t('habit_detail.not_found')} />;
+  }
+
+  if (editing) {
+    return (
+      <Screen
+        style={{ flex: 1 }}
+        contentStyle={{
+          paddingHorizontal: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <View
+            style={[
+              habitHeaderRowBase,
+              {
+                paddingHorizontal: theme.spacing.marginMobile,
+                paddingTop: theme.spacing.stackSm,
+                paddingBottom: theme.spacing.stackSm,
+                borderBottomWidth: theme.borderWidth.default,
+                borderBottomColor: theme.border.default,
+                backgroundColor: theme.bg.base,
+              },
+            ]}
+          >
+            <Pressable
+              onPress={() => setEditing(false)}
+              style={({ pressed }) => [{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }, { opacity: pressed ? 0.2 : 1 }]}
+            >
+              <MaterialIcons name="close" size={22} color={theme.text.primary} />
+            </Pressable>
+            <Text
+              style={{
+                color: theme.text.primary,
+                fontSize: theme.typography.scale.labelCaps.fontSize,
+                fontFamily: 'Lexend_600SemiBold',
+                letterSpacing: theme.typography.scale.labelCaps.letterSpacing,
+                textTransform: 'uppercase',
+              }}
+            >
+              {t('habit_detail.edit_title')}
+            </Text>
+            <View style={{ width: 40 }} />
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={{ paddingHorizontal: theme.spacing.marginMobile, paddingTop: theme.spacing.stackMd }}>
+              <HabitForm
+                defaultValues={{
+                  name: habit.name,
+                  description: habit.description ?? '',
+                  category: habit.category as HabitCategoryId,
+                  custom_label: habit.custom_label ?? '',
+                  custom_emoji: habit.custom_emoji ?? '✨',
+                  frequency_days: days,
+                }}
+                onSubmit={handleUpdate}
+                submitLabel={t('habit_detail.save_changes')}
+                loading={saving}
+              />
+              <Button
+                label={t('common.cancel')}
+                variant="ghost"
+                onPress={() => setEditing(false)}
+                style={{ marginTop: theme.spacing.stackSm }}
+              />
+            </View>
+            <View style={{ height: theme.spacing.stackLg }} />
+          </ScrollView>
+        </View>
+      </Screen>
+    );
+  }
+
+  return (
+    <HabitMainView
+      habit={habit}
+      id={id}
+      todayCheckIn={todayCheckIn}
+      last30Days={last30Days}
+      canCheckInToday={canCheckInToday}
+      alreadyCheckedIn={alreadyCheckedIn}
+      skipAvailable={skipAvailable}
+      checkInLoading={checkInLoading}
+      checkInErrorCode={checkInErrorCode}
+      markCompleted={markCompleted}
+      markSkipped={markSkipped}
+      habitTasks={habitTasks}
+      refreshTasks={refreshTasks}
+      actionsOpen={actionsOpen}
+      setActionsOpen={setActionsOpen}
+      handleToggleTask={handleToggleTask}
+      handleDeleteTask={handleDeleteTask}
+      DAY_LABELS={DAY_LABELS}
+      openEdit={openEdit}
+      archiveFromActions={archiveFromActions}
+      bottomBarPadding={bottomBarPadding}
+      score={score}
+      days={days}
+      streak={streak}
+      level={level}
+      monthlyCompletion={monthlyCompletion}
+      avgPerWeek={avgPerWeek}
+      weeklyRhythm={weeklyRhythm}
+      weekStart={weekStart}
+      weekEnd={weekEnd}
+      weeklyCompletions={weeklyCompletions}
+    />
   );
 }

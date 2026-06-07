@@ -5,6 +5,7 @@ export { useTodayCheckIns } from './hooks/useTodayCheckIns';
 export { CheckInButton } from './components/CheckInButton';
 export { isPlannedDay } from './utils/isPlannedDay';
 export { hasUsedSkipThisWeek } from './utils/hasUsedSkipThisWeek';
+export { getPowerGridCellPalette } from './utils/getPowerGridCellPalette';
 export type { CheckInRecord } from './services/checkin.service';
 export type {
   PowerGridDayCell,

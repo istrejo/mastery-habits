@@ -8,6 +8,7 @@ import { Screen, Card } from '@core/components';
 import { useTheme } from '@core/theming';
 import {
   usePowerGridMonth,
+  getPowerGridCellPalette,
   type PowerGridDayCell,
 } from '@checkin/index';
 
@@ -181,6 +182,174 @@ function CellContent({ cell }: { cell: PowerGridDayCell }) {
   return <View style={{ height: 28 }} />;
 }
 
+function PowerGridCalendar({
+  days,
+  monthLabel,
+  rangeLabel,
+  canGoNext,
+  goPrevWindow,
+  goNextWindow,
+}: {
+  days: PowerGridDayCell[];
+  monthLabel: string;
+  rangeLabel: string;
+  canGoNext: boolean;
+  goPrevWindow: () => void;
+  goNextWindow: () => void;
+}) {
+  const theme = useTheme();
+  const router = useRouter();
+
+  return (
+    <Card style={{ gap: theme.spacing.stackMd }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <View style={{ gap: 4 }}>
+          <Text
+            style={{
+              color: theme.text.primary,
+              fontSize: theme.typography.scale.labelCaps.fontSize,
+              fontFamily: 'Anton_400Regular',
+              textTransform: 'uppercase',
+            }}
+          >
+            {monthLabel}
+          </Text>
+          <Text
+            style={{
+              color: theme.text.secondary,
+              fontSize: theme.typography.scale.microBold.fontSize,
+              fontFamily: 'Lexend_400Regular',
+              textTransform: 'uppercase',
+            }}
+          >
+            {rangeLabel}
+          </Text>
+        </View>
+
+        <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
+          <Pressable
+            onPress={goPrevWindow}
+            hitSlop={8}
+            style={({ pressed }) => [{
+              width: 32,
+              height: 32,
+              borderRadius: theme.radius.sm,
+              borderWidth: theme.borderWidth.default,
+              borderColor: theme.accent.primary,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }, { opacity: pressed ? 0.2 : 1 }]}
+          >
+            <MaterialIcons
+              name='chevron-left'
+              size={20}
+              color={theme.accent.primary}
+            />
+          </Pressable>
+
+          <Pressable
+            onPress={goNextWindow}
+            disabled={!canGoNext}
+            hitSlop={8}
+            style={({ pressed }) => [{
+              width: 32,
+              height: 32,
+              borderRadius: theme.radius.sm,
+              borderWidth: theme.borderWidth.default,
+              borderColor: theme.accent.primary,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: canGoNext ? 1 : 0.35,
+            }, canGoNext ? { opacity: pressed ? 0.2 : 1 } : {}]}
+          >
+            <MaterialIcons
+              name='chevron-right'
+              size={20}
+              color={theme.accent.primary}
+            />
+          </Pressable>
+        </View>
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing.stackSm,
+        }}
+      >
+        {days.map((cell) => {
+          const palette = getPowerGridCellPalette(cell, theme);
+          const isPressable = cell.state === 'active' && !!cell.habitId;
+
+          return (
+            <Pressable
+              key={cell.date}
+              disabled={!isPressable}
+              onPress={() => {
+                if (cell.habitId) router.push(`/habit/${cell.habitId}`);
+              }}
+              style={({ pressed }) => [{
+                width: '48.5%',
+                aspectRatio: 1,
+                backgroundColor: palette.backgroundColor,
+                borderColor: palette.borderColor,
+                borderStyle: palette.borderStyle,
+                borderWidth:
+                  cell.state === 'today'
+                    ? theme.borderWidth.bold
+                    : theme.borderWidth.default,
+                borderRadius: theme.radius.md,
+                padding: theme.spacing.stackSm,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                opacity: palette.opacity,
+                position: 'relative',
+              }, isPressable ? { opacity: (palette.opacity ?? 1) * (pressed ? 0.82 : 1) } : {}]}
+            >
+              {cell.state === 'today' ? (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: 14,
+                    height: 14,
+                    backgroundColor: theme.accent.primary,
+                    borderBottomLeftRadius: theme.radius.sm,
+                  }}
+                />
+              ) : null}
+
+              <Text
+                style={{
+                  color: palette.textColor,
+                  fontSize: theme.typography.scale.microBold.fontSize,
+                  fontFamily: 'Lexend_600SemiBold',
+                  fontVariant: ['tabular-nums'],
+                  opacity: palette.dayOpacity,
+                }}
+              >
+                {cell.dayNumber}
+              </Text>
+
+              <CellContent cell={cell} />
+
+              <View style={{ height: 12 }} />
+            </Pressable>
+          );
+        })}
+      </View>
+    </Card>
+  );
+}
+
 export default function PowerGridScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -198,59 +367,6 @@ export default function PowerGridScreen() {
     goPrevWindow,
     goNextWindow,
   } = usePowerGridMonth();
-
-  const getCellPalette = (cell: PowerGridDayCell) => {
-    const previousMonthOpacity = cell.isOutsideReferenceMonth ? 0.48 : 1;
-
-    switch (cell.state) {
-      case 'active':
-        return {
-          backgroundColor: theme.accent.primary,
-          borderColor: theme.accent.primary,
-          borderStyle: 'solid' as const,
-          textColor: theme.accent.onPrimary,
-          dayOpacity: 0.72,
-          opacity: previousMonthOpacity,
-        };
-      case 'missed':
-        return {
-          backgroundColor: theme.bg.surfaceAlt,
-          borderColor: theme.border.default,
-          borderStyle: 'solid' as const,
-          textColor: theme.text.secondary,
-          dayOpacity: 0.6,
-          opacity: 0.85 * previousMonthOpacity,
-        };
-      case 'today':
-        return {
-          backgroundColor: theme.bg.surface,
-          borderColor: theme.accent.primary,
-          borderStyle: 'solid' as const,
-          textColor: theme.accent.primary,
-          dayOpacity: 1,
-          opacity: previousMonthOpacity,
-        };
-      case 'future':
-        return {
-          backgroundColor: 'transparent',
-          borderColor: theme.border.default,
-          borderStyle: 'dashed' as const,
-          textColor: theme.text.tertiary,
-          dayOpacity: 0.55,
-          opacity: 0.6 * previousMonthOpacity,
-        };
-      case 'not_planned':
-      default:
-        return {
-          backgroundColor: theme.bg.surface,
-          borderColor: theme.border.default,
-          borderStyle: 'solid' as const,
-          textColor: theme.text.tertiary,
-          dayOpacity: 0.55,
-          opacity: 0.8 * previousMonthOpacity,
-        };
-    }
-  };
 
   return (
     <Screen scrollable>
@@ -351,152 +467,14 @@ export default function PowerGridScreen() {
         </Card>
       ) : (
         <View style={{ gap: theme.spacing.stackMd }}>
-          <Card style={{ gap: theme.spacing.stackMd }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <View style={{ gap: 4 }}>
-                <Text
-                  style={{
-                    color: theme.text.primary,
-                    fontSize: theme.typography.scale.labelCaps.fontSize,
-                    fontFamily: 'Anton_400Regular',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {monthLabel}
-                </Text>
-                <Text
-                  style={{
-                    color: theme.text.secondary,
-                    fontSize: theme.typography.scale.microBold.fontSize,
-                    fontFamily: 'Lexend_400Regular',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {rangeLabel}
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', gap: theme.spacing.stackSm }}>
-                <Pressable
-                  onPress={goPrevWindow}
-                  hitSlop={8}
-                  style={({ pressed }) => [{
-                    width: 32,
-                    height: 32,
-                    borderRadius: theme.radius.sm,
-                    borderWidth: theme.borderWidth.default,
-                    borderColor: theme.accent.primary,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }, { opacity: pressed ? 0.2 : 1 }]}
-                >
-                  <MaterialIcons
-                    name='chevron-left'
-                    size={20}
-                    color={theme.accent.primary}
-                  />
-                </Pressable>
-
-                <Pressable
-                  onPress={goNextWindow}
-                  disabled={!canGoNext}
-                  hitSlop={8}
-                  style={({ pressed }) => [{
-                    width: 32,
-                    height: 32,
-                    borderRadius: theme.radius.sm,
-                    borderWidth: theme.borderWidth.default,
-                    borderColor: theme.accent.primary,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: canGoNext ? 1 : 0.35,
-                  }, canGoNext ? { opacity: pressed ? 0.2 : 1 } : {}]}
-                >
-                  <MaterialIcons
-                    name='chevron-right'
-                    size={20}
-                    color={theme.accent.primary}
-                  />
-                </Pressable>
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                gap: theme.spacing.stackSm,
-              }}
-            >
-              {days.map((cell) => {
-                const palette = getCellPalette(cell);
-                const isPressable = cell.state === 'active' && !!cell.habitId;
-
-                return (
-                  <Pressable
-                    key={cell.date}
-                    disabled={!isPressable}
-                    onPress={() => {
-                      if (cell.habitId) router.push(`/habit/${cell.habitId}`);
-                    }}
-                    style={({ pressed }) => [{
-                      width: '48.5%',
-                      aspectRatio: 1,
-                      backgroundColor: palette.backgroundColor,
-                      borderColor: palette.borderColor,
-                      borderStyle: palette.borderStyle,
-                      borderWidth:
-                        cell.state === 'today'
-                          ? theme.borderWidth.bold
-                          : theme.borderWidth.default,
-                      borderRadius: theme.radius.md,
-                      padding: theme.spacing.stackSm,
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      opacity: palette.opacity,
-                      position: 'relative',
-                    }, isPressable ? { opacity: (palette.opacity ?? 1) * (pressed ? 0.82 : 1) } : {}]}
-                  >
-                    {cell.state === 'today' ? (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          width: 14,
-                          height: 14,
-                          backgroundColor: theme.accent.primary,
-                          borderBottomLeftRadius: theme.radius.sm,
-                        }}
-                      />
-                    ) : null}
-
-                    <Text
-                      style={{
-                        color: palette.textColor,
-                        fontSize: theme.typography.scale.microBold.fontSize,
-                        fontFamily: 'Lexend_600SemiBold',
-                        fontVariant: ['tabular-nums'],
-                        opacity: palette.dayOpacity,
-                      }}
-                    >
-                      {cell.dayNumber}
-                    </Text>
-
-                    <CellContent cell={cell} />
-
-                    <View style={{ height: 12 }} />
-                </Pressable>
-                );
-              })}
-            </View>
-          </Card>
+          <PowerGridCalendar
+            days={days}
+            monthLabel={monthLabel}
+            rangeLabel={rangeLabel}
+            canGoNext={canGoNext}
+            goPrevWindow={goPrevWindow}
+            goNextWindow={goNextWindow}
+          />
 
           <View style={{ gap: theme.spacing.stackSm }}>
             <MetricCard
