@@ -1,6 +1,8 @@
-# Master Prompt: Mastery Habits — Ionic + Angular Standalone
+# Master Prompt: Mastery Habits — Ionic + Angular 21 (Standalone)
 
-> **Objetivo:** Reconstruir la app **Mastery Habits** (actualmente en Expo + React Native) usando **Ionic + Angular** en modo **standalone** (sin `NgModules`), manteniendo la misma lógica de negocio, las mismas tablas de Supabase y la misma división de funcionalidades por feature.
+> **Contexto:** Este prompt se ejecuta **dentro de un proyecto Ionic + Angular ya existente** creado previamente con `ionic start`. No se debe crear el proyecto desde cero. Solo instalar dependencias faltantes y escribir código.
+>
+> **Objetivo:** Implementar la app **Mastery Habits** usando **Ionic + Angular 21** en modo **standalone** (sin `NgModules`), manteniendo la misma lógica de negocio, las mismas tablas de Supabase y la misma división de funcionalidades por feature.
 
 ---
 
@@ -49,7 +51,7 @@ Recrear **exactamente** estas pantallas. El enrutamiento usa Angular Router + Io
 
 | Capa | Tecnología | Notas |
 |------|-----------|-------|
-| Framework | **Angular 17+** | Modo **standalone** obligatorio. Sin `NgModule`. |
+| Framework | **Angular 21** | Standalone por defecto. Zoneless change detection opcional. Signals-first. |
 | UI / Mobile | **Ionic 8+** | `@ionic/angular/standalone`. Usar `ion-*` components. |
 | Router | **Angular Router** | Lazy loading con `loadComponent`. Guards funcionales con `inject()`. |
 | Backend / Auth | **Supabase** | Reutilizar el proyecto existente (`nvpkgrqfzrcwgigztymp`). |
@@ -149,16 +151,18 @@ src/
 
 ---
 
-## 6. Reglas de Oro — Angular Standalone Moderno
+## 6. Reglas de Oro — Angular 21 Standalone Moderno
 
 1. **No `NgModule`**: Todo es `standalone: true`. Importar componentes/directivas directamente en el `imports` array de cada componente.
-2. **Nueva sintaxis de control flow**: Usar `@if`, `@for`, `@switch` en templates. **NO** usar `*ngIf`, `*ngFor`.
+2. **Nueva sintaxis de control flow**: Usar `@if`, `@for`, `@switch`, `@empty` en templates. **NO** usar `*ngIf`, `*ngFor`, `*ngSwitch`.
 3. **Signals para estado local**: Usar `signal()`, `computed()`, `effect()` de `@angular/core`. Reemplaza completamente a Zustand para estado local.
 4. **`inject()` para inyección de dependencias**: Usar `inject()` en lugar de constructor injection. Ejemplo: `private readonly authService = inject(AuthService)`.
 5. **Lazy loading**: Todas las rutas deben usar `loadComponent`.
 6. **OnPush por defecto**: Usar `changeDetection: ChangeDetectionStrategy.OnPush` en todos los componentes.
 7. **Inputs/Outputs modernos**: Usar `input()`, `output()`, `model()` de `@angular/core` en lugar de `@Input()` / `@Output()`.
 8. **Ionic standalone**: Importar componentes Ionic desde `@ionic/angular/standalone`. Ejemplo: `import { IonButton, IonContent } from '@ionic/angular/standalone';`.
+9. **Zoneless opcional**: Si el proyecto usa `provideExperimentalZonelessChangeDetection()`, respetarlo. Signals disparan cambios sin Zone.js.
+10. **No `async` pipe en templates**: Preferir `toSignal()` de `@angular/core/rxjs-interop` para convertir Observables a Signals. O usar directamente TanStack Query.
 
 ---
 
@@ -304,20 +308,21 @@ export function zodValidator<T>(schema: z.ZodSchema<T>) {
 
 ## 13. Checklist de Implementación
 
-### Phase 1: Scaffold y Configuración
-- [ ] Crear proyecto Ionic Angular standalone (`ionic start --type=angular --standalone` o `ng new` + `@ionic/angular`)
+> **Nota:** El proyecto Ionic + Angular ya existe. No crearlo. Solo instalar dependencias y escribir código.
+
+### Phase 1: Instalación y Configuración
 - [ ] Instalar dependencias: `@supabase/supabase-js`, `zod`, `date-fns`, `@tanstack/angular-query-experimental`, `@capacitor/preferences`
-- [ ] Configurar `app.config.ts` con `provideRouter`, `provideHttpClient`
-- [ ] Configurar path aliases en `tsconfig.json` (si se usan)
+- [ ] Configurar `app.config.ts` con `provideRouter`, `provideHttpClient`, providers de Supabase/TanStack Query
 - [ ] Generar `database.types.ts` con Supabase CLI
 - [ ] Crear `supabase.ts` singleton
+- [ ] Configurar path aliases en `tsconfig.json` si se usan (opcional)
 
 ### Phase 2: Auth
 - [ ] Implementar `AuthService` (signIn, signUp, signOut, getSession, onAuthStateChange)
 - [ ] Crear Zod schemas para login/signup
 - [ ] Implementar `LoginPage`, `SignupPage`, `ConfirmPage`, `ForgotPasswordPage`
 - [ ] Crear `authGuard` y `publicGuard`
-- [ ] Configurar rutas de auth lazy-loaded
+- [ ] Configurar rutas de auth lazy-loaded en `app.routes.ts`
 
 ### Phase 3: Layout Principal (Tabs)
 - [ ] Crear `TabsPage` con `ion-tabs` y `ion-tab-bar`
@@ -345,12 +350,14 @@ export function zodValidator<T>(schema: z.ZodSchema<T>) {
 
 ## 14. Notas Importantes
 
+- **Proyecto existente**: No ejecutar `ionic start`, `ng new`, ni crear estructura de carpetas base. El proyecto ya está creado. Solo agregar código dentro del `src/` existente.
 - **Standalone obligatorio**: No crear ningún `NgModule`. Ni `AppModule`, ni feature modules. Todo se configura en `app.config.ts` y en `imports` de cada componente.
 - **Supabase es el backend**: No replicar validaciones de negocio que RLS ya resuelve, pero sí validar inputs de usuario antes de enviar.
 - **Pomodoro es local**: Respetar la decisión de que el timer no tiene persistencia de sesiones. Solo configuraciones.
 - **No inventar tablas nuevas**: Usar exactamente las mismas tablas y constraints que ya existen en Supabase.
 - **Zustand → Signals**: El paradigma es diferente. Signals son más granulares. No trates de replicar 1:1 un store monolítico; aprovecha la reactividad fina de Signals.
 - **TanStack Query Angular**: Es experimental pero funcional. Alternativa: usar RxJS + `shareReplay()` manual, pero se pierde cacheo inteligente. Recomendado usar TanStack Query.
+- **Angular 21**: Asumir que el proyecto usa la API más moderna de Angular (standalone por defecto, control flow, signals inputs/outputs). Si algo falla por versión, ajustar al mínimo compatible.
 
 ---
 

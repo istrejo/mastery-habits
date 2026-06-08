@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -22,15 +22,45 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const setSession = useAuthStore((s) => s.setSession);
+  const loginAttempts = useAuthStore((s) => s.loginAttempts);
+  const loginBlockedUntil = useAuthStore((s) => s.loginBlockedUntil);
+  const recordLoginAttempt = useAuthStore((s) => s.recordLoginAttempt);
+  const resetLoginAttempts = useAuthStore((s) => s.resetLoginAttempts);
   const router = useRouter();
 
+  const isBlocked = loginBlockedUntil > Date.now();
+
+  useEffect(() => {
+    if (!isBlocked) {
+      setCountdown(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const remaining = Math.ceil((loginBlockedUntil - Date.now()) / 1000);
+      if (remaining <= 0) {
+        setCountdown(0);
+        clearInterval(interval);
+      } else {
+        setCountdown(remaining);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isBlocked, loginBlockedUntil]);
+
   const onSubmit = handleSubmit(async ({ email, password }) => {
+    if (isBlocked) return;
+
     setLoading(true);
     setServerError('');
     const { data, error } = await authService.signIn(email, password);
     setLoading(false);
+
     if (error) {
+      recordLoginAttempt();
       if (isEmailNotConfirmed(error)) {
         router.push({ pathname: '/(auth)/confirm', params: { email } });
         return;
@@ -38,8 +68,12 @@ export default function LoginScreen() {
       setServerError(getAuthErrorMessage(error) ?? error.message);
       return;
     }
+
+    resetLoginAttempts();
     setSession(data.session);
   });
+
+  const isFormDisabled = loading || isBlocked;
 
   return (
     <AuthLayout>
@@ -90,16 +124,28 @@ export default function LoginScreen() {
             <Text className="text-body-md text-error">{serverError}</Text>
           ) : null}
 
+          {isBlocked && countdown > 0 ? (
+            <Text className="text-body-md text-on-surface-variant text-center">
+              Too many attempts. Try again in {countdown}s
+            </Text>
+          ) : null}
+
           <Pressable onPress={() => router.push('/(auth)/forgot-password')} className="self-end">
             <Text className="text-label-md text-primary">Forgot Password?</Text>
           </Pressable>
 
           <Button
-            label={loading ? 'Signing in…' : 'Sign In'}
+            label={isBlocked ? `Wait ${countdown}s` : loading ? 'Signing in…' : 'Sign In'}
             onPress={onSubmit}
-            disabled={loading}
+            disabled={isFormDisabled}
             fullWidth
           />
+
+          {loginAttempts > 0 && !isBlocked && loginAttempts < 5 ? (
+            <Text className="text-body-md text-on-surface-variant text-center">
+              {5 - loginAttempts} attempts remaining
+            </Text>
+          ) : null}
 
           <FormDivider />
 
