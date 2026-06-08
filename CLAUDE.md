@@ -63,7 +63,7 @@ src/
       Button.tsx
       Card.tsx
       Checkbox.tsx
-      index.ts                # Barrel export for all shared UI
+      (no barrel — import directly from each file)
 ```
 
 ## Architecture
@@ -78,7 +78,7 @@ src/
 
 **Pomodoro timer is 100% local/ephemeral** — only config (durations) syncs to the `profiles` Supabase table. No session history is persisted to the DB.
 
-**Shared UI** lives in `src/shared/ui/` and is exported via barrel `index.ts`. Import from `src/shared/ui`, never directly from individual files. Do not add feature-specific logic to shared components.
+**Shared UI** lives in `src/shared/ui/`. Import directly from each file (`src/shared/ui/Button`, `src/shared/ui/Card`, etc.) — there is no barrel. Do not add feature-specific logic to shared components.
 
 ## Data Layer
 
