@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { mmkvStorage } from "../../core/storage/mmkvAdapter";
+import { Constants } from "../../shared/types/database.types";
 
-type ColorScheme = "light" | "dark" | "system";
+type ColorScheme = typeof Constants.public.Enums.theme_preference[number];
 type Language = "en" | "es";
 
 interface SettingsState {
