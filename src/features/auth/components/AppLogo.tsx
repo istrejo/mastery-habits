@@ -1,11 +1,15 @@
-import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'react-native';
 
-export function AppLogo() {
+interface AppLogoProps {
+  size?: number;
+}
+
+export function AppLogo({ size = 48 }: AppLogoProps) {
   return (
-    <View className="flex-row items-center gap-xs">
-      <Ionicons name="lock-closed" size={28} color="#004ac6" />
-      <Text className="text-display text-primary font-bold tracking-tight">Pendie</Text>
-    </View>
+    <Image
+      source={require('../../../../assets/logo.png')}
+      style={{ width: size, height: size }}
+      resizeMode="contain"
+    />
   );
 }
