@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pendie",
     "slug": "pendie",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.istrejo.pendie"
+      "bundleIdentifier": "com.istrejo.pendie",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,6 +38,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8e7aeb5a-4069-4802-9c66-cd1b4f26e2c5"
+      }
+    },
+    "owner": "istrejo"
   }
 }
