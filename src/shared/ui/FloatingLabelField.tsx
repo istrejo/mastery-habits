@@ -1,5 +1,12 @@
 import { useRef, useState } from 'react';
-import { View, Text, TextInput, Animated, Pressable, type TextInputProps } from 'react-native';
+import { View, Text, TextInput, Pressable, type TextInputProps } from 'react-native';
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  interpolate,
+  interpolateColor,
+} from 'react-native-reanimated';
 
 interface FloatingLabelFieldProps extends TextInputProps {
   label: string;
@@ -9,37 +16,31 @@ interface FloatingLabelFieldProps extends TextInputProps {
 
 export function FloatingLabelField({ label, error, trailingElement, value, onFocus, onBlur, ...inputProps }: FloatingLabelFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
-  const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const progress = useSharedValue(value ? 1 : 0);
+  const focusColor = useSharedValue(0);
   const inputRef = useRef<TextInput>(null);
 
   const handleFocus = (e: Parameters<NonNullable<TextInputProps['onFocus']>>[0]) => {
     setIsFocused(true);
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration: 150,
-      useNativeDriver: false,
-    }).start();
+    progress.value = withTiming(1, { duration: 150 });
+    focusColor.value = withTiming(1, { duration: 150 });
     onFocus?.(e);
   };
 
   const handleBlur = (e: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
     setIsFocused(false);
     if (!value) {
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: false,
-      }).start();
+      progress.value = withTiming(0, { duration: 150 });
     }
+    focusColor.value = withTiming(0, { duration: 150 });
     onBlur?.(e);
   };
 
-  const labelTop = animatedValue.interpolate({ inputRange: [0, 1], outputRange: [16, 6] });
-  const labelSize = animatedValue.interpolate({ inputRange: [0, 1], outputRange: [16, 11] });
-  const labelColor = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['#737686', isFocused ? '#004ac6' : '#737686'],
-  });
+  const animatedLabelStyle = useAnimatedStyle(() => ({
+    top: interpolate(progress.value, [0, 1], [16, 6]),
+    fontSize: interpolate(progress.value, [0, 1], [16, 11]),
+    color: interpolateColor(focusColor.value, [0, 1], ['#737686', '#004ac6']),
+  }));
 
   return (
     <View>
@@ -52,7 +53,7 @@ export function FloatingLabelField({ label, error, trailingElement, value, onFoc
         >
           <Animated.Text
             className="absolute left-4 z-10 bg-transparent"
-            style={{ top: labelTop, fontSize: labelSize, color: labelColor }}
+            style={animatedLabelStyle}
           >
             {label}
           </Animated.Text>
