@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppLogo } from '../../src/features/auth/components/AppLogo';
 import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { PasswordField } from '../../src/shared/ui/PasswordField';
-import { Button } from '../../src/shared/ui';
+import { Button } from '../../src/shared/ui/Button';
 import { supabase } from '../../src/core/api/supabase';
 
 const resetPasswordSchema = z.object({

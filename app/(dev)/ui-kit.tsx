@@ -1,5 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
-import { Button, Card, Checkbox } from "../../src/shared/ui";
+import { Button } from "../../src/shared/ui/Button";
+import { Card } from "../../src/shared/ui/Card";
+import { Checkbox } from "../../src/shared/ui/Checkbox";
 import { useState } from "react";
 
 export default function UiKitScreen() {

@@ -12,7 +12,7 @@ import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { LabeledField } from '../../src/shared/ui/LabeledField';
 import { PasswordField } from '../../src/shared/ui/PasswordField';
 import { FormDivider } from '../../src/shared/ui/FormDivider';
-import { Button } from '../../src/shared/ui';
+import { Button } from '../../src/shared/ui/Button';
 import { authService } from '../../src/features/auth/services/authService';
 import { getAuthErrorMessage } from '../../src/features/auth/services/authErrors';
 import { useOAuthCallback } from '../../src/features/auth/hooks/useOAuthCallback';

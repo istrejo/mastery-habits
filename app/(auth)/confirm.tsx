@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AuthLayout } from '../../src/features/auth/components/AuthLayout';
 import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { OTPForm } from '../../src/features/auth/components/OTPForm';
-import { Button } from '../../src/shared/ui';
+import { Button } from '../../src/shared/ui/Button';
 import { authService } from '../../src/features/auth/services/authService';
 import { getAuthErrorMessage } from '../../src/features/auth/services/authErrors';
 import { useAuthStore } from '../../src/features/auth/useAuthStore';
