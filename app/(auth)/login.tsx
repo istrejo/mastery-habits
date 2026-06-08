@@ -1,5 +1,5 @@
 import * as WebBrowser from 'expo-web-browser';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 
 WebBrowser.maybeCompleteAuthSession();
 import { View, Text, Pressable, Platform } from 'react-native';
@@ -12,19 +12,44 @@ import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { FloatingLabelField } from '../../src/shared/ui/FloatingLabelField';
 import { FormDivider } from '../../src/shared/ui/FormDivider';
 import { EyeToggle } from '../../src/features/auth/components/EyeToggle';
-import { Button } from '../../src/shared/ui';
+import { Button } from '../../src/shared/ui/Button';
 import { authService } from '../../src/features/auth/services/authService';
 import { getAuthErrorMessage, isEmailNotConfirmed } from '../../src/features/auth/services/authErrors';
 import { useAuthStore } from '../../src/features/auth/useAuthStore';
 import { useOAuthCallback } from '../../src/features/auth/hooks/useOAuthCallback';
 
+type SubmitState = {
+  loading: boolean;
+  socialLoading: string | null;
+  serverError: string;
+};
+
+type SubmitAction =
+  | { type: 'SUBMIT_START' }
+  | { type: 'SUBMIT_END' }
+  | { type: 'SOCIAL_START'; provider: string }
+  | { type: 'SOCIAL_END' }
+  | { type: 'SET_ERROR'; message: string };
+
+function submitReducer(state: SubmitState, action: SubmitAction): SubmitState {
+  switch (action.type) {
+    case 'SUBMIT_START': return { ...state, loading: true, serverError: '' };
+    case 'SUBMIT_END': return { ...state, loading: false };
+    case 'SOCIAL_START': return { ...state, socialLoading: action.provider, serverError: '' };
+    case 'SOCIAL_END': return { ...state, socialLoading: null };
+    case 'SET_ERROR': return { ...state, serverError: action.message };
+  }
+}
+
 export default function LoginScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
-  const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<string | null>(null);
-  const [serverError, setServerError] = useState('');
+  const [{ loading, socialLoading, serverError }, dispatch] = useReducer(submitReducer, {
+    loading: false,
+    socialLoading: null,
+    serverError: '',
+  });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const setSession = useAuthStore((s) => s.setSession);
@@ -60,10 +85,9 @@ export default function LoginScreen() {
   const onSubmit = handleSubmit(async ({ email, password }) => {
     if (isBlocked) return;
 
-    setLoading(true);
-    setServerError('');
+    dispatch({ type: 'SUBMIT_START' });
     const { data, error } = await authService.signIn(email, password);
-    setLoading(false);
+    dispatch({ type: 'SUBMIT_END' });
 
     if (error) {
       recordLoginAttempt();
@@ -71,7 +95,7 @@ export default function LoginScreen() {
         router.push({ pathname: '/(auth)/confirm', params: { email } });
         return;
       }
-      setServerError(getAuthErrorMessage(error) ?? error.message);
+      dispatch({ type: 'SET_ERROR', message: getAuthErrorMessage(error) ?? error.message });
       return;
     }
 
@@ -80,26 +104,24 @@ export default function LoginScreen() {
   });
 
   const handleGoogleSignIn = async () => {
-    setSocialLoading('google');
-    setServerError('');
+    dispatch({ type: 'SOCIAL_START', provider: 'google' });
     try {
       await authService.signInWithGoogle();
     } catch (err: any) {
-      setServerError(getAuthErrorMessage(err) ?? err.message ?? 'Google sign-in failed');
+      dispatch({ type: 'SET_ERROR', message: getAuthErrorMessage(err) ?? err.message ?? 'Google sign-in failed' });
     } finally {
-      setSocialLoading(null);
+      dispatch({ type: 'SOCIAL_END' });
     }
   };
 
   const handleAppleSignIn = async () => {
-    setSocialLoading('apple');
-    setServerError('');
+    dispatch({ type: 'SOCIAL_START', provider: 'apple' });
     try {
       await authService.signInWithApple();
     } catch (err: any) {
-      setServerError(getAuthErrorMessage(err) ?? err.message ?? 'Apple sign-in failed');
+      dispatch({ type: 'SET_ERROR', message: getAuthErrorMessage(err) ?? err.message ?? 'Apple sign-in failed' });
     } finally {
-      setSocialLoading(null);
+      dispatch({ type: 'SOCIAL_END' });
     }
   };
 
@@ -195,7 +217,7 @@ export default function LoginScreen() {
                 disabled={socialLoading !== null}
                 fullWidth
                 variant="dark"
-                icon={<Text className="text-white text-label-md"></Text>}
+                icon={<Text className="text-white text-label-md"></Text>}
               />
             )}
           </View>
