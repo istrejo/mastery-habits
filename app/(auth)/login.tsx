@@ -1,5 +1,8 @@
+import * as WebBrowser from 'expo-web-browser';
 import { useState, useEffect } from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
+
+WebBrowser.maybeCompleteAuthSession();
+import { View, Text, Pressable, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,18 +11,19 @@ import { AuthLayout } from '../../src/features/auth/components/AuthLayout';
 import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { FloatingLabelField } from '../../src/shared/ui/FloatingLabelField';
 import { FormDivider } from '../../src/shared/ui/FormDivider';
-import { GoogleSignInButton } from '../../src/features/auth/components/GoogleSignInButton';
 import { EyeToggle } from '../../src/features/auth/components/EyeToggle';
 import { Button } from '../../src/shared/ui';
 import { authService } from '../../src/features/auth/services/authService';
 import { getAuthErrorMessage, isEmailNotConfirmed } from '../../src/features/auth/services/authErrors';
 import { useAuthStore } from '../../src/features/auth/useAuthStore';
+import { useOAuthCallback } from '../../src/features/auth/hooks/useOAuthCallback';
 
 export default function LoginScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [serverError, setServerError] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -29,6 +33,8 @@ export default function LoginScreen() {
   const recordLoginAttempt = useAuthStore((s) => s.recordLoginAttempt);
   const resetLoginAttempts = useAuthStore((s) => s.resetLoginAttempts);
   const router = useRouter();
+
+  useOAuthCallback();
 
   const isBlocked = loginBlockedUntil > Date.now();
 
@@ -73,7 +79,31 @@ export default function LoginScreen() {
     setSession(data.session);
   });
 
-  const isFormDisabled = loading || isBlocked;
+  const handleGoogleSignIn = async () => {
+    setSocialLoading('google');
+    setServerError('');
+    try {
+      await authService.signInWithGoogle();
+    } catch (err: any) {
+      setServerError(getAuthErrorMessage(err) ?? err.message ?? 'Google sign-in failed');
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setSocialLoading('apple');
+    setServerError('');
+    try {
+      await authService.signInWithApple();
+    } catch (err: any) {
+      setServerError(getAuthErrorMessage(err) ?? err.message ?? 'Apple sign-in failed');
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const isFormDisabled = loading || isBlocked || socialLoading !== null;
 
   return (
     <AuthLayout>
@@ -149,10 +179,26 @@ export default function LoginScreen() {
 
           <FormDivider />
 
-          <GoogleSignInButton
-            label="Sign in with Google"
-            onPress={() => Alert.alert('Coming soon', 'Google sign-in is not yet available.')}
-          />
+          <View className="gap-sm">
+            <Button
+              label="Sign in with Google"
+              onPress={handleGoogleSignIn}
+              disabled={socialLoading !== null}
+              fullWidth
+              variant="secondary"
+              icon={<View className="w-5 h-5 rounded-full bg-[#4285F4] items-center justify-center"><Text className="text-white text-xs font-bold leading-5">G</Text></View>}
+            />
+            {Platform.OS === 'ios' && (
+              <Button
+                label="Sign in with Apple"
+                onPress={handleAppleSignIn}
+                disabled={socialLoading !== null}
+                fullWidth
+                variant="dark"
+                icon={<Text className="text-white text-label-md"></Text>}
+              />
+            )}
+          </View>
         </View>
       </AuthCard>
 

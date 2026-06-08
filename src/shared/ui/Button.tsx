@@ -1,6 +1,6 @@
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "dark";
 
 interface ButtonProps {
   label: string;
@@ -8,6 +8,7 @@ interface ButtonProps {
   variant?: Variant;
   disabled?: boolean;
   fullWidth?: boolean;
+  icon?: React.ReactNode;
 }
 
 const variantClasses: Record<Variant, { container: string; text: string }> = {
@@ -23,9 +24,13 @@ const variantClasses: Record<Variant, { container: string; text: string }> = {
     container: "bg-transparent px-6 py-3 items-center active:opacity-60",
     text: "text-primary font-semibold text-label-md",
   },
+  dark: {
+    container: "bg-black rounded px-6 py-3 items-center active:opacity-80",
+    text: "text-white font-semibold text-label-md uppercase tracking-widest",
+  },
 };
 
-export function Button({ label, onPress, variant = "primary", disabled = false, fullWidth = false }: ButtonProps) {
+export function Button({ label, onPress, variant = "primary", disabled = false, fullWidth = false, icon }: ButtonProps) {
   const classes = variantClasses[variant];
   return (
     <Pressable
@@ -33,7 +38,10 @@ export function Button({ label, onPress, variant = "primary", disabled = false, 
       disabled={disabled}
       className={`${classes.container} ${fullWidth ? "w-full" : ""} ${disabled ? "opacity-50" : ""}`}
     >
-      <Text className={classes.text}>{label}</Text>
+      <View className="flex-row items-center gap-sm">
+        {icon}
+        <Text className={classes.text}>{label}</Text>
+      </View>
     </Pressable>
   );
 }

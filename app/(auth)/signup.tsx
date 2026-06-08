@@ -1,5 +1,8 @@
+import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
+
+WebBrowser.maybeCompleteAuthSession();
+import { View, Text, Pressable, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,18 +12,21 @@ import { AuthCard } from '../../src/features/auth/components/AuthCard';
 import { LabeledField } from '../../src/shared/ui/LabeledField';
 import { PasswordField } from '../../src/shared/ui/PasswordField';
 import { FormDivider } from '../../src/shared/ui/FormDivider';
-import { GoogleSignInButton } from '../../src/features/auth/components/GoogleSignInButton';
 import { Button } from '../../src/shared/ui';
 import { authService } from '../../src/features/auth/services/authService';
 import { getAuthErrorMessage } from '../../src/features/auth/services/authErrors';
+import { useOAuthCallback } from '../../src/features/auth/hooks/useOAuthCallback';
 
 export default function SignupScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [serverError, setServerError] = useState('');
   const router = useRouter();
+
+  useOAuthCallback();
 
   const onSubmit = handleSubmit(async ({ email, password }) => {
     setLoading(true);
@@ -33,6 +39,30 @@ export default function SignupScreen() {
     }
     router.replace('/(auth)/confirm');
   });
+
+  const handleGoogleSignUp = async () => {
+    setSocialLoading('google');
+    setServerError('');
+    try {
+      await authService.signInWithGoogle();
+    } catch (err: any) {
+      setServerError(getAuthErrorMessage(err) ?? err.message ?? 'Google sign-up failed');
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleAppleSignUp = async () => {
+    setSocialLoading('apple');
+    setServerError('');
+    try {
+      await authService.signInWithApple();
+    } catch (err: any) {
+      setServerError(getAuthErrorMessage(err) ?? err.message ?? 'Apple sign-up failed');
+    } finally {
+      setSocialLoading(null);
+    }
+  };
 
   return (
     <AuthLayout>
@@ -111,10 +141,26 @@ export default function SignupScreen() {
 
           <FormDivider />
 
-          <GoogleSignInButton
-            label="Sign up with Google"
-            onPress={() => Alert.alert('Coming soon', 'Google sign-up is not yet available.')}
-          />
+          <View className="gap-sm">
+            <Button
+              label="Sign up with Google"
+              onPress={handleGoogleSignUp}
+              disabled={socialLoading !== null}
+              fullWidth
+              variant="secondary"
+              icon={<View className="w-5 h-5 rounded-full bg-[#4285F4] items-center justify-center"><Text className="text-white text-xs font-bold leading-5">G</Text></View>}
+            />
+            {Platform.OS === 'ios' && (
+              <Button
+                label="Sign up with Apple"
+                onPress={handleAppleSignUp}
+                disabled={socialLoading !== null}
+                fullWidth
+                variant="dark"
+                icon={<Text className="text-white text-label-md"></Text>}
+              />
+            )}
+          </View>
         </View>
       </AuthCard>
 

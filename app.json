@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "mastery-habits",
-    "slug": "mastery-habits",
-    "version": "1.0.0",
+    "name": "Pendie",
+    "slug": "pendie",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.istrejo.pendie"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,14 +22,16 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.istrejo.pendie"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "masteryhabits",
+    "scheme": "pendie",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
