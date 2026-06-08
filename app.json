@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.istrejo.pendie",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "appleTeamId": "2T88AYWVAJ"
     },
     "android": {
       "adaptiveIcon": {
