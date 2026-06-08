@@ -9,7 +9,7 @@ interface OTPFormProps {
 }
 
 export function OTPForm({ onComplete }: OTPFormProps) {
-  const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
+  const [digits, setDigits] = useState<string[]>(() => Array(OTP_LENGTH).fill(''));
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const refs = useRef<(TextInput | null)[]>([]);
 
@@ -39,7 +39,7 @@ export function OTPForm({ onComplete }: OTPFormProps) {
     <View className="flex-row gap-md justify-center">
       {digits.map((digit, index) => (
         <OTPDigitInput
-          key={index}
+          key={`digit-${index}`}
           ref={(el) => { refs.current[index] = el; }}
           value={digit}
           isFocused={focusedIndex === index}
