@@ -27,7 +27,7 @@ function AuthGuard() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [setSession, setLoading]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -37,7 +37,7 @@ function AuthGuard() {
     } else if (session && inAuthGroup) {
       router.replace("/(tabs)/today");
     }
-  }, [session, segments, isLoading]);
+  }, [session, segments, isLoading, router]);
 
   return null;
 }
