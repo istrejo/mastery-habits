@@ -7,7 +7,7 @@ interface AuthCardProps {
 export function AuthCard({ children }: AuthCardProps) {
   return (
     <View className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-lg"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 15, elevation: 4 }}
+      style={{ boxShadow: '0 10px 15px rgba(0,0,0,0.1)' }}
     >
       {children}
     </View>
