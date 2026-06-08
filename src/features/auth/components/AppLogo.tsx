@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import { Image } from 'expo-image';
 
 interface AppLogoProps {
   size?: number;
@@ -9,7 +9,7 @@ export function AppLogo({ size = 48 }: AppLogoProps) {
     <Image
       source={require('../../../../assets/logo.png')}
       style={{ width: size, height: size }}
-      resizeMode="contain"
+      contentFit="contain"
     />
   );
 }
