@@ -85,34 +85,34 @@ Chain strategy: pending
 ## PR 2 — Habits Feature (~200 lines)
 
 ### 2.1 Reconcile `useHabitsStore.ts`
-- [ ] Replace hand-written `Habit` with `Database['public']['Tables']['habits']['Row']`
-- [ ] Keep only `pendingToggles: Set<string>` for optimistic state
+- [x] Replace hand-written `Habit` with `Database['public']['Tables']['habits']['Row']`
+- [x] Keep only `pendingToggles: Set<string>` for optimistic state
 - **Estimated**: 25 lines
 - **TDD checkpoint**: None — type-only change
 - **Depends on**: PR 1 (1.3 types)
 
 ### 2.2 Create `src/features/habits/services/habitsService.ts`
-- [ ] Implement `fetchActiveHabits`, `fetchLogsForDate`, `insertLog`, `deleteLog`, `writeStreak`
+- [x] Implement `fetchActiveHabits`, `fetchLogsForDate`, `insertLog`, `deleteLog`, `writeStreak`
 - **Estimated**: 50 lines
 - **TDD checkpoint**: `src/features/habits/services/habitsService.test.ts` must exist BEFORE implementation
 - **Depends on**: PR 1 (1.4 date utils, 1.5 query keys)
 
 ### 2.3 Create streak recompute helper
-- [ ] Idempotent algorithm; respects `frequency` (daily/weekly); `UNIQUE` constraint handles duplicates
+- [x] Idempotent algorithm; respects `frequency` (daily/weekly); `UNIQUE` constraint handles duplicates
 - **Estimated**: 30 lines
 - **TDD checkpoint**: `src/features/habits/services/streakHelper.test.ts` must exist BEFORE implementation
 - **Depends on**: PR 2 (2.2)
 
 ### 2.4 Create hooks: `useHabitsQuery.ts` + `useToggleHabit.ts`
-- [ ] `useHabitsQuery`: `useQuery` for habits + merged completion flag
-- [ ] `useToggleHabit`: `useMutation` with optimistic `onMutate`/`onError` rollback
+- [x] `useHabitsQuery`: `useQuery` for habits + merged completion flag
+- [x] `useToggleHabit`: `useMutation` with optimistic `onMutate`/`onError` rollback
 - **Estimated**: 40 lines
 - **TDD checkpoint**: `src/features/habits/hooks/useHabitsQuery.test.ts` and `useToggleHabit.test.ts` must exist BEFORE implementation
 - **Depends on**: PR 2 (2.2, 2.3)
 
 ### 2.5 Create presentational components: `HabitsSection.tsx` + `HabitChip.tsx`
-- [ ] `HabitsSection`: scrollable row of chips
-- [ ] `HabitChip`: single chip with check state + color
+- [x] `HabitsSection`: scrollable row of chips
+- [x] `HabitChip`: single chip with check state + color
 - **Estimated**: 35 lines
 - **TDD checkpoint**: `src/features/habits/components/HabitsSection.test.tsx` and `HabitChip.test.tsx` must exist BEFORE implementation
 - **Depends on**: PR 2 (2.4)
@@ -122,37 +122,37 @@ Chain strategy: pending
 ## PR 3 — Tasks Feature (~250 lines)
 
 ### 3.1 Create `src/features/tasks/useTasksStore.ts`
-- [ ] Optimistic toggle state: `Set<string>` of task ids in flight
+- [x] Optimistic toggle state: `Set<string>` of task ids in flight
 - **Estimated**: 15 lines
 - **TDD checkpoint**: None — trivial store
 - **Depends on**: PR 1 (1.3 types)
 
 ### 3.2 Create `src/features/tasks/services/tasksService.ts`
-- [ ] `fetchTasksByDate`, `fetchSubTasks`, `insertTask` (with sub-tasks), `toggleTask`, `deleteTask`
+- [x] `fetchTasksByDate`, `fetchSubTasks`, `insertTask` (with sub-tasks), `toggleTask`, `deleteTask`
 - **Estimated**: 60 lines
 - **TDD checkpoint**: `src/features/tasks/services/tasksService.test.ts` must exist BEFORE implementation
 - **Depends on**: PR 1 (1.4 date utils, 1.5 query keys)
 
 ### 3.3 Create hooks: `useTasksQuery.ts`, `useCreateTask.ts`, `useToggleTask.ts`
-- [ ] `useTasksQuery`: `useQuery` for tasks + sub-tasks
-- [ ] `useCreateTask`: `useMutation` for insert + sub-tasks
-- [ ] `useToggleTask`: `useMutation` with optimistic `is_completed` flip
+- [x] `useTasksQuery`: `useQuery` for tasks + sub-tasks
+- [x] `useCreateTask`: `useMutation` for insert + sub-tasks
+- [x] `useToggleTask`: `useMutation` with optimistic `is_completed` flip
 - **Estimated**: 50 lines
 - **TDD checkpoint**: `src/features/tasks/hooks/useTasksQuery.test.ts`, `useCreateTask.test.ts`, `useToggleTask.test.ts` must exist BEFORE implementation
 - **Depends on**: PR 3 (3.2)
 
 ### 3.4 Create presentational components: `TasksSection.tsx`, `TaskRow.tsx`, `SubTaskRow.tsx`
-- [ ] `TasksSection`: collapsible header + list
-- [ ] `TaskRow`: task with checkbox, priority badge, description
-- [ ] `SubTaskRow`: nested sub-task with checkbox
+- [x] `TasksSection`: collapsible header + list
+- [x] `TaskRow`: task with checkbox, priority badge, description
+- [x] `SubTaskRow`: nested sub-task with checkbox
 - **Estimated**: 55 lines
 - **TDD checkpoint**: `src/features/tasks/components/TasksSection.test.tsx`, `TaskRow.test.tsx`, `SubTaskRow.test.tsx` must exist BEFORE implementation
 - **Depends on**: PR 3 (3.3)
 
 ### 3.5 Create `CreateTaskSheet.tsx`
-- [ ] `@gorhom/bottom-sheet` + `react-hook-form` + `zod`
-- [ ] Fields: title (required), due_date (default selected), frequency selector, custom_days chip group, sub-tasks
-- [ ] `frequency` values: `'once' | 'daily' | 'weekly' | 'custom'`
+- [x] `@gorhom/bottom-sheet` + `react-hook-form` + `zod`
+- [x] Fields: title (required), due_date (default selected), frequency selector, custom_days chip group, sub-tasks
+- [x] `frequency` values: `'once' | 'daily' | 'weekly' | 'custom'`
 - **Estimated**: 55 lines
 - **TDD checkpoint**: `src/features/tasks/components/CreateTaskSheet.test.tsx` must exist BEFORE implementation (validate form, frequency selector, custom days)
 - **Depends on**: PR 1 (1.7, 1.8 bottom-sheet), PR 3 (3.3)
