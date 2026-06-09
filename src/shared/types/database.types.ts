@@ -144,6 +144,7 @@ export type Database = {
           due_date: string | null
           id: string
           is_completed: boolean
+          parent_id: string | null
           priority: Database["public"]["Enums"]["priority_level"]
           title: string
           updated_at: string
@@ -156,6 +157,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           is_completed?: boolean
+          parent_id?: string | null
           priority?: Database["public"]["Enums"]["priority_level"]
           title: string
           updated_at?: string
@@ -168,12 +170,20 @@ export type Database = {
           due_date?: string | null
           id?: string
           is_completed?: boolean
+          parent_id?: string | null
           priority?: Database["public"]["Enums"]["priority_level"]
           title?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_user_id_fkey"
             columns: ["user_id"]

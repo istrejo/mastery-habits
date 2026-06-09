@@ -1,15 +1,14 @@
 import { create } from "zustand";
 import { Database } from "../../shared/types/database.types";
 
-export type Habit = Database["public"]["Tables"]["habits"]["Row"];
-export type HabitLog = Database["public"]["Tables"]["habit_logs"]["Row"];
+export type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
-interface HabitsOptimisticState {
+interface TasksOptimisticState {
   togglingIds: Set<string>;
   setToggling: (id: string, value: boolean) => void;
 }
 
-export const useHabitsStore = create<HabitsOptimisticState>()((set) => ({
+export const useTasksStore = create<TasksOptimisticState>()((set) => ({
   togglingIds: new Set(),
   setToggling: (id, value) =>
     set((state) => {

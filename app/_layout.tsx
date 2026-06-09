@@ -1,12 +1,21 @@
 import "../global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { supabase } from "../src/core/api/supabase";
 import { useAuthStore } from "../src/features/auth/useAuthStore";
 import { ThemeProvider } from "../src/core/theme/ThemeProvider";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+});
 
 function AuthGuard() {
   const { session, isLoading, setSession, setLoading } = useAuthStore();
@@ -44,11 +53,15 @@ function AuthGuard() {
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-        <AuthGuard />
-      </ThemeProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <BottomSheetModalProvider>
+          <ThemeProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+            <AuthGuard />
+          </ThemeProvider>
+        </BottomSheetModalProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
