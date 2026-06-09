@@ -72,6 +72,38 @@ describe("HabitsSection", () => {
 
   it("renders a chevron icon for collapse/expand", () => {
     render(<HabitsSection habits={mockHabits} onToggle={() => {}} />);
-    expect(screen.getByTestId("icon-keyboard-arrow-down")).toBeInTheDocument();
+    // Starts expanded, shows expand-less chevron
+    expect(screen.getByTestId("icon-expand-less")).toBeInTheDocument();
+  });
+
+  it("collapses and expands when header is tapped", () => {
+    render(<HabitsSection habits={mockHabits} onToggle={() => {}} />);
+
+    // Starts expanded — chips visible
+    expect(screen.getByText("Exercise")).toBeInTheDocument();
+    expect(screen.getByText("Read")).toBeInTheDocument();
+    expect(screen.getByTestId("icon-expand-less")).toBeInTheDocument();
+
+    // Tap header to collapse
+    fireEvent.click(screen.getByRole("button", { name: "Collapse habits" }));
+
+    // Chips hidden
+    expect(screen.queryByText("Exercise")).not.toBeInTheDocument();
+    expect(screen.queryByText("Read")).not.toBeInTheDocument();
+    // Chevron changes
+    expect(screen.getByTestId("icon-expand-more")).toBeInTheDocument();
+
+    // Tap header to expand again
+    fireEvent.click(screen.getByRole("button", { name: "Expand habits" }));
+    expect(screen.getByText("Exercise")).toBeInTheDocument();
+    expect(screen.getByText("Read")).toBeInTheDocument();
+    expect(screen.getByTestId("icon-expand-less")).toBeInTheDocument();
+  });
+
+  it("header has accessibility button role and label", () => {
+    render(<HabitsSection habits={mockHabits} onToggle={() => {}} />);
+    expect(
+      screen.getByRole("button", { name: "Collapse habits" }),
+    ).toBeInTheDocument();
   });
 });

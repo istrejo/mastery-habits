@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useImperativeHandle } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import {
   BottomSheetModal,
@@ -19,10 +19,15 @@ export interface CreateTaskInput {
   subtasks: { title: string }[];
 }
 
+export interface CreateTaskSheetRef {
+  present: () => void;
+}
+
 interface CreateTaskSheetProps {
   defaultDate: string;
   onSubmit: (data: CreateTaskInput) => void;
   onClose: () => void;
+  ref?: React.Ref<CreateTaskSheetRef>;
 }
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -37,8 +42,15 @@ export function CreateTaskSheet({
   defaultDate,
   onSubmit,
   onClose,
+  ref,
 }: CreateTaskSheetProps) {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  useImperativeHandle(ref, () => ({
+    present: () => {
+      bottomSheetRef.current?.present();
+    },
+  }));
 
   const { control, handleSubmit, watch, setValue, formState } = useForm<CreateTaskInput>({
     defaultValues: {
@@ -57,17 +69,17 @@ export function CreateTaskSheet({
   });
 
   const frequency = watch("frequency");
-  const customDays = watch("custom_days") ?? [];
+  const customDays: number[] = (watch("custom_days") as number[]) ?? [];
 
   const toggleCustomDay = useCallback(
     (day: number) => {
-      const current = customDays;
+      const current = watch("custom_days") ?? [];
       const next = current.includes(day)
         ? current.filter((d) => d !== day)
         : [...current, day].sort();
       setValue("custom_days", next, { shouldValidate: false });
     },
-    [customDays, setValue],
+    [setValue, watch],
   );
 
   const handleSave = useCallback(
@@ -163,7 +175,7 @@ export function CreateTaskSheet({
                 const isSelected = customDays.includes(dayNum);
                 return (
                   <TouchableOpacity
-                    key={i}
+                    key={dayNum}
                     onPress={() => toggleCustomDay(dayNum)}
                     className={`w-9 h-9 rounded-full items-center justify-center ${
                       isSelected ? "bg-primary" : "bg-muted"

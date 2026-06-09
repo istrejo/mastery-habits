@@ -4,13 +4,22 @@ interface CheckboxProps {
   checked: boolean;
   onToggle: () => void;
   disabled?: boolean;
+  accessibilityLabel?: string;
 }
 
-export function Checkbox({ checked, onToggle, disabled = false }: CheckboxProps) {
+export function Checkbox({
+  checked,
+  onToggle,
+  disabled = false,
+  accessibilityLabel,
+}: CheckboxProps) {
   return (
     <Pressable
       onPress={onToggle}
       disabled={disabled}
+      accessibilityRole="checkbox"
+      accessibilityLabel={accessibilityLabel ?? "Checkbox"}
+      accessibilityState={{ checked, disabled }}
       className={`w-6 h-6 rounded-sm border-2 items-center justify-center active:opacity-70 ${
         checked ? "bg-primary border-primary" : "border-outline"
       } ${disabled ? "opacity-50" : ""}`}
