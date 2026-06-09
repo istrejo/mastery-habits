@@ -140,10 +140,13 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          custom_days: number[] | null
           description: string | null
           due_date: string | null
+          frequency: Database["public"]["Enums"]["task_frequency"]
           id: string
           is_completed: boolean
+          parent_id: string | null
           priority: Database["public"]["Enums"]["priority_level"]
           title: string
           updated_at: string
@@ -152,10 +155,13 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
+          custom_days?: number[] | null
           description?: string | null
           due_date?: string | null
+          frequency?: Database["public"]["Enums"]["task_frequency"]
           id?: string
           is_completed?: boolean
+          parent_id?: string | null
           priority?: Database["public"]["Enums"]["priority_level"]
           title: string
           updated_at?: string
@@ -164,16 +170,26 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
+          custom_days?: number[] | null
           description?: string | null
           due_date?: string | null
+          frequency?: Database["public"]["Enums"]["task_frequency"]
           id?: string
           is_completed?: boolean
+          parent_id?: string | null
           priority?: Database["public"]["Enums"]["priority_level"]
           title?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_user_id_fkey"
             columns: ["user_id"]
@@ -193,6 +209,7 @@ export type Database = {
     Enums: {
       habit_frequency: "daily" | "weekly"
       priority_level: "low" | "medium" | "high"
+      task_frequency: "once" | "daily" | "weekly" | "custom"
       theme_preference: "light" | "dark" | "system"
     }
     CompositeTypes: {
@@ -323,6 +340,7 @@ export const Constants = {
     Enums: {
       habit_frequency: ["daily", "weekly"],
       priority_level: ["low", "medium", "high"],
+      task_frequency: ["once", "daily", "weekly", "custom"],
       theme_preference: ["light", "dark", "system"],
     },
   },
