@@ -14,7 +14,7 @@ export function TasksSection({ tasks, onToggleTask, onAddTask }: TasksSectionPro
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <View className="bg-card rounded-xl p-4">
+    <View className="bg-surface-container rounded-xl p-4">
       {/* Section Header */}
       <TouchableOpacity
         className="flex-row items-center justify-between"
@@ -26,16 +26,16 @@ export function TasksSection({ tasks, onToggleTask, onAddTask }: TasksSectionPro
           <MaterialIcons
             name="checklist"
             size={24}
-            className="text-foreground"
+            color="var(--color-on-surface)"
           />
-          <Text className="text-lg font-semibold text-foreground">
+          <Text className="text-lg font-semibold text-on-surface">
             Tasks{tasks.length > 0 ? ` (${tasks.length})` : ""}
           </Text>
         </View>
         <MaterialIcons
           name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
           size={24}
-          className="text-muted-foreground"
+          color="var(--color-on-surface-variant)"
         />
       </TouchableOpacity>
 
@@ -43,7 +43,7 @@ export function TasksSection({ tasks, onToggleTask, onAddTask }: TasksSectionPro
       {expanded && (
         <View className="mt-3 gap-2">
           {tasks.length === 0 ? (
-            <Text className="text-muted-foreground text-sm">No tasks for this day.</Text>
+            <Text className="text-on-surface-variant text-sm">No tasks for this day.</Text>
           ) : (
             tasks.map((task) => (
               <TaskRow
@@ -65,7 +65,7 @@ export function TasksSection({ tasks, onToggleTask, onAddTask }: TasksSectionPro
             <MaterialIcons
               name="add"
               size={20}
-              className="text-primary"
+              color="var(--color-primary)"
             />
             <Text className="text-primary font-medium">+ Add Task</Text>
           </TouchableOpacity>

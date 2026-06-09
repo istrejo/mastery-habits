@@ -22,7 +22,7 @@ export function TaskRow({ task, onToggle, onAddSubtask }: TaskRowProps) {
         <MaterialIcons
           name={task.is_completed ? "check-circle" : "radio-button-unchecked"}
           size={24}
-          className={task.is_completed ? "text-primary" : "text-muted-foreground"}
+          color={task.is_completed ? "var(--color-primary)" : "var(--color-on-surface-variant)"}
         />
       </TouchableOpacity>
 

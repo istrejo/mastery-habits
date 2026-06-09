@@ -6,18 +6,23 @@ import {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useThemeColors } from "../../../core/theme/useThemeColors";
 import type { Database } from "../../../shared/types/database.types";
 
 type TaskFrequency = Database["public"]["Enums"]["task_frequency"];
 
-export interface CreateTaskInput {
-  title: string;
-  due_date: string;
-  frequency: TaskFrequency;
-  custom_days?: number[];
-  subtasks: { title: string }[];
-}
+const createTaskSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  due_date: z.string(),
+  frequency: z.enum(["once", "daily", "weekly", "custom"]).default("once"),
+  custom_days: z.array(z.number().min(1).max(7)).optional(),
+  subtasks: z.array(z.object({ title: z.string().min(1) })).default([]),
+});
+
+export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 
 export interface CreateTaskSheetRef {
   present: () => void;
@@ -25,7 +30,7 @@ export interface CreateTaskSheetRef {
 
 interface CreateTaskSheetProps {
   defaultDate: string;
-  onSubmit: (data: CreateTaskInput) => void;
+  onSubmit: (data: CreateTaskInput) => Promise<void> | void;
   onClose: () => void;
   ref?: React.Ref<CreateTaskSheetRef>;
 }
@@ -45,14 +50,26 @@ export function CreateTaskSheet({
   ref,
 }: CreateTaskSheetProps) {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const themeColors = useThemeColors();
 
   useImperativeHandle(ref, () => ({
     present: () => {
+      setSubmitError(null);
       bottomSheetRef.current?.present();
     },
   }));
 
-  const { control, handleSubmit, watch, setValue, formState } = useForm<CreateTaskInput>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isValid },
+    reset,
+  } = useForm<CreateTaskInput>({
+    resolver: zodResolver(createTaskSchema),
     defaultValues: {
       title: "",
       due_date: defaultDate,
@@ -60,7 +77,7 @@ export function CreateTaskSheet({
       custom_days: [],
       subtasks: [],
     },
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -77,17 +94,29 @@ export function CreateTaskSheet({
       const next = current.includes(day)
         ? current.filter((d) => d !== day)
         : [...current, day].sort();
-      setValue("custom_days", next, { shouldValidate: false });
+      setValue("custom_days", next, { shouldValidate: true });
     },
     [setValue, watch],
   );
 
   const handleSave = useCallback(
-    (data: CreateTaskInput) => {
-      onSubmit(data);
-      bottomSheetRef.current?.dismiss();
+    async (data: CreateTaskInput) => {
+      setIsSubmitting(true);
+      setSubmitError(null);
+      try {
+        await onSubmit(data);
+        bottomSheetRef.current?.dismiss();
+        reset();
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to create task";
+        setSubmitError(message);
+        // Sheet stays open on error
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [onSubmit],
+    [onSubmit, reset],
   );
 
   return (
@@ -99,28 +128,30 @@ export function CreateTaskSheet({
     >
       <BottomSheetView className="px-6 py-4">
         {/* Title */}
-        <Text className="text-lg font-semibold text-foreground mb-4">
-          Create Task
+        <Text className="text-lg font-semibold text-on-surface mb-4">
+          New Task
         </Text>
 
         {/* Title Input */}
         <Controller
           control={control}
           name="title"
-          rules={{ required: true, minLength: 1 }}
-          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
             <View className="mb-4">
               <BottomSheetTextInput
                 placeholder="Task title"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                className="bg-muted rounded-lg px-4 py-3 text-foreground text-base"
-                placeholderTextColor="#9CA3AF"
+                className="bg-surface-container rounded-lg px-4 py-3 text-on-surface text-base"
+                placeholderTextColor={themeColors['--color-on-surface-variant']}
               />
               {error && (
-                <Text className="text-destructive text-xs mt-1">
-                  Title is required
+                <Text className="text-error text-xs mt-1">
+                  {error.message || "Title is required"}
                 </Text>
               )}
             </View>
@@ -129,12 +160,18 @@ export function CreateTaskSheet({
 
         {/* Due Date (display only) */}
         <View className="flex-row items-center gap-2 mb-4">
-          <MaterialIcons name="calendar-today" size={18} color="#9CA3AF" />
-          <Text className="text-muted-foreground text-sm">{defaultDate}</Text>
+          <MaterialIcons
+            name="calendar-today"
+            size={18}
+            color={themeColors['--color-on-surface-variant']}
+          />
+          <Text className="text-on-surface-variant text-sm">{defaultDate}</Text>
         </View>
 
         {/* Frequency Selector */}
-        <Text className="text-sm font-medium text-foreground mb-2">Frequency</Text>
+        <Text className="text-sm font-medium text-on-surface mb-2">
+          Repeat Frequency
+        </Text>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {FREQUENCY_OPTIONS.map((opt) => {
             const isSelected = frequency === opt.value;
@@ -142,10 +179,10 @@ export function CreateTaskSheet({
               <TouchableOpacity
                 key={opt.value}
                 onPress={() =>
-                  setValue("frequency", opt.value, { shouldValidate: false })
+                  setValue("frequency", opt.value, { shouldValidate: true })
                 }
                 className={`px-3 py-1.5 rounded-full ${
-                  isSelected ? "bg-primary" : "bg-muted"
+                  isSelected ? "bg-primary" : "bg-surface-container"
                 }`}
                 accessibilityRole="button"
                 accessibilityLabel={`Frequency ${opt.label}`}
@@ -153,7 +190,7 @@ export function CreateTaskSheet({
               >
                 <Text
                   className={`text-sm font-medium ${
-                    isSelected ? "text-primary-foreground" : "text-muted-foreground"
+                    isSelected ? "text-on-primary" : "text-on-surface-variant"
                   }`}
                 >
                   {opt.label}
@@ -166,8 +203,8 @@ export function CreateTaskSheet({
         {/* Custom Days Selector */}
         {frequency === "custom" && (
           <View className="mb-4">
-            <Text className="text-sm font-medium text-foreground mb-2">
-              Select days
+            <Text className="text-sm font-medium text-on-surface mb-2">
+              Custom Days
             </Text>
             <View className="flex-row gap-2">
               {DAY_LABELS.map((label, i) => {
@@ -178,7 +215,7 @@ export function CreateTaskSheet({
                     key={dayNum}
                     onPress={() => toggleCustomDay(dayNum)}
                     className={`w-9 h-9 rounded-full items-center justify-center ${
-                      isSelected ? "bg-primary" : "bg-muted"
+                      isSelected ? "bg-primary" : "bg-surface-container"
                     }`}
                     accessibilityRole="button"
                     accessibilityLabel={`Day ${label}`}
@@ -186,9 +223,7 @@ export function CreateTaskSheet({
                   >
                     <Text
                       className={`text-sm font-medium ${
-                        isSelected
-                          ? "text-primary-foreground"
-                          : "text-muted-foreground"
+                        isSelected ? "text-on-primary" : "text-on-surface-variant"
                       }`}
                     >
                       {label}
@@ -202,7 +237,7 @@ export function CreateTaskSheet({
 
         {/* Subtasks */}
         <View className="mb-4">
-          <Text className="text-sm font-medium text-foreground mb-2">
+          <Text className="text-sm font-medium text-on-surface mb-2">
             Subtasks
           </Text>
           {fields.map((field, index) => (
@@ -210,23 +245,36 @@ export function CreateTaskSheet({
               <Controller
                 control={control}
                 name={`subtasks.${index}.title`}
-                rules={{ required: true, minLength: 1 }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <BottomSheetTextInput
-                    placeholder="Subtask title"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    className="flex-1 bg-muted rounded-lg px-3 py-2 text-foreground text-sm"
-                    placeholderTextColor="#9CA3AF"
-                  />
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <View className="flex-1">
+                    <BottomSheetTextInput
+                      placeholder="Subtask title"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      className="bg-surface-container rounded-lg px-3 py-2 text-on-surface text-sm"
+                placeholderTextColor={themeColors['--color-on-surface-variant']}
+                    />
+                    {error && (
+                      <Text className="text-error text-xs mt-1">
+                        {error.message}
+                      </Text>
+                    )}
+                  </View>
                 )}
               />
               <TouchableOpacity
                 onPress={() => remove(index)}
                 accessibilityLabel="Remove subtask"
               >
-                <MaterialIcons name="close" size={20} color="#9CA3AF" />
+                <MaterialIcons
+                  name="close"
+                  size={20}
+                  color={themeColors['--color-on-surface-variant']}
+                />
               </TouchableOpacity>
             </View>
           ))}
@@ -235,25 +283,36 @@ export function CreateTaskSheet({
             className="flex-row items-center gap-1 mt-1"
             accessibilityRole="button"
           >
-            <MaterialIcons name="add" size={18} color="#3B82F6" />
+            <MaterialIcons name="add" size={18} color={themeColors['--color-primary']} />
             <Text className="text-primary text-sm font-medium">
-              + Add subtask
+              Add subtask
             </Text>
           </TouchableOpacity>
         </View>
 
+        {/* Error message */}
+        {submitError && (
+          <Text className="text-error text-sm mb-3">{submitError}</Text>
+        )}
+
         {/* Save Button */}
         <TouchableOpacity
           onPress={handleSubmit(handleSave)}
-          disabled={!formState.isValid && formState.submitCount > 0}
+          disabled={!isValid || isSubmitting}
           className={`py-3 rounded-lg items-center ${
-            formState.isValid || formState.submitCount === 0 ? "bg-primary" : "bg-muted"
+            isValid && !isSubmitting ? "bg-primary" : "bg-surface-container"
           }`}
           accessibilityRole="button"
           accessibilityLabel="Save task"
         >
-          <Text className="text-base font-semibold text-primary-foreground">
-            Save
+          <Text
+            className={`text-base font-semibold ${
+              isValid && !isSubmitting
+                ? "text-on-primary"
+                : "text-on-surface-variant"
+            }`}
+          >
+            {isSubmitting ? "Saving..." : "Save"}
           </Text>
         </TouchableOpacity>
       </BottomSheetView>

@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useThemeColors } from "../../core/theme/useThemeColors";
 
 type Variant = "primary" | "secondary" | "ghost" | "dark";
 
@@ -11,36 +12,39 @@ interface ButtonProps {
   icon?: React.ReactNode;
 }
 
-const variantClasses: Record<Variant, { container: string; text: string }> = {
-  primary: {
-    container: "bg-primary rounded px-6 py-3 items-center active:opacity-80",
-    text: "text-on-primary font-semibold text-label-md uppercase tracking-widest",
-  },
-  secondary: {
-    container: "bg-transparent border border-outline rounded px-6 py-3 items-center active:opacity-80",
-    text: "text-on-surface font-semibold text-label-md uppercase tracking-widest",
-  },
-  ghost: {
-    container: "bg-transparent px-6 py-3 items-center active:opacity-60",
-    text: "text-primary font-semibold text-label-md",
-  },
-  dark: {
-    container: "bg-black rounded px-6 py-3 items-center active:opacity-80",
-    text: "text-white font-semibold text-label-md uppercase tracking-widest",
-  },
+const TEXT_CLASSES: Record<Variant, string> = {
+  primary: "text-on-primary font-semibold text-label-md uppercase tracking-widest",
+  secondary: "text-on-surface font-semibold text-label-md uppercase tracking-widest",
+  ghost: "text-primary font-semibold text-label-md",
+  dark: "text-white font-semibold text-label-md uppercase tracking-widest",
+};
+
+const CONTAINER_CLASSES: Record<Variant, string> = {
+  primary: "rounded px-6 py-3 items-center active:opacity-80",
+  secondary: "rounded px-6 py-3 items-center active:opacity-80 border border-outline",
+  ghost: "px-6 py-3 items-center active:opacity-60",
+  dark: "rounded px-6 py-3 items-center active:opacity-80",
 };
 
 export function Button({ label, onPress, variant = "primary", disabled = false, fullWidth = false, icon }: ButtonProps) {
-  const classes = variantClasses[variant];
+  const themeColors = useThemeColors();
+  const backgroundColor =
+    variant === "primary"
+      ? themeColors["--color-primary"]
+      : variant === "dark"
+        ? "#000000"
+        : "transparent";
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className={`${classes.container} ${fullWidth ? "w-full" : ""} ${disabled ? "opacity-50" : ""}`}
+      style={{ backgroundColor }}
+      className={`${CONTAINER_CLASSES[variant]} ${fullWidth ? "w-full" : ""} ${disabled ? "opacity-50" : ""}`}
     >
       <View className="flex-row items-center gap-sm">
         {icon}
-        <Text className={classes.text}>{label}</Text>
+        <Text className={TEXT_CLASSES[variant]}>{label}</Text>
       </View>
     </Pressable>
   );
