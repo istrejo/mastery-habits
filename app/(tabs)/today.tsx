@@ -1,7 +1,6 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useAuthStore } from "../../src/features/auth/useAuthStore";
 import { useHabitsQuery } from "../../src/features/habits/hooks/useHabitsQuery";
 import { useToggleHabit } from "../../src/features/habits/hooks/useToggleHabit";
@@ -22,8 +21,7 @@ export default function TodayScreen() {
   const { session } = useAuthStore();
   const userId = session?.user?.id ?? "";
   const insets = useSafeAreaInsets();
-  const sheetRef = useRef<BottomSheetModal>(null);
-
+  const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedDate, setSelectedDate] = useState(todayString);
 
   const { habitsWithCompletion, isLoading: habitsLoading } = useHabitsQuery(
@@ -76,7 +74,7 @@ export default function TodayScreen() {
             tasks={tasks}
             togglingIds={togglingIds}
             onToggle={handleToggleTask}
-            onAddTask={() => sheetRef.current?.present()}
+            onAddTask={() => setShowCreateTask(true)}
             isLoading={tasksLoading}
             userId={userId}
             date={selectedDate}
@@ -89,7 +87,8 @@ export default function TodayScreen() {
       </View>
 
       <CreateTaskSheet
-        sheetRef={sheetRef}
+        visible={showCreateTask}
+        onClose={() => setShowCreateTask(false)}
         defaultDate={selectedDate}
         userId={userId}
         onSuccess={() => {}}
