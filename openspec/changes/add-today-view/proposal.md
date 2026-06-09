@@ -10,14 +10,14 @@ Replace the placeholder `today.tsx` with a functional Today View: habits, tasks,
 - Week strip date selector driving habits/tasks queries
 - Habits chips + toggle (`habits` + `habit_logs`; streak recompute)
 - Tasks + sub-tasks (`tasks` with new `parent_id` self-reference)
-- Create Task bottom sheet (`@gorhom/bottom-sheet`, react-hook-form, zod)
+- Create Task bottom sheet (`@gorhom/bottom-sheet`, react-hook-form, zod) — includes frequency selector (Daily, Weekly, Specific day, Custom days)
 - Floating pomodoro pill (reads `usePomodoroStore`)
 - Custom bottom tab bar
 - Schedule events — mock data only
-- DB migration: `add_tasks_parent_id`
+- DB migration: `add_tasks_parent_id` + `add_tasks_frequency`
 
 ### Out of Scope
-- Task recurrence / frequency
+- Priority selector on tasks (deferred per design review)
 - Real Google Calendar integration
 - Pomodoro session history persistence
 - Habit creation/editing UI
@@ -67,7 +67,7 @@ TanStack Query owns all server-synced data. Week strip date is local state passe
 ## Dependencies
 
 - Install `@gorhom/bottom-sheet`, `react-native-gesture-handler`, `react-native-reanimated`
-- Run DB migration: `add_tasks_parent_id`
+- Run DB migrations: `add_tasks_parent_id`, `add_tasks_frequency`
 - Reconcile `src/features/habits/useHabitsStore.ts` with DB types
 
 ## Success Criteria
