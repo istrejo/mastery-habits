@@ -2,7 +2,6 @@ import "../global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { supabase } from "../src/core/api/supabase";
 import { useAuthStore } from "../src/features/auth/useAuthStore";
 import { ThemeProvider } from "../src/core/theme/ThemeProvider";
@@ -52,13 +51,11 @@ function AuthGuard() {
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-          <AuthGuard />
-        </ThemeProvider>
-      </QueryClientProvider>
-    </GestureHandlerRootView>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+        <AuthGuard />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

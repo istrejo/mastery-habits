@@ -33,8 +33,8 @@ interface Props {
 function PlaceholderRow() {
   return (
     <View className="flex-row items-center gap-3 py-3">
-      <View className="w-6 h-6 rounded-sm bg-surface-variant animate-pulse" />
-      <View className="flex-1 h-4 rounded bg-surface-variant animate-pulse" />
+      <View className="w-6 h-6 rounded-sm bg-surface-variant opacity-50" />
+      <View className="flex-1 h-4 rounded bg-surface-variant opacity-50" />
     </View>
   );
 }
