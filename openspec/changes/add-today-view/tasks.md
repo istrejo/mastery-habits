@@ -162,38 +162,38 @@ Chain strategy: pending
 ## PR 4 — Screen Assembly & Polish (~200 lines)
 
 ### 4.1 Create `src/features/schedule/mockSchedule.ts` + `ScheduleSection.tsx`
-- [ ] `getMockSchedule()` returns deterministic `ScheduleEvent[]` per date
-- [ ] `ScheduleSection`: collapsible mock events (icon, title, time, subtitle)
+- [x] `getMockSchedule()` returns deterministic `ScheduleEvent[]` per date
+- [x] `ScheduleSection`: collapsible mock events (icon, title, time, subtitle)
 - **Estimated**: 40 lines
 - **TDD checkpoint**: `src/features/schedule/mockSchedule.test.ts` must exist BEFORE implementation
 - **Depends on**: None (self-contained)
 
 ### 4.2 Create `WeekStrip.tsx`
-- [ ] Mon–Fri strip; today selected by default; `onSelectDate` callback
+- [x] Mon–Fri strip; today selected by default; `onSelectDate` callback
 - **Estimated**: 35 lines
-- **TDD checkpoint**: `src/features/schedule/WeekStrip.test.tsx` must exist BEFORE implementation
+- **TDD checkpoint**: `src/shared/ui/WeekStrip.test.tsx` must exist BEFORE implementation
 - **Depends on**: PR 1 (1.4 date utils)
 
 ### 4.3 Create `PomodoroPill.tsx`
-- [ ] Floating pill reading `usePomodoroStore` (default `25:00`); tap navigates to Pomodoro tab
+- [x] Floating pill reading `usePomodoroStore` (default `25:00`); tap navigates to Pomodoro tab
 - **Estimated**: 20 lines
-- **TDD checkpoint**: `src/features/pomodoro/PomodoroPill.test.tsx` must exist BEFORE implementation
+- **TDD checkpoint**: `src/features/pomodoro/components/PomodoroPill.test.tsx` must exist BEFORE implementation
 - **Depends on**: None (reads existing store)
 
 ### 4.4 Build `app/(tabs)/today.tsx` container
-- [ ] `selectedDate` state; wire all Query hooks; mount full component tree (WeekStrip, HabitsSection, TasksSection, ScheduleSection, CreateTaskSheet, PomodoroPill)
+- [x] `selectedDate` state; wire all Query hooks; mount full component tree (WeekStrip, HabitsSection, TasksSection, ScheduleSection, CreateTaskSheet, PomodoroPill)
 - **Estimated**: 60 lines
 - **TDD checkpoint**: None — integration screen, manual test
 - **Depends on**: PR 2 (2.5), PR 3 (3.4, 3.5), PR 4 (4.1, 4.2, 4.3)
 
 ### 4.5 Implement collapsible section behavior + accessibility + safe-area
-- [ ] Chevron toggle on all sections; `accessibilityRole` + `accessibilityLabel` on all interactive elements; checkboxes expose checked state; safe-area padding
+- [x] Chevron toggle on all sections; `accessibilityRole` + `accessibilityLabel` on all interactive elements; checkboxes expose checked state; safe-area padding
 - **Estimated**: 25 lines
 - **TDD checkpoint**: None — accessibility via inspector
 - **Depends on**: PR 4 (4.4)
 
 ### 4.6 Run `react-doctor` and fix findings
-- [ ] `npm run doctor` → fix all warnings/errors
+- [x] `npm run doctor` → fix all warnings/errors in PR 4 files
 - **Estimated**: 15 lines
 - **TDD checkpoint**: None — tooling pass
 
