@@ -6,6 +6,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   'Email not verified': 'Please verify your email before signing in',
   'User already registered': 'An account with this email already exists',
   'Email address already registered': 'An account with this email already exists',
+  'Database error saving new user': 'This email is already registered. Please sign in with your email and password.',
   'User not found': 'No account found with this email',
   'Password should be at least 6 characters': 'Password must be at least 6 characters',
   'New password should be different from the old password': 'Your new password must be different from your current password',
@@ -45,6 +46,11 @@ export function getAuthErrorMessage(error: AuthError | null): string | null {
   // Network errors
   if (lower.includes('network') || lower.includes('fetch') || lower.includes('connection')) {
     return 'Network error. Please check your connection and try again.';
+  }
+
+  // Database/server errors (e.g. trigger failure on social sign-in)
+  if (lower.includes('database error')) {
+    return 'This email is already registered. Please sign in with your email and password.';
   }
 
   // Fallback: return original message if we don't have a mapping

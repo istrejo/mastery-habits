@@ -1,28 +1,32 @@
 import { useEffect } from 'react';
 import { Linking } from 'react-native';
 import { authService } from '../services/authService';
+import { supabase } from '../../../core/api/supabase';
 
 /**
- * Listens for OAuth deep-link callbacks and exchanges the authorization
- * code for a Supabase session.
+ * Listens for OAuth deep-link callbacks on cold-start and exchanges the
+ * authorization code for a Supabase session.
  *
- * Place this hook in any auth screen that may receive an OAuth redirect
- * (e.g. login, signup).
+ * Guards against double-exchange: signInWithGoogle already handles the PKCE
+ * exchange inline when the app is in the foreground. This hook only runs when
+ * no session exists yet (i.e. cold-start after a redirect).
  */
 export function useOAuthCallback() {
   useEffect(() => {
     const handleUrl = async ({ url }: { url: string }) => {
-      // Extract ?code=... from the deep link URL
       const match = url.match(/[?&]code=([^&]+)/);
       const code = match?.[1] ? decodeURIComponent(match[1]) : null;
 
-      if (code) {
-        try {
-          await authService.exchangeCodeForSession(code);
-        } catch {
-          // The caller should observe onAuthStateChange for session updates.
-          // Errors here are typically handled by the auth guard or UI state.
-        }
+      if (!code) return;
+
+      // Skip if a session is already active — signInWithGoogle handled it inline
+      const { data } = await supabase.auth.getSession();
+      if (data.session) return;
+
+      try {
+        await authService.exchangeCodeForSession(code);
+      } catch (err) {
+        console.error('[useOAuthCallback] code exchange failed:', err);
       }
     };
 
