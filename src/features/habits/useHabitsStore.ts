@@ -1,43 +1,28 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { mmkvStorage } from "../../core/storage/mmkvAdapter";
+import { Database } from "../../shared/types/database.types";
 
-export interface Habit {
-  id: string;
-  name: string;
-  description?: string;
-  frequency: "daily" | "weekly";
-  targetDays: number[];
-  score: number;
-  createdAt: string;
-}
+export type Habit = Database["public"]["Tables"]["habits"]["Row"];
+export type HabitLog = Database["public"]["Tables"]["habit_logs"]["Row"];
 
 interface HabitsState {
-  habits: Habit[];
-  setHabits: (habits: Habit[]) => void;
-  addHabit: (habit: Habit) => void;
-  updateHabit: (id: string, updates: Partial<Habit>) => void;
-  removeHabit: (id: string) => void;
+  /** Habit IDs currently being toggled (optimistic UI) */
+  pendingToggles: Set<string>;
+  addPendingToggle: (habitId: string) => void;
+  removePendingToggle: (habitId: string) => void;
   reset: () => void;
 }
 
-export const useHabitsStore = create<HabitsState>()(
-  persist(
-    (set) => ({
-      habits: [],
-      setHabits: (habits) => set({ habits }),
-      addHabit: (habit) => set((state) => ({ habits: [...state.habits, habit] })),
-      updateHabit: (id, updates) =>
-        set((state) => ({
-          habits: state.habits.map((h) => (h.id === id ? { ...h, ...updates } : h)),
-        })),
-      removeHabit: (id) =>
-        set((state) => ({ habits: state.habits.filter((h) => h.id !== id) })),
-      reset: () => set({ habits: [] }),
+export const useHabitsStore = create<HabitsState>()((set) => ({
+  pendingToggles: new Set<string>(),
+  addPendingToggle: (habitId) =>
+    set((state) => ({
+      pendingToggles: new Set(state.pendingToggles).add(habitId),
+    })),
+  removePendingToggle: (habitId) =>
+    set((state) => {
+      const next = new Set(state.pendingToggles);
+      next.delete(habitId);
+      return { pendingToggles: next };
     }),
-    {
-      name: "habits-store",
-      storage: createJSONStorage(() => mmkvStorage),
-    }
-  )
-);
+  reset: () => set({ pendingToggles: new Set<string>() }),
+}));
